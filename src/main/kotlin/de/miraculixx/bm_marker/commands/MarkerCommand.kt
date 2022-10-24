@@ -81,9 +81,9 @@ class MarkerCommand {
             runs {
                 if (!builder.contains(sender.textName)) noMarkerBuilder(sender)
                 else {
-                    val builder = builder[sender.textName]
-                    val worldName = builder?.args?.get(MarkerArg.WORLD)
-                    val markerID = builder?.args?.get(MarkerArg.ID)
+                    val build = builder[sender.textName]
+                    val worldName = build?.args?.get(MarkerArg.WORLD)?.getString()
+                    val markerID = build?.args?.get(MarkerArg.ID)?.getString()
                     val bukkitSender = sender.bukkitSender
                     if (worldName == null || markerID == null) {
                         bukkitSender.sendMessage(prefix + cmp("Please provide a marker ID and a target world!", cError))
@@ -91,7 +91,7 @@ class MarkerCommand {
                     }
 
                     val marker = try {
-                        builder.buildMarker()
+                        build.buildMarker()
                     } catch (e: Exception) {
                         bukkitSender.sendMessage(prefix + cmp("An unexpected error occurred! Please validate your arguments with ", cError) + literalText {
                             val cmd = "/$setupCommandPrefix"
@@ -110,7 +110,8 @@ class MarkerCommand {
                         } + cmp(" to see more information", cError))
                         return@runs
                     }
-                    MarkerManager.addMarker(worldName.toString(), marker, markerID.toString())
+                    MarkerManager.addMarker(worldName, marker, markerID)
+                    builder.remove(sender.textName)
 
                     bukkitSender.sendMessage(prefix + cmp("Marker created! It should appear on your BlueMap in a few seconds"))
                 }
@@ -404,15 +405,22 @@ class MarkerCommand {
             })
         }
         bukkitSender.sendMessage(
-            cmp("                 ", cHighlight, strikethrough = true) + cmp("[ ", cHighlight) + literalText {
-                component(cmp("BUILD", cSuccess, bold = true))
-                clickEvent = ClickEvent.runCommand("/bmarker build")
-                hoverEvent = HoverEvent.showText(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!"))
-            } + cmp(" | ") + literalText {
-                component(cmp("CANCEL", cError, bold = true))
-                clickEvent = ClickEvent.runCommand("/bmarker cancel")
-                hoverEvent = HoverEvent.showText(cmp("Cancel the current marker builder.\nThis will delete all your values!"))
-            } + cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
+            cmp("                 ", cHighlight, strikethrough = true) + cmp("[ ", cHighlight, strikethrough = false) +
+                    literalText("BUILD") {
+                        color = cSuccess
+                        bold = true
+                        strikethrough = false
+                        clickEvent = ClickEvent.runCommand("/bmarker build")
+                        hoverEvent = HoverEvent.showText(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!"))
+                    } +
+                    cmp(" | ") +
+                    literalText("CANCEL") {
+                        color = cError
+                        bold = true
+                        strikethrough = false
+                        clickEvent = ClickEvent.runCommand("/bmarker cancel")
+                        hoverEvent = HoverEvent.showText(cmp("Cancel the current marker builder.\nThis will delete all your values!"))
+                    } + cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
         )
     }
 

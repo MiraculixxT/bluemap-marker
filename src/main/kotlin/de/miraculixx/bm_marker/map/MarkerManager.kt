@@ -40,6 +40,7 @@ object MarkerManager {
         val folder = prepareConfigFolder()
         worlds.forEach { world ->
             val worldName = world.key.key
+            println(worldName)
             val markerFile = File("${folder.path}/${worldName}.json")
             val set = if (markerFile.exists()) {
                 logger.info("Found markers for world '$worldName' - Loading ${markerFile.length() / 1000.0}kb")

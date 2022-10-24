@@ -49,10 +49,6 @@ class MarkerCommand {
                         } + cmp(" it before creating a new one", cError))
                     } else {
                         val type = getArgument<String>("type")
-                        val supported = when (type) {
-                            "poi" -> "position, label, anchor, min-distance, max-distance"
-                            else -> "unknown"
-                        }
 
                         val markerType = enumOf<MarkerType>(type.uppercase())
                         if (markerType == null) {
@@ -76,7 +72,7 @@ class MarkerCommand {
                             clickEvent = ClickEvent.runCommand("/bmarker build")
                             hoverEvent = HoverEvent.showText(cmp("/bmarker build"))
                         })
-                        sender.bukkitSender.sendMessage(prefix + cmp("Supported values: ") + cmp(supported, cMark))
+                        sendStatusInfo(sender)
                     }
                 }
             }
@@ -371,7 +367,7 @@ class MarkerCommand {
         val nothingSet = cmp("Not Set", italic = true)
         val dash = cmp("- ")
         val midDash = cmp(" ≫ ", NamedTextColor.DARK_GRAY)
-        bukkitSender.sendMessage(prefix + cmp("Your current setup state (${type.name})"))
+        bukkitSender.sendMessage(cmp(" \n") + prefix + cmp("Your current setup state (${type.name})"))
         type.args.forEach { arg ->
             // List values displayed in a different way than single values
             if (arg == MarkerArg.ADD_DIRECTION || arg == MarkerArg.ADD_EDGE) {
@@ -407,6 +403,17 @@ class MarkerCommand {
                 clickEvent = ClickEvent.suggestCommand("/$setupCommandPrefix ${arg.name.lowercase()} ")
             })
         }
+        bukkitSender.sendMessage(
+            cmp("                 ", cHighlight, strikethrough = true) + cmp("[ ", cHighlight) + literalText {
+                component(cmp("BUILD", cSuccess, bold = true))
+                clickEvent = ClickEvent.runCommand("/bmarker build")
+                hoverEvent = HoverEvent.showText(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!"))
+            } + cmp(" | ") + literalText {
+                component(cmp("CANCEL", cError, bold = true))
+                clickEvent = ClickEvent.runCommand("/bmarker cancel")
+                hoverEvent = HoverEvent.showText(cmp("Cancel the current marker builder.\nThis will delete all your values!"))
+            } + cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
+        )
     }
 
     private fun sendAppliedSuccess(sender: CommandSourceStack, message: String) {

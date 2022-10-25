@@ -32,8 +32,9 @@ import net.minecraft.sounds.SoundEvents
 class MarkerCommand {
     private val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
     private val setupCommandPrefix = "bmarker-setup"
+    private val mainCommandPrefix = "bmarker"
 
-    val mainCommand = command("bmarker") {
+    val mainCommand = command(mainCommandPrefix) {
         literal("create") {
             argument<String>("type", StringArgumentType.word()) {
                 suggestList { listOf("poi", "line", "shape", "extrude") }
@@ -41,12 +42,12 @@ class MarkerCommand {
                     if (builder.contains(sender.textName)) {
                         sender.bukkitSender.sendMessage(prefix + cmp("You already started a marker setup! ", cError) + literalText {
                             component(cmp("Cancel", cError, underlined = true))
-                            clickEvent = ClickEvent.runCommand("/bmarker cancel")
-                            hoverEvent = HoverEvent.showText(cmp("/bmarker cancel"))
+                            clickEvent = ClickEvent.runCommand("/$setupCommandPrefix cancel")
+                            hoverEvent = HoverEvent.showText(cmp("/$setupCommandPrefix cancel"))
                         } + cmp(" or ", cError) + literalText {
                             component(cmp("build", cError, underlined = true))
-                            clickEvent = ClickEvent.runCommand("/bmarker build")
-                            hoverEvent = HoverEvent.showText(cmp("/bmarker build"))
+                            clickEvent = ClickEvent.runCommand("/$setupCommandPrefix build")
+                            hoverEvent = HoverEvent.showText(cmp("/$setupCommandPrefix build"))
                         } + cmp(" it before creating a new one", cError))
                     } else {
                         val type = getArgument<String>("type")
@@ -65,19 +66,40 @@ class MarkerCommand {
                         builder[sender.textName] = MarkerBuilder(markerType)
                         broadcast(sender.textName)
                         sender.bukkitSender.sendMessage(prefix + cmp("Marker setup started! Modify values using ") + literalText {
-                            component(cmp("/bmarker-setup", cMark, underlined = true))
-                            clickEvent = ClickEvent.suggestCommand("/bmarker-setup ")
-                            hoverEvent = HoverEvent.showText(cmp("Use /bmarker-setup <arg> <value>"))
+                            component(cmp("/$setupCommandPrefix", cMark, underlined = true))
+                            clickEvent = ClickEvent.suggestCommand("/$setupCommandPrefix ")
+                            hoverEvent = HoverEvent.showText(cmp("Use /$setupCommandPrefix <arg> <value>"))
                         } + cmp(" and finish your setup with ") + literalText {
-                            component(cmp("/bmarker build", cMark, underlined = true))
-                            clickEvent = ClickEvent.runCommand("/bmarker build")
-                            hoverEvent = HoverEvent.showText(cmp("/bmarker build"))
+                            component(cmp("/$setupCommandPrefix build", cMark, underlined = true))
+                            clickEvent = ClickEvent.runCommand("/$setupCommandPrefix build")
+                            hoverEvent = HoverEvent.showText(cmp("/$setupCommandPrefix build"))
                         })
                         sendStatusInfo(sender)
                     }
                 }
             }
         }
+        literal("delete") {
+            argument<ResourceLocation>("world", DimensionArgument()) {
+                argument<String>("marker-id", StringArgumentType.word()) {
+                    suggestList { ctx -> MarkerManager.getAllMarkers(worldName = ctx.getArgument<ResourceLocation>("world").path).keys }
+                    runs {
+                        val world = getArgument<ResourceLocation>("world").path
+                        val markerID = getArgument<String>("marker-id")
+                        MarkerManager.removeMarker(world, markerID)
+                        sender.bukkitSender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(markerID, cMark) + cmp(" marker! It should disappear from your BlueMap in a few seconds"))
+                    }
+                }
+            }
+        }
+    }
+
+    val enterCommand = command(setupCommandPrefix) {
+        runs {
+            sendStatusInfo(sender)
+        }
+
+        // SETUP COMMANDS
         literal("build") {
             runs {
                 if (!builder.contains(sender.textName)) noMarkerBuilder(sender)
@@ -105,9 +127,9 @@ class MarkerCommand {
                     }
                     if (marker == null) {
                         bukkitSender.sendMessage(prefix + cmp("A required option is not set! Type ", cError) + literalText {
-                            component(cmp("/bmarker-setup", cError, underlined = true))
-                            clickEvent = ClickEvent.runCommand("/bmarker-setup")
-                            hoverEvent = HoverEvent.showText(cmp("/bmarker-setup"))
+                            component(cmp("/$setupCommandPrefix", cError, underlined = true))
+                            clickEvent = ClickEvent.runCommand("/$setupCommandPrefix")
+                            hoverEvent = HoverEvent.showText(cmp("/$setupCommandPrefix"))
                         } + cmp(" to see more information", cError))
                         return@runs
                     }
@@ -118,31 +140,11 @@ class MarkerCommand {
                 }
             }
         }
-        literal("delete") {
-            argument<ResourceLocation>("world", DimensionArgument()) {
-                argument<String>("marker-id", StringArgumentType.word()) {
-                    suggestList { ctx -> MarkerManager.getAllMarkers(worldName = ctx.getArgument<ResourceLocation>("world").path).keys }
-                    runs {
-                        val world = getArgument<ResourceLocation>("world").path
-                        val markerID = getArgument<String>("marker-id")
-                        MarkerManager.removeMarker(world, markerID)
-                        sender.bukkitSender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(markerID, cMark) + cmp(" marker! It should disappear from your BlueMap in a few seconds"))
-                    }
-                }
-            }
-        }
         literal("cancel") {
             runs {
                 if (builder.remove(sender.textName) == null) noMarkerBuilder(sender)
                 else sender.bukkitSender.sendMessage(prefix + cmp("Canceled current marker setup!"))
             }
-        }
-
-    }
-
-    val enterCommand = command(setupCommandPrefix) {
-        runs {
-            sendStatusInfo(sender)
         }
 
         // Single String / URL
@@ -411,7 +413,7 @@ class MarkerCommand {
                         color = cSuccess
                         bold = true
                         strikethrough = false
-                        clickEvent = ClickEvent.runCommand("/bmarker build")
+                        clickEvent = ClickEvent.runCommand("/$setupCommandPrefix build")
                         hoverEvent = HoverEvent.showText(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!"))
                     } +
                     cmp(" | ") +
@@ -419,7 +421,7 @@ class MarkerCommand {
                         color = cError
                         bold = true
                         strikethrough = false
-                        clickEvent = ClickEvent.runCommand("/bmarker cancel")
+                        clickEvent = ClickEvent.runCommand("/$setupCommandPrefix cancel")
                         hoverEvent = HoverEvent.showText(cmp("Cancel the current marker builder.\nThis will delete all your values!"))
                     } + cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
         )

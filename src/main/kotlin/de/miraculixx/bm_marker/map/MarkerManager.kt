@@ -7,6 +7,7 @@ import de.bluecolored.bluemap.api.markers.Marker
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bm_marker.PluginManager
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.axay.kspigot.extensions.bukkit.warn
 import net.axay.kspigot.extensions.console
@@ -114,10 +115,8 @@ object MarkerManager {
         val logger = PluginManager.logger
         val folder = prepareConfigFolder()
         val file = File("${folder.path}/marker-sets.json")
-        if (!file.exists()) {
-            file.mkdir()
-            file.writeText("{}")
-        }
+        if (!file.exists()) file.writeText("[]")
+
         val setIDs = Json.decodeFromString<List<String>>(file.readText())
         setIDs.forEach { setID ->
             val data = setID.split('_')
@@ -157,6 +156,8 @@ object MarkerManager {
     fun saveAllMarker() {
         val gson = MarkerGson.INSTANCE
         val folder = prepareConfigFolder()
+        val sets = File("${folder.path}/marker-sets.json")
+        sets.writeText(Json.encodeToString(markerSets.keys))
         markerSets.forEach { (id, set) ->
             val file = File("${folder.path}/$id.json")
             file.writeText(gson.toJson(set))

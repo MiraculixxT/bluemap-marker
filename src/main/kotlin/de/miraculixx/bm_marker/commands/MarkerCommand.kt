@@ -18,6 +18,7 @@ import de.miraculixx.bm_marker.utils.enums.MarkerType
 import de.miraculixx.bm_marker.utils.message.*
 import net.axay.kspigot.chat.literalText
 import net.axay.kspigot.commands.*
+import net.axay.kspigot.extensions.broadcast
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -112,7 +113,6 @@ class MarkerCommand {
                         hoverEvent = HoverEvent.showText(cmp("/$setupSetCommandPrefix build"))
                     } + cmp(" it before creating a new one", cError))
                 } else {
-
                     builderSet[sender.textName] = MarkerSetBuilder()
                     sender.bukkitSender.sendMessage(prefix + cmp("Marker-Set setup started! Modify values using ") + literalText {
                         component(cmp("/$setupSetCommandPrefix", cMark, underlined = true))
@@ -458,7 +458,7 @@ class MarkerCommand {
                     val worldName = getArgument<ResourceLocation>("world").path
                     val builder = getBuilder(sender, true) ?: return@runs
                     builder.setArg(MarkerArg.WORLD, ArgumentValue(worldName))
-                    sendAppliedSuccess(sender, "world $worldName")
+                    sendAppliedSuccess(sender, "world $worldName", true)
                 }
             }
         }
@@ -468,9 +468,9 @@ class MarkerCommand {
             argument<Boolean>("toggleable", BoolArgumentType.bool()) {
                 runs {
                     val toggleable = getArgument<Boolean>("toggleable")
-                    val builder = getBuilder(sender) ?: return@runs
+                    val builder = getBuilder(sender, true) ?: return@runs
                     builder.setArg(MarkerArg.TOGGLEABLE, ArgumentValue(toggleable))
-                    sendAppliedSuccess(sender, "toggleable $toggleable")
+                    sendAppliedSuccess(sender, "toggleable $toggleable", true)
                 }
             }
         }
@@ -478,9 +478,9 @@ class MarkerCommand {
             argument<Boolean>("default-hidden", BoolArgumentType.bool()) {
                 runs {
                     val defaultHidden = getArgument<Boolean>("default-hidden")
-                    val builder = getBuilder(sender) ?: return@runs
+                    val builder = getBuilder(sender, true) ?: return@runs
                     builder.setArg(MarkerArg.DEFAULT_HIDDEN, ArgumentValue(defaultHidden))
-                    sendAppliedSuccess(sender, "default hidden $defaultHidden")
+                    sendAppliedSuccess(sender, "default hidden $defaultHidden", true)
                 }
             }
         }
@@ -503,24 +503,29 @@ class MarkerCommand {
 
     private fun getBuilder(sender: CommandSourceStack, isSet: Boolean = false): Builder? {
         return if (isSet) {
+            broadcast("set")
             builderSet.getOrElse(sender.textName) {
                 noBuilder(sender, true)
                 return null
             }
-        } else builder.getOrElse(sender.textName) {
-            noBuilder(sender, true)
-            return null
+        } else {
+            broadcast("no set")
+            builder.getOrElse(sender.textName) {
+                noBuilder(sender, true)
+                return null
+            }
         }
     }
 
     private fun sendStatusInfo(sender: CommandSourceStack, isMarkerSet: Boolean = false) {
-        val builder = if (isMarkerSet) getBuilder(sender, true) ?: return else getBuilder(sender) ?: return
+        val builder = getBuilder(sender, isMarkerSet) ?: return
         val bukkitSender = sender.bukkitSender
         val type = builder.getType()
         val appliedArgs = builder.getArgs()
         val nothingSet = cmp("Not Set", italic = true)
         val dash = cmp("- ")
         val midDash = cmp(" ≫ ", NamedTextColor.DARK_GRAY)
+        val cmd = if (isMarkerSet) "/$setupSetCommandPrefix" else "/$setupCommandPrefix"
         bukkitSender.sendMessage(cmp(" \n") + prefix + cmp("Your current setup state (${type.name})"))
         type.args.forEach { arg ->
             // List values displayed in a different way than single values
@@ -539,7 +544,7 @@ class MarkerCommand {
                                 if (isSet) cmp("[${list.size} Values]", cMark) else nothingSet
                     )
                     hoverEvent = HoverEvent.showText(cmp(arg.description) + cmp("\n\nClick to add a value", cMark))
-                    clickEvent = ClickEvent.suggestCommand("/$setupCommandPrefix ${arg.name.lowercase()} ")
+                    clickEvent = ClickEvent.suggestCommand("$cmd ${arg.name.lowercase()} ")
                 })
                 return@forEach
             }
@@ -554,7 +559,7 @@ class MarkerCommand {
                             if (isSet) cmp(value?.getString() ?: "Not Set", cMark) else nothingSet
                 )
                 hoverEvent = HoverEvent.showText(cmp(arg.description) + cmp("\n\nClick to modify value", cMark))
-                clickEvent = ClickEvent.suggestCommand("/$setupCommandPrefix ${arg.name.lowercase()} ")
+                clickEvent = ClickEvent.suggestCommand("$cmd ${arg.name.lowercase()} ")
             })
         }
         bukkitSender.sendMessage(
@@ -563,7 +568,7 @@ class MarkerCommand {
                         color = cSuccess
                         bold = true
                         strikethrough = false
-                        clickEvent = ClickEvent.runCommand("/$setupCommandPrefix build")
+                        clickEvent = ClickEvent.runCommand("$cmd build")
                         hoverEvent = HoverEvent.showText(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!"))
                     } +
                     cmp(" | ") +
@@ -571,7 +576,7 @@ class MarkerCommand {
                         color = cError
                         bold = true
                         strikethrough = false
-                        clickEvent = ClickEvent.runCommand("/$setupCommandPrefix cancel")
+                        clickEvent = ClickEvent.runCommand("$cmd cancel")
                         hoverEvent = HoverEvent.showText(cmp("Cancel the current marker builder.\nThis will delete all your values!"))
                     } + cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
         )
@@ -579,7 +584,7 @@ class MarkerCommand {
 
     private fun sendAppliedSuccess(sender: CommandSourceStack, message: String, isSet: Boolean = false) {
         sender.bukkitSender.sendMessage(prefix + cmp("Marker${if (isSet) "-Set" else ""} $message applied!", cSuccess))
-        sendStatusInfo(sender)
+        sendStatusInfo(sender, isSet)
         sender.player?.playSound(SoundEvents.NOTE_BLOCK_BIT, 1f, 1.3f)
     }
 
@@ -631,12 +636,12 @@ class MarkerCommand {
 
     private fun ArgumentBuilder<CommandSourceStack, *>.labelLogic(isSet: Boolean): LiteralArgumentBuilder<CommandSourceStack> {
         return literal("label") {
-            argument<String>("label", StringArgumentType.word()) {
+            argument<String>("label", StringArgumentType.greedyString()) {
                 runs {
                     val label = getArgument<String>("label")
                     val builder = getBuilder(sender, isSet) ?: return@runs
                     builder.setArg(MarkerArg.LABEL, ArgumentValue(label))
-                    sendAppliedSuccess(sender, "label $label", isSet)
+                    sendAppliedSuccess(sender, "label '$label'", isSet)
                 }
             }
         }

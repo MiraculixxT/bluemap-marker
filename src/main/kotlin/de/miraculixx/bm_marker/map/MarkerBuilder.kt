@@ -6,14 +6,16 @@ import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.*
 import de.bluecolored.bluemap.api.math.Line
 import de.bluecolored.bluemap.api.math.Shape
+import de.miraculixx.bm_marker.map.data.ArgumentValue
+import de.miraculixx.bm_marker.map.interfaces.Builder
 import de.miraculixx.bm_marker.utils.enums.MarkerArg
 import de.miraculixx.bm_marker.utils.enums.MarkerType
 
 
-class MarkerBuilder(val type: MarkerType) {
-    val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
-    val vector3dList: MutableList<Vector3d> = mutableListOf()
-    val vector2dList: MutableList<Vector2d> = mutableListOf()
+class MarkerBuilder(private val type: MarkerType): Builder {
+    private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
+    private val vector3dList: MutableList<Vector3d> = mutableListOf()
+    private val vector2dList: MutableList<Vector2d> = mutableListOf()
 
     fun buildMarker(): Marker? {
         return when (type) {
@@ -69,7 +71,7 @@ class MarkerBuilder(val type: MarkerType) {
                 args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
             }.build()
 
-            MarkerType.HTML -> return null // Not supported
+            else -> return null
         }
     }
 
@@ -78,5 +80,28 @@ class MarkerBuilder(val type: MarkerType) {
         label(label)
         args[MarkerArg.POSITION]?.getVector3d()?.let { position(it) }
         return true
+    }
+
+    /*
+    Getter and setter
+     */
+    override fun getType(): MarkerType {
+        return type
+    }
+
+    override fun getArgs(): Map<MarkerArg, ArgumentValue> {
+        return args
+    }
+
+    override fun setArg(arg: MarkerArg, value: ArgumentValue) {
+        args[arg] = value
+    }
+
+    override fun getVec2List(): MutableList<Vector2d> {
+        return vector2dList
+    }
+
+    override fun getVec3List(): MutableList<Vector3d> {
+        return vector3dList
     }
 }

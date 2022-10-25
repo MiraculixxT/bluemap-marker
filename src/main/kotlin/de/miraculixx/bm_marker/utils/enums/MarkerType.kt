@@ -5,19 +5,18 @@ enum class MarkerType(val args: List<MarkerArg>) {
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.WORLD,
+            MarkerArg.MARKER_SET,
             MarkerArg.POSITION,
             MarkerArg.ICON,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE
         )
     ),
-    HTML(listOf()), // Unusable
     LINE(
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.WORLD,
+            MarkerArg.MARKER_SET,
             MarkerArg.ADD_POSITION,
             MarkerArg.DETAIL,
             MarkerArg.LINK,
@@ -33,7 +32,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.WORLD,
+            MarkerArg.MARKER_SET,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
             MarkerArg.DETAIL,
@@ -50,7 +49,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
     EXTRUDE(
         listOf(
             MarkerArg.ID,
-            MarkerArg.WORLD,
+            MarkerArg.MARKER_SET,
             MarkerArg.LABEL,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
@@ -64,6 +63,16 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE
+        )
+    ),
+
+    MARKER_SET(
+        listOf(
+            MarkerArg.ID,
+            MarkerArg.WORLD,
+            MarkerArg.LABEL,
+            MarkerArg.TOGGLEABLE,
+            MarkerArg.DEFAULT_HIDDEN
         )
     )
 }

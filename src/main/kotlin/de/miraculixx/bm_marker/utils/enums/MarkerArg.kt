@@ -1,10 +1,10 @@
 package de.miraculixx.bm_marker.utils.enums
 
 enum class MarkerArg(val description: String, val isRequired: Boolean) {
-    ID("Internal ID to access the marker", true),
-    WORLD("Target world/dimension", true),
-    POSITION("Position where the marker will be placed", true),
-    LABEL("Displayed label on the marker menu", true),
+    ID("Internal ID to access the marker(-set)", true),
+    MARKER_SET("Target marker-set where the marker\nshould be stored (provides world)", true),
+    POSITION("Position where the marker will be \nplaced. (NOT the world)", true),
+    LABEL("Displayed label in the marker menu", true),
     ICON("Image URL for displayed image on\ngiven position (POI exclusive)", false),
     ANCHOR("Offset for displayed image/html code (in pixel)", false),
     MAX_DISTANCE("Max distance to the camera at\nwhich the marker is shown", false),
@@ -19,5 +19,10 @@ enum class MarkerArg(val description: String, val isRequired: Boolean) {
     LINE_COLOR("Color of the line/outline (RGBA)\n- https://htmlcolorcodes.com -", false),
     FILL_COLOR("Color of the drawn field (RGBA)\n- https://htmlcolorcodes.com -", false),
     HEIGHT("The minimal height of the marker field.\nDefinition height for shape markers", true),
-    MAX_HEIGHT("The maximal height of the marker field\n(Extrude exclusive)", true)
+    MAX_HEIGHT("The maximal height of the marker field\n(Extrude exclusive)", true),
+
+    // Marker-Set exclusives
+    WORLD("Target world/dimension", true),
+    TOGGLEABLE("If this is true, the marker-set\ncan be enabled or disabled in the menu", false),
+    DEFAULT_HIDDEN("If this is true, the marker-set\nwill be hidden by default and can be\nenabled by the user. If 'TOGGELABLE' is\nfalse, this is the forced state", false),
 }

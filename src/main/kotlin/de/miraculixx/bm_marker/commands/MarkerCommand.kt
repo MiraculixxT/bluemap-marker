@@ -28,6 +28,7 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvents
 
+@Suppress("unused")
 class MarkerCommand {
     private val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
     private val setupCommandPrefix = "bmarker-setup"
@@ -35,7 +36,7 @@ class MarkerCommand {
     val mainCommand = command("bmarker") {
         literal("create") {
             argument<String>("type", StringArgumentType.word()) {
-                suggestList { listOf("poi", "html", "line", "shape", "extrude") }
+                suggestList { listOf("poi", "line", "shape", "extrude") }
                 runs {
                     if (builder.contains(sender.textName)) {
                         sender.bukkitSender.sendMessage(prefix + cmp("You already started a marker setup! ", cError) + literalText {
@@ -215,7 +216,7 @@ class MarkerCommand {
             argument<Coordinates>("position", Vec3Argument(true)) {
                 runs {
                     val position = getArgument<Coordinates>("position").getPosition(sender)
-                    val vec3d = Vector3d(position.x, position.y, position.z)
+                    val vec3d = Vector3d(position.x.round(2), position.y.round(2), position.z.round(2))
                     val builder = getBuilder(sender) ?: return@runs
                     builder.args[MarkerArg.POSITION] = ArgumentValue(vec3d)
                     sendAppliedSuccess(sender, "position $vec3d")
@@ -233,11 +234,11 @@ class MarkerCommand {
                 }
             }
         }
-        literal("add_direction") {
+        literal("add_position") {
             argument<Coordinates>("add-direction", Vec3Argument(true)) {
                 runs {
                     val newDirection = getArgument<Coordinates>("add-direction").getPosition(sender)
-                    val vec3d = Vector3d(newDirection.x, newDirection.y, newDirection.z)
+                    val vec3d = Vector3d(newDirection.x.round(2), newDirection.y.round(2), newDirection.z.round(2))
                     val builder = getBuilder(sender) ?: return@runs
                     builder.vector3dList.add(vec3d)
                     sendAppliedSuccess(sender, "new direction $vec3d")
@@ -248,7 +249,7 @@ class MarkerCommand {
             argument<Coordinates>("add-edge", Vec2Argument(true)) {
                 runs {
                     val edge = getArgument<Coordinates>("add-edge").getPosition(sender)
-                    val vec2d = Vector2d(edge.x, edge.z)
+                    val vec2d = Vector2d(edge.x.round(2), edge.z.round(2))
                     val builder = getBuilder(sender) ?: return@runs
                     builder.vector2dList.add(vec2d)
                     sendAppliedSuccess(sender, "new edge $vec2d")
@@ -371,10 +372,10 @@ class MarkerCommand {
         bukkitSender.sendMessage(cmp(" \n") + prefix + cmp("Your current setup state (${type.name})"))
         type.args.forEach { arg ->
             // List values displayed in a different way than single values
-            if (arg == MarkerArg.ADD_DIRECTION || arg == MarkerArg.ADD_EDGE) {
+            if (arg == MarkerArg.ADD_POSITION || arg == MarkerArg.ADD_EDGE) {
                 bukkitSender.sendMessage(dash + literalText {
                     val list = when (arg) {
-                        MarkerArg.ADD_DIRECTION -> builder.vector3dList
+                        MarkerArg.ADD_POSITION -> builder.vector3dList
                         MarkerArg.ADD_EDGE -> builder.vector2dList
                         else -> emptyList()
                     }

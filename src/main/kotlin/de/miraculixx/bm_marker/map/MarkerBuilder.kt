@@ -74,10 +74,9 @@ class MarkerBuilder(val type: MarkerType) {
     }
 
     private fun <T : Marker, B : Marker.Builder<T, B>> Marker.Builder<T, B>.applyBasics(): Boolean {
-        val position = args[MarkerArg.POSITION]?.getVector3d() ?: return false
         val label = args[MarkerArg.LABEL]?.getString() ?: return false
-        position(position)
         label(label)
+        args[MarkerArg.POSITION]?.getVector3d()?.let { position(it) }
         return true
     }
 }

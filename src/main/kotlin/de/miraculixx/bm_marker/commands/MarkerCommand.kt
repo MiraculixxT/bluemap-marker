@@ -18,7 +18,6 @@ import de.miraculixx.bm_marker.utils.enums.MarkerType
 import de.miraculixx.bm_marker.utils.message.*
 import net.axay.kspigot.chat.literalText
 import net.axay.kspigot.commands.*
-import net.axay.kspigot.extensions.broadcast
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -503,13 +502,11 @@ class MarkerCommand {
 
     private fun getBuilder(sender: CommandSourceStack, isSet: Boolean = false): Builder? {
         return if (isSet) {
-            broadcast("set")
             builderSet.getOrElse(sender.textName) {
                 noBuilder(sender, true)
                 return null
             }
         } else {
-            broadcast("no set")
             builder.getOrElse(sender.textName) {
                 noBuilder(sender, true)
                 return null

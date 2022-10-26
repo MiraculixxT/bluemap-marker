@@ -84,7 +84,7 @@ class MarkerCommand {
                 argument<String>("marker-set", StringArgumentType.word()) {
                     suggestList { ctx -> MarkerManager.getAllSetIDs(ctx.getArgument<ResourceLocation>("world").path) }
                     argument<String>("marker-id", StringArgumentType.word()) {
-                        suggestList { ctx -> MarkerManager.getAllMarkers("${ctx.getArgument<String>("marker-id")}_${ctx.getArgument<ResourceLocation>("world").path}").keys }
+                        suggestList { ctx -> MarkerManager.getAllMarkers("${ctx.getArgument<String>("marker-set")}_${ctx.getArgument<ResourceLocation>("world").path}").keys }
                         runs {
                             val worldName = getArgument<ResourceLocation>("world").path
                             val setID = getArgument<String>("marker-set")

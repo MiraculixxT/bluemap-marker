@@ -340,17 +340,17 @@ class MarkerCommand {
         literal("height") {
             argument<Float>("height", FloatArgumentType.floatArg()) {
                 runs {
-                    val height = getArgument<Int>("height")
+                    val height = getArgument<Float>("height")
                     val builder = getBuilder(sender) ?: return@runs
                     builder.setArg(MarkerArg.HEIGHT, ArgumentValue(height))
                     sendAppliedSuccess(sender, "height $height")
                 }
             }
         }
-        literal("max-height") {
+        literal("max_height") {
             argument<Float>("max-height", FloatArgumentType.floatArg()) {
                 runs {
-                    val maxHeight = getArgument<Int>("max-height")
+                    val maxHeight = getArgument<Float>("max-height")
                     val builder = getBuilder(sender) ?: return@runs
                     builder.setArg(MarkerArg.MAX_HEIGHT, ArgumentValue(maxHeight))
                     sendAppliedSuccess(sender, "maximal height $maxHeight")

@@ -6,6 +6,7 @@ import de.miraculixx.bm_marker.map.MarkerManager
 import net.axay.kspigot.main.KSpigot
 import java.util.function.Consumer
 
+
 class BMMarker : KSpigot() {
     companion object {
         lateinit var INSTANCE: KSpigot

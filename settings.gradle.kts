@@ -1,5 +1,5 @@
 
-rootProject.name = "BlueMap-BannerMarker"
+rootProject.name = "BlueMap-MarkerManager"
 
 pluginManagement {
     repositories {
@@ -7,3 +7,6 @@ pluginManagement {
         maven("https://papermc.io/repo/repository/maven-public/")
     }
 }
+
+include("bmm-paper")
+include("bmm-core")

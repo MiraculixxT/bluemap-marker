@@ -1,0 +1,333 @@
+package de.miraculixx.bmm
+
+import com.flowpowered.math.vector.Vector2d
+import com.flowpowered.math.vector.Vector3d
+import de.miraculixx.bmm.map.MarkerBuilder
+import de.miraculixx.bmm.map.MarkerManager
+import de.miraculixx.bmm.map.MarkerSetBuilder
+import de.miraculixx.bmm.map.data.ArgumentValue
+import de.miraculixx.bmm.map.interfaces.Builder
+import de.miraculixx.bmm.utils.enumOf
+import de.miraculixx.bmm.utils.enums.MarkerArg
+import de.miraculixx.bmm.utils.enums.MarkerType
+import de.miraculixx.bmm.utils.message.*
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.sound.Sound
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+
+interface MarkerCommandInstance {
+    val builder: MutableMap<String, MarkerBuilder>
+    val builderSet: MutableMap<String, MarkerSetBuilder>
+    val mainCommandPrefix: String
+        get() = "bmarker"
+    val setupCommandPrefix: String
+        get() = "bmarker-setup"
+    val setupSetCommandPrefix: String
+        get() = "bmarker-setup-set"
+    private val alreadyStarted: Component
+        get() = prefix +
+                cmp("You already started a marker setup! ", cError) +
+                cmp("Cancel", cError, underlined = true).addClick("/$setupCommandPrefix cancel", true) +
+                cmp(" or ", cError) +
+                cmp("build", cError, underlined = true).addClick("/$setupCommandPrefix build", true) +
+                cmp(" it before creating a new one", cError)
+
+    /*
+     *
+     * Begin of command functions
+     *
+     */
+    fun create(sender: Audience, id: String, type: String) {
+        if (builder.contains(id)) {
+            sender.sendMessage(alreadyStarted)
+        } else {
+            val markerType = enumOf<MarkerType>(type.uppercase())
+            if (markerType == null) {
+                sender.sendMessage(prefix + cmp("This is not a valid marker!", cError))
+                return
+            }
+            builder[id] = MarkerBuilder(markerType)
+            sender.sendMessage(
+                prefix +
+                    cmp("Marker setup started! Modify values using ") +
+                    cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("Use /$setupCommandPrefix <arg> <value>")) +
+                    cmp(" and finish your setup with ") +
+                    cmp("/$setupCommandPrefix build", cMark, underlined = true).addClick("/$setupCommandPrefix build", true))
+            sendStatusInfo(sender, id)
+        }
+    }
+
+    fun createSet(sender: Audience, id: String) {
+        if (builderSet.contains(id)) {
+            sender.sendMessage(prefix +
+                    cmp("You already started a marker-set setup! ", cError) +
+                    cmp("Cancel", cError, underlined = true).addClick("/$setupSetCommandPrefix cancel", true) +
+                    cmp(" or ", cError) +
+                    cmp("build", cError, underlined = true).addClick("/$setupSetCommandPrefix build", true) +
+                    cmp(" it before creating a new one", cError))
+        } else {
+            builderSet[id] = MarkerSetBuilder()
+            sender.sendMessage(prefix +
+                    cmp("Marker-Set setup started! Modify values using ") +
+                    cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("Use /$setupSetCommandPrefix <arg> <value>")) +
+                    cmp(" and finish your setup with ") +
+                    cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addClick("/$setupSetCommandPrefix build", true))
+            sendStatusInfo(sender, id,true)
+        }
+    }
+
+    fun delete(sender: Audience, mapName: String, setID: String, markerID: String) {
+        if (MarkerManager.removeMarker("${setID}_$mapName", markerID)) {
+            sender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(markerID, cMark) + cmp(" marker! It should disappear from your BlueMap in a few seconds"))
+        } else sender.sendMessage(prefix + cmp("This marker does not exist!", cError))
+    }
+
+    fun confirmDelete(sender: Audience, setID: String, mapName: String) {
+        sender.sendMessage(prefix +
+                cmp("Are you really sure you want to delete the '$setID' set on map '$mapName'? Please confirm by typing ", cError) +
+                cmp("/$mainCommandPrefix set-delete $mapName $setID true", cError, underlined = true))
+    }
+
+    fun deleteSet(sender: Audience, confirm: Boolean, setID: String, mapName: String) {
+        if (!confirm) return
+        if (MarkerManager.removeSet(setID, mapName)) {
+            sender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(setID, cMark) + cmp(" marker-set! It should disappear from your BlueMap in a few seconds"))
+        } else sender.sendMessage(prefix + cmp("This marker-set does not exist or BlueMap is not loaded!", cError))
+    }
+
+    fun build(sender: Audience, id: String) {
+        if (!builder.contains(id)) noBuilder(sender)
+        else {
+            val build = builder[id]
+            val markerSet = build?.getArgs()?.get(MarkerArg.MARKER_SET)?.getString()
+            val markerID = build?.getArgs()?.get(MarkerArg.ID)?.getString()
+            if (markerSet == null || markerID == null) {
+                sender.sendMessage(prefix + cmp("Please provide a marker ID and a target marker-set!", cError))
+                return
+            }
+            if (!validateID(markerID)) {
+                sender.sendMessage(prefix + cmp("IDs must be alphanumeric (only contains letters and numbers)", cError))
+                return
+            }
+            if (MarkerManager.getAllMarkers(markerSet).contains(markerID)) {
+                sender.sendMessage(prefix + cmp("The ID ", cError) + cmp(markerID, cError, underlined = true) + cmp(" already exist in this set!", cError))
+                sender.sendMessage(prefix + cmp("The old marker will be replaced with your new one..."))
+                MarkerManager.removeMarker(markerSet, markerID)
+            }
+
+            val marker = try {
+                build.buildMarker()
+            } catch (e: Exception) {
+                sendBuildError(sender, "/$setupCommandPrefix")
+                e.printStackTrace()
+                return
+            }
+            if (marker == null) {
+                sendRequiredError(sender, "/$setupCommandPrefix")
+                return
+            }
+            if (MarkerManager.addMarker(markerSet, marker, markerID)) {
+                builder.remove(id)
+                sender.sendMessage(prefix + cmp("Marker created! It should appear on your BlueMap in a few seconds"))
+            } else sender.sendMessage(prefix + cmp("The marker set ", cError) + cmp(markerID, cError, underlined = true) + cmp(" does not exist (/$mainCommandPrefix set-create)", cError))
+        }
+    }
+
+    fun buildSet(sender: Audience, id: String) {
+        if (!builderSet.contains(id)) noBuilder(sender, true)
+        else {
+            val build = builderSet[id]
+            val mapName = build?.getArgs()?.get(MarkerArg.MAP)?.getString()
+            val setID = build?.getArgs()?.get(MarkerArg.ID)?.getString()
+            if (setID == null || mapName == null) {
+                sender.sendMessage(prefix + cmp("Please provide a marker-set ID and a target world!", cError))
+                return
+            }
+            if (!validateID(setID)) {
+                sender.sendMessage(prefix + cmp("IDs must be alphanumeric (only contains letters and numbers)", cError))
+                return
+            }
+            if (MarkerManager.getAllSetIDs(mapName).contains(setID)) {
+                sender.sendMessage(prefix + cmp("The ID ", cError) + cmp(setID, cError, underlined = true) + cmp(" already exist in this world!", cError))
+                return
+            }
+
+            val markerSet = try {
+                build.buildMarkerSet()
+            } catch (e: Exception) {
+                sendBuildError(sender, "/$setupSetCommandPrefix")
+                e.printStackTrace()
+                return
+            }
+            if (markerSet == null) {
+                sendRequiredError(sender, "/$setupSetCommandPrefix")
+                return
+            }
+
+            if (!MarkerManager.addSet(setID, mapName, markerSet)) {
+                sender.sendMessage(prefix + cmp("Something went wrong... Check if BlueMap is already loaded or contact support", cError))
+                return
+            }
+            builderSet.remove(id)
+
+            sender.sendMessage(prefix +
+                    cmp("Marker-Set created! Use it too add new markers inside this set with ") +
+                    cmp("/$mainCommandPrefix create", cMark, underlined = true).addSuggest("/$mainCommandPrefix create ").addHover(cmp("/$mainCommandPrefix create <type>")))
+        }
+    }
+
+    fun cancel(sender: Audience, id: String, isSet: Boolean = false) {
+        val removed = if (isSet) builderSet.remove(id) else builder.remove(id)
+        if (removed == null) noBuilder(sender, isSet)
+        else sender.sendMessage(prefix + cmp("Canceled current marker${if (isSet) "-set" else ""} setup!"))
+    }
+
+    fun edit(sender: Audience, id: String, setID: String, markerID: String) {
+        if (builder.contains(id)) {
+            sender.sendMessage(alreadyStarted)
+            return
+        }
+        sender.sendMessage(cmp("Get marker..."))
+        val marker = MarkerManager.getMarker(setID, markerID)
+        if (marker == null) {
+            sender.sendMessage(prefix +
+                    cmp("Could not find any marker in set ", cError) +
+                    cmp(setID, cError, underlined = true) +
+                    cmp(" with ID ", cError) +
+                    cmp(markerID, cError, underlined = true) +
+                    cmp("!", cError))
+            return
+        }
+        sender.sendMessage(cmp("Getting marker type..."))
+        val markerType = enumOf<MarkerType>(marker.type.uppercase())
+        if (markerType == null) {
+            sender.sendMessage(prefix + cmp("Could not resolve marker type ", cError) + cmp(marker.type, cError, underlined = true) + cmp("! Outdated?", cError))
+            return
+        }
+        sender.sendMessage(cmp("Building marker..."))
+        val newBuilder = MarkerBuilder.of(marker, markerType, markerID, setID)
+        if (newBuilder == null) {
+            sender.sendMessage(prefix + cmp("Something unexpected went wrong while reading marker data... Please contact support", cError))
+            return
+        }
+        builder[id] = newBuilder
+        sender.sendMessage(prefix + cmp("Editing marker ") +
+                cmp(markerID, cMark) + cmp(". Changing the ") +
+                cmp("ID", cMark) + cmp(" or ") +
+                cmp("Set", cMark) + cmp(" will clone this marker!"))
+        sendStatusInfo(sender, id)
+    }
+
+
+    /*
+     *
+     * Begin of Utility functions to display or calculate output
+     *
+     */
+    fun noBuilder(sender: Audience, isSet: Boolean = false) {
+        val addition = if (isSet) "-set" else ""
+        sender.sendMessage(prefix +
+                cmp("You have no current marker$addition setups. Start one with ", cError) +
+                cmp("/$mainCommandPrefix create$addition", cError, underlined = true).addSuggest("/$mainCommandPrefix create$addition ").addHover(cmp("Start a marker$addition setup (click)")))
+    }
+
+    fun getBuilder(sender: Audience, id: String, isSet: Boolean = false): Builder? {
+        return if (isSet) {
+            builderSet.getOrElse(id) {
+                noBuilder(sender, true)
+                return null
+            }
+        } else {
+            builder.getOrElse(id) {
+                noBuilder(sender, true)
+                return null
+            }
+        }
+    }
+
+    fun sendStatusInfo(sender: Audience, id: String, isMarkerSet: Boolean = false) {
+        val builder = getBuilder(sender, id, isMarkerSet) ?: return
+        val type = builder.getType()
+        val appliedArgs = builder.getArgs()
+        val nothingSet = cmp("Not Set", italic = true)
+        val dash = cmp("- ")
+        val midDash = cmp(" ≫ ", NamedTextColor.DARK_GRAY)
+        val cmd = if (isMarkerSet) "/$setupSetCommandPrefix" else "/$setupCommandPrefix"
+        sender.sendMessage(cmp(" \n") + prefix + cmp("Your current setup state (${type.name})"))
+        type.args.forEach { arg ->
+            // List values displayed in a different way than single values
+            if (arg == MarkerArg.ADD_POSITION || arg == MarkerArg.ADD_EDGE) {
+                val list = when (arg) {
+                    MarkerArg.ADD_POSITION -> builder.getVec3List()
+                    MarkerArg.ADD_EDGE -> builder.getVec2List()
+                    else -> emptyList()
+                }
+                val isSet = list.isNotEmpty()
+                val color = if (!isSet) cError else NamedTextColor.GREEN
+                sender.sendMessage(dash +
+                        (cmp(arg.name.replace('_', ' '), color) +
+                                midDash +
+                                if (isSet) cmp("[${list.size} Values]", cMark) else nothingSet)
+                            .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to add a value", cMark)))
+                return@forEach
+            }
+
+            val value = appliedArgs[arg]
+            val isSet = value != null
+            val color = if (!isSet) if (arg.isRequired) cError else NamedTextColor.GRAY else NamedTextColor.GREEN
+            sender.sendMessage(dash +
+                    (cmp(arg.name.replace('_', ' '), color) +
+                            midDash +
+                            if (isSet) cmp(value?.getString() ?: "Not Set", cMark) else nothingSet)
+                        .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to modify value", cMark)))
+        }
+        sender.sendMessage(cmp("                 ", cHighlight, strikethrough = true) +
+                cmp("[ ", cHighlight, strikethrough = false) +
+                cmp("BUILD", cSuccess, bold = true, strikethrough = false).addClick("$cmd build").addHover(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!")) +
+                cmp(" | ") +
+                cmp("CANCEL", cError, bold = true, strikethrough = false).addClick("$cmd cancel").addHover(cmp("Cancel the current marker builder.\nThis will delete all your values!")) +
+                cmp(" ]", cHighlight) +
+                cmp("                 ", cHighlight, strikethrough = true))
+    }
+
+    fun sendAppliedSuccess(sender: Audience, id: String, message: String, isSet: Boolean = false) {
+        sender.sendMessage(prefix + cmp("Marker${if (isSet) "-Set" else ""} $message applied!", cSuccess))
+        sendStatusInfo(sender, id, isSet)
+        sender.playSound(Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 1f, 1.3f))
+    }
+
+    fun validateID(id: String): Boolean {
+        return id.matches(Regex("[A-Za-z0-9]*")) && !id.contains(' ')
+    }
+
+    fun sendBuildError(sender: Audience, cmd: String) {
+        sender.sendMessage(prefix +
+                cmp("An unexpected error occurred! Please validate your arguments with ", cError) +
+                cmp(cmd, cError, underlined = true).addClick(cmd, true) +
+                cmp(" or report it to the BlueMap Discord (#3rd-party-support)"))
+    }
+
+    fun sendRequiredError(sender: Audience, cmd: String) {
+        sender.sendMessage(prefix +
+                cmp("A required option is not set! Type ", cError) +
+                cmp(cmd, cError, underlined = true).addClick(cmd, true) +
+                cmp(" to see more information", cError))
+    }
+
+    fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, value: Any, message: String, isSet: Boolean = false) {
+        val builder = getBuilder(sender, id, isSet) ?: return
+        builder.setArg(type, ArgumentValue(value))
+        sendAppliedSuccess(sender, id, message, isSet)
+    }
+
+    fun addMarkerArgumentList(sender: Audience, id: String, type: MarkerArg, value: Any, message: String, isSet: Boolean = false) {
+        val builder = getBuilder(sender, id, isSet) ?: return
+        when (value) {
+            is Vector3d -> builder.getVec3List().add(value)
+            is Vector2d -> builder.getVec2List().add(value)
+        }
+        sendAppliedSuccess(sender, id, message, isSet)
+    }
+}

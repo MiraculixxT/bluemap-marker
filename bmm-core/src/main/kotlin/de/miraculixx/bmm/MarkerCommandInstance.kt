@@ -51,30 +51,35 @@ interface MarkerCommandInstance {
             builder[id] = MarkerBuilder(markerType)
             sender.sendMessage(
                 prefix +
-                    cmp("Marker setup started! Modify values using ") +
-                    cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("Use /$setupCommandPrefix <arg> <value>")) +
-                    cmp(" and finish your setup with ") +
-                    cmp("/$setupCommandPrefix build", cMark, underlined = true).addClick("/$setupCommandPrefix build", true))
+                        cmp("Marker setup started! Modify values using ") +
+                        cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("Use /$setupCommandPrefix <arg> <value>")) +
+                        cmp(" and finish your setup with ") +
+                        cmp("/$setupCommandPrefix build", cMark, underlined = true).addClick("/$setupCommandPrefix build", true)
+            )
             sendStatusInfo(sender, id)
         }
     }
 
     fun createSet(sender: Audience, id: String) {
         if (builderSet.contains(id)) {
-            sender.sendMessage(prefix +
-                    cmp("You already started a marker-set setup! ", cError) +
-                    cmp("Cancel", cError, underlined = true).addClick("/$setupSetCommandPrefix cancel", true) +
-                    cmp(" or ", cError) +
-                    cmp("build", cError, underlined = true).addClick("/$setupSetCommandPrefix build", true) +
-                    cmp(" it before creating a new one", cError))
+            sender.sendMessage(
+                prefix +
+                        cmp("You already started a marker-set setup! ", cError) +
+                        cmp("Cancel", cError, underlined = true).addClick("/$setupSetCommandPrefix cancel", true) +
+                        cmp(" or ", cError) +
+                        cmp("build", cError, underlined = true).addClick("/$setupSetCommandPrefix build", true) +
+                        cmp(" it before creating a new one", cError)
+            )
         } else {
             builderSet[id] = MarkerSetBuilder()
-            sender.sendMessage(prefix +
-                    cmp("Marker-Set setup started! Modify values using ") +
-                    cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("Use /$setupSetCommandPrefix <arg> <value>")) +
-                    cmp(" and finish your setup with ") +
-                    cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addClick("/$setupSetCommandPrefix build", true))
-            sendStatusInfo(sender, id,true)
+            sender.sendMessage(
+                prefix +
+                        cmp("Marker-Set setup started! Modify values using ") +
+                        cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("Use /$setupSetCommandPrefix <arg> <value>")) +
+                        cmp(" and finish your setup with ") +
+                        cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addClick("/$setupSetCommandPrefix build", true)
+            )
+            sendStatusInfo(sender, id, true)
         }
     }
 
@@ -90,9 +95,11 @@ interface MarkerCommandInstance {
     }
 
     fun confirmDelete(sender: Audience, setID: String, mapName: String) {
-        sender.sendMessage(prefix +
-                cmp("Are you really sure you want to delete the '$setID' set on map '$mapName'? Please confirm by typing ", cError) +
-                cmp("/$mainCommandPrefix set-delete $mapName $setID true", cError, underlined = true))
+        sender.sendMessage(
+            prefix +
+                    cmp("Are you really sure you want to delete the '$setID' set on map '$mapName'? Please confirm by typing ", cError) +
+                    cmp("/$mainCommandPrefix set-delete $mapName $setID true", cError, underlined = true)
+        )
     }
 
     fun deleteSet(sender: Audience, confirm: Boolean, setID: String?, mapName: String?) {
@@ -181,9 +188,11 @@ interface MarkerCommandInstance {
             }
             builderSet.remove(id)
 
-            sender.sendMessage(prefix +
-                    cmp("Marker-Set created! Use it too add new markers inside this set with ") +
-                    cmp("/$mainCommandPrefix create", cMark, underlined = true).addSuggest("/$mainCommandPrefix create ").addHover(cmp("/$mainCommandPrefix create <type>")))
+            sender.sendMessage(
+                prefix +
+                        cmp("Marker-Set created! Use it too add new markers inside this set with ") +
+                        cmp("/$mainCommandPrefix create", cMark, underlined = true).addSuggest("/$mainCommandPrefix create ").addHover(cmp("/$mainCommandPrefix create <type>"))
+            )
         }
     }
 
@@ -204,12 +213,14 @@ interface MarkerCommandInstance {
         }
         val marker = MarkerManager.getMarker(setID, markerID)
         if (marker == null) {
-            sender.sendMessage(prefix +
-                    cmp("Could not find any marker in set ", cError) +
-                    cmp(setID, cError, underlined = true) +
-                    cmp(" with ID ", cError) +
-                    cmp(markerID, cError, underlined = true) +
-                    cmp("!", cError))
+            sender.sendMessage(
+                prefix +
+                        cmp("Could not find any marker in set ", cError) +
+                        cmp(setID, cError, underlined = true) +
+                        cmp(" with ID ", cError) +
+                        cmp(markerID, cError, underlined = true) +
+                        cmp("!", cError)
+            )
             return
         }
         val markerType = enumOf<MarkerType>(marker.type.uppercase())
@@ -223,10 +234,12 @@ interface MarkerCommandInstance {
             return
         }
         builder[id] = newBuilder
-        sender.sendMessage(prefix + cmp("Editing marker ") +
-                cmp(markerID, cMark) + cmp(". Changing the ") +
-                cmp("ID", cMark) + cmp(" or ") +
-                cmp("Set", cMark) + cmp(" will clone this marker!"))
+        sender.sendMessage(
+            prefix + cmp("Editing marker ") +
+                    cmp(markerID, cMark) + cmp(". Changing the ") +
+                    cmp("ID", cMark) + cmp(" or ") +
+                    cmp("Set", cMark) + cmp(" will clone this marker!")
+        )
         sendStatusInfo(sender, id)
     }
 
@@ -238,9 +251,11 @@ interface MarkerCommandInstance {
      */
     fun noBuilder(sender: Audience, isSet: Boolean = false) {
         val addition = if (isSet) "set-" else ""
-        sender.sendMessage(prefix +
-                cmp("You have no current marker$addition setups. Start one with ", cError) +
-                cmp("/$mainCommandPrefix ${addition}create", cError, underlined = true).addSuggest("/$mainCommandPrefix ${addition}create ").addHover(cmp("Start a marker$addition setup (click)")))
+        sender.sendMessage(
+            prefix +
+                    cmp("You have no current marker$addition setups. Start one with ", cError) +
+                    cmp("/$mainCommandPrefix ${addition}create", cError, underlined = true).addSuggest("/$mainCommandPrefix ${addition}create ").addHover(cmp("Start a marker$addition setup (click)"))
+        )
     }
 
     fun getBuilder(sender: Audience, id: String, isSet: Boolean = false): Builder? {
@@ -276,30 +291,37 @@ interface MarkerCommandInstance {
                 }
                 val isSet = list.isNotEmpty()
                 val color = if (!isSet) cError else NamedTextColor.GREEN
-                sender.sendMessage(dash +
-                        (cmp(arg.name.replace('_', ' '), color) +
-                                midDash +
-                                if (isSet) cmp("[${list.size} Values]", cMark) else nothingSet)
-                            .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to add a value", cMark)))
+                sender.sendMessage(
+                    dash +
+                            (cmp(arg.name.replace('_', ' '), color) +
+                                    midDash +
+                                    if (isSet) cmp("[${list.size} Values]", cMark) else nothingSet)
+                                .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to add a value", cMark))
+                )
                 return@forEach
             }
 
             val value = appliedArgs[arg]
             val isSet = value != null
             val color = if (!isSet) if (arg.isRequired) cError else NamedTextColor.GRAY else NamedTextColor.GREEN
-            sender.sendMessage(dash +
-                    (cmp(arg.name.replace('_', ' '), color) +
-                            midDash +
-                            if (isSet) cmp(value?.getString() ?: "Not Set", cMark) else nothingSet)
-                        .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to modify value", cMark)))
+            sender.sendMessage(
+                dash +
+                        (cmp(arg.name.replace('_', ' '), color) +
+                                midDash +
+                                if (isSet) cmp(value?.getString() ?: "Not Set", cMark) else nothingSet)
+                            .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to modify value", cMark))
+            )
         }
-        sender.sendMessage(cmp("                 ", cHighlight, strikethrough = true) +
-                cmp("[ ", cHighlight, strikethrough = false) +
-                cmp("BUILD", cSuccess, bold = true, strikethrough = false).addClick("$cmd build").addHover(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!")) +
-                cmp(" | ") +
-                cmp("CANCEL", cError, bold = true, strikethrough = false).addClick("$cmd cancel").addHover(cmp("Cancel the current marker builder.\nThis will delete all your values!")) +
-                cmp(" ]", cHighlight) +
-                cmp("                 ", cHighlight, strikethrough = true))
+        sender.sendMessage(
+            cmp("                 ", cHighlight, strikethrough = true) +
+                    cmp("[ ", cHighlight, strikethrough = false) +
+                    cmp("BUILD", cSuccess, bold = true, strikethrough = false).addClick("$cmd build")
+                        .addHover(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!")) +
+                    cmp(" | ") +
+                    cmp("CANCEL", cError, bold = true, strikethrough = false).addClick("$cmd cancel").addHover(cmp("Cancel the current marker builder.\nThis will delete all your values!")) +
+                    cmp(" ]", cHighlight) +
+                    cmp("                 ", cHighlight, strikethrough = true)
+        )
     }
 
     fun sendAppliedSuccess(sender: Audience, id: String, message: String, isSet: Boolean = false) {
@@ -313,17 +335,21 @@ interface MarkerCommandInstance {
     }
 
     fun sendBuildError(sender: Audience, cmd: String) {
-        sender.sendMessage(prefix +
-                cmp("An unexpected error occurred! Please validate your arguments with ", cError) +
-                cmp(cmd, cError, underlined = true).addClick(cmd, true) +
-                cmp(" or report it to the BlueMap Discord (#3rd-party-support)"))
+        sender.sendMessage(
+            prefix +
+                    cmp("An unexpected error occurred! Please validate your arguments with ", cError) +
+                    cmp(cmd, cError, underlined = true).addClick(cmd, true) +
+                    cmp(" or report it to the BlueMap Discord (#3rd-party-support)")
+        )
     }
 
     fun sendRequiredError(sender: Audience, cmd: String) {
-        sender.sendMessage(prefix +
-                cmp("A required option is not set! Type ", cError) +
-                cmp(cmd, cError, underlined = true).addClick(cmd, true) +
-                cmp(" to see more information", cError))
+        sender.sendMessage(
+            prefix +
+                    cmp("A required option is not set! Type ", cError) +
+                    cmp(cmd, cError, underlined = true).addClick(cmd, true) +
+                    cmp(" to see more information", cError)
+        )
     }
 
     fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, value: Any, message: String, isSet: Boolean = false) {

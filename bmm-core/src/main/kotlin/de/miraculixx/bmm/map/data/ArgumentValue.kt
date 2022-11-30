@@ -16,6 +16,6 @@ data class ArgumentValue(private val value: Any) {
     fun getDouble(): Double? { return value as? Double }
     fun getBoolean(): Boolean? { return value as? Boolean }
     fun getVector3d(): Vector3d? { return value as? Vector3d }
-    fun getVector2d(): Vector2i? { return value as? Vector2i }
+    fun getVector2i(): Vector2i? { return value as? Vector2i }
     fun getColor(): Color? { return value as? Color }
 }

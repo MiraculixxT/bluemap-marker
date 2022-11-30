@@ -22,7 +22,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
             MarkerType.POI -> POIMarker.builder().apply {
                 applyBasics()
 
-                args[MarkerArg.ICON]?.getString()?.let { icon(it, args[MarkerArg.ANCHOR]?.getVector2d() ?: Vector2i.ZERO) }
+                args[MarkerArg.ICON]?.getString()?.let { icon(it, args[MarkerArg.ANCHOR]?.getVector2i() ?: Vector2i.ZERO) }
                 args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
                 args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
             }.build()

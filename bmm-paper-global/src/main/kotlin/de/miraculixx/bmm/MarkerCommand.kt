@@ -1,5 +1,6 @@
 package de.miraculixx.bmm
 
+import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.math.Color
@@ -31,7 +32,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
                 }
 
                 4 -> when (args?.getOrNull(0) ?: "") {
-                    "delete", "edit" -> addAll(MarkerManager.getAllMarkers("${args?.getOrNull(3) ?: ""}_${args?.getOrNull(2) ?: ""}").keys)
+                    "delete", "edit" -> addAll(MarkerManager.getAllMarkers(args?.getOrNull(2) ?: "").keys)
                 }
             }
         }.filter { it.startsWith(args?.lastOrNull() ?: "", true) }.toMutableList()
@@ -49,11 +50,11 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             else noPermission("bmarker.command.create", sender)
 
             "edit" -> if (sender.hasPermission("bmarker.command.edit"))
-                edit(sender, sender.name, "${args.getOrNull(2)}_${args.getOrNull(1)}", args.getOrNull(3))
+                edit(sender, sender.name, args.getOrNull(2), args.getOrNull(3))
             else noPermission("bmarker.command.edit", sender)
 
             "delete" -> if (sender.hasPermission("bmarker.command.delete"))
-                delete(sender, sender.name, "${args.getOrNull(2)}_${args.getOrNull(1)}", args.getOrNull(3))
+                delete(sender, sender.name, args.getOrNull(2), args.getOrNull(3))
             else noPermission("bmarker.command.delete", sender)
 
             "set-create" -> if (sender.hasPermission("bmarker.command.set-create"))
@@ -79,7 +80,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
                 when (args?.size ?: 0) {
                     0, 1 -> addAll(listOf("build", "cancel", "icon", "link", "id", "label", "detail", "marker_set", "position", "anchor", "add_direction", "add_edge", "max_distance", "min_distance", "line_width", "height", "line_color", "fill_color", "new_tab", "depth_test"))
                     2 -> when (args?.getOrNull(0)) {
-                        "add_position", "add_direction" -> add("~ ~ ~")
+                        "position", "add_direction" -> add("~ ~ ~")
                         "anchor", "add_edge" -> add("~ ~")
                         "line_color", "fill_color" -> add("<red 0-255>")
                         "new_tab", "depth_test" -> addAll(listOf("true","false"))
@@ -126,12 +127,12 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
                     builder.setMarkerArgument(sender, name, MarkerArg.DETAIL, v, "detail $v")
                 }
                 "marker_set" -> builder.setMarkerArgument(sender, name, MarkerArg.MARKER_SET, value, "set $value")
-                "add_position" -> {
+                "position" -> {
                     val position = parse3d(getMultiString(args), sender)
                     builder.setMarkerArgument(sender, name, MarkerArg.POSITION, position, "position $position")
                 }
                 "anchor" -> {
-                    val position = parse2d(getMultiString(args), sender)
+                    val position = parse2i(getMultiString(args), sender)
                     builder.setMarkerArgument(sender, name, MarkerArg.ANCHOR, position, "anchor $position")
                 }
                 "add_direction" -> {
@@ -166,7 +167,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
         private fun parse3d(value: String, sender: CommandSender): Vector3d {
             if (value.contains("~ ~ ~") && sender is Player) {
                 val loc = sender.location
-                return Vector3d.from(loc.x, loc.y, loc.z)
+                return Vector3d.from(loc.x.round(2), loc.y.round(2), loc.z.round(2))
             }
             val split = value.split(' ', limit = 3)
             return Vector3d.from(
@@ -176,10 +177,22 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             )
         }
 
-        private fun parse2d(value: String, sender: CommandSender): Vector2i {
+        private fun parse2d(value: String, sender: CommandSender): Vector2d {
             if (value.contains("~ ~") && sender is Player) {
                 val loc = sender.location
-                return Vector2i(loc.x, loc.z)
+                return Vector2d(loc.x.round(2), loc.z.round(2))
+            }
+            val split = value.split(' ', limit = 2)
+            return Vector2d(
+                split.getOrNull(0)?.toDoubleOrNull() ?: .0,
+                split.getOrNull(1)?.toDoubleOrNull() ?: .0,
+            )
+        }
+
+        private fun parse2i(value: String, sender: CommandSender): Vector2i {
+            if (value.contains("~ ~") && sender is Player) {
+                val loc = sender.location
+                return Vector2i(loc.x.round(2), loc.z.round(2))
             }
             val split = value.split(' ', limit = 2)
             return Vector2i(

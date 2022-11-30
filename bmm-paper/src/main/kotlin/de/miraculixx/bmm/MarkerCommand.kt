@@ -12,7 +12,7 @@ import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.*
-import net.axay.kspigot.commands.*
+import de.miraculixx.kpaper.commands.*
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.coordinates.Coordinates
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
@@ -193,7 +193,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Coordinates>("add-edge", Vec2Argument(true)) {
                 runs {
                     val edge = getArgument<Coordinates>("add-edge").getPosition(sender)
-                    val value = Vector2i(edge.x.round(2), edge.z.round(2))
+                    val value = Vector2d(edge.x.round(2), edge.z.round(2))
                     addMarkerArgumentList(sender.bukkitSender, sender.textName, MarkerArg.ADD_EDGE, value, "new edge $value")
                 }
             }

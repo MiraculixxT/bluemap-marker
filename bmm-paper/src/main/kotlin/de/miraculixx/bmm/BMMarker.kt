@@ -5,8 +5,8 @@ import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
 import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
-import net.axay.kspigot.extensions.console
-import net.axay.kspigot.main.KSpigot
+import de.miraculixx.kpaper.extensions.console
+import de.miraculixx.kpaper.main.KSpigot
 
 @Suppress("unused")
 class BMMarker : KSpigot() {

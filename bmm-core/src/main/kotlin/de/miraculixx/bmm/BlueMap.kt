@@ -11,15 +11,25 @@ import java.io.File
 import java.util.function.Consumer
 
 class BlueMap(sourceFolder: File) {
-    val onEnable = Consumer<BlueMapAPI> {
+    private val onEnable = Consumer<BlueMapAPI> {
         consoleAudience.sendMessage(prefix + cmp("Connect to BlueMap API..."))
         MarkerManager.loadAllMarker(it, sourceFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully enabled Marker Command addition!"))
     }
 
-    val onDisable = Consumer<BlueMapAPI> {
+    private val onDisable = Consumer<BlueMapAPI> {
         consoleAudience.sendMessage(prefix + cmp("Disconnecting from BlueMap API..."))
         MarkerManager.saveAllMarker(sourceFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully saved all data. Waiting for BlueMap to reload..."))
+    }
+
+    fun disable() {
+        BlueMapAPI.unregisterListener(onDisable)
+        BlueMapAPI.unregisterListener(onEnable)
+    }
+
+    init {
+        BlueMapAPI.onEnable(onEnable)
+        BlueMapAPI.onDisable(onDisable)
     }
 }

@@ -5,30 +5,32 @@ import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
 import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
-import net.axay.kspigot.extensions.console
-import net.axay.kspigot.main.KSpigot
+import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 
-@Suppress("unused")
-class BMMarker : KSpigot() {
+class BMMarker : JavaPlugin() {
     companion object {
-        lateinit var INSTANCE: KSpigot
+        lateinit var INSTANCE: JavaPlugin
     }
     private lateinit var blueMapInstance: BlueMap
+    private lateinit var commandInstance: MarkerCommandInstance
 
-    override fun startup() {
+    override fun onEnable() {
         INSTANCE = this
-        consoleAudience = console
+        consoleAudience = Bukkit.getConsoleSender()
 
         // Load Content
-        MarkerCommand()
+        commandInstance = MarkerCommand()
 
         // BlueMap Management
         blueMapInstance = BlueMap(dataFolder)
     }
 
-    override fun shutdown() {
+    override fun onDisable() {
         blueMapInstance.disable()
         MarkerManager.saveAllMarker(dataFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully saved all data! Good Bye :)"))
     }
 }
+
+val PluginManager by lazy { BMMarker.INSTANCE }

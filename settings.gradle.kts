@@ -9,4 +9,6 @@ pluginManagement {
 }
 
 include("bmm-paper")
+include("bmm-paper-global")
 include("bmm-core")
+include("bmm-fabric")

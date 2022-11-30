@@ -12,7 +12,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/bmm-core" />
+            <option value="$PROJECT_DIR$/bmm-fabric" />
             <option value="$PROJECT_DIR$/bmm-paper" />
+            <option value="$PROJECT_DIR$/bmm-paper-global" />
             <option value="$PROJECT_DIR$/buildSrc" />
           </set>
         </option>

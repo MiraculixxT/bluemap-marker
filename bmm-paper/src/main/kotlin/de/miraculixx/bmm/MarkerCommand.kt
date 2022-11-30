@@ -75,7 +75,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-create
         literal("set-create") {
-            requiresPermission(Permission("bmarker.command.create-set", PermissionDefault.OP))
+            requiresPermission(Permission("bmarker.command.set-create", PermissionDefault.OP))
             runs {
                 createSet(sender.bukkitSender, sender.textName)
             }
@@ -83,7 +83,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-delete <map> <id> <true>
         literal("set-delete") {
-            requiresPermission(Permission("bmarker.command.delete-set", PermissionDefault.OP))
+            requiresPermission(Permission("bmarker.command.set-delete", PermissionDefault.OP))
             argument<String>("map", StringArgumentType.word()) {
                 suggestList { MarkerManager.getAllMaps() }
                 argument<String>("set-id", StringArgumentType.word()) {
@@ -193,7 +193,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Coordinates>("add-edge", Vec2Argument(true)) {
                 runs {
                     val edge = getArgument<Coordinates>("add-edge").getPosition(sender)
-                    val value = Vector2d(edge.x.round(2), edge.z.round(2))
+                    val value = Vector2i(edge.x.round(2), edge.z.round(2))
                     addMarkerArgumentList(sender.bukkitSender, sender.textName, MarkerArg.ADD_EDGE, value, "new edge $value")
                 }
             }
@@ -273,7 +273,7 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val setupSetCommand = command(setupSetCommandPrefix) {
-        requiresPermission(Permission("bmarker.command.create-set", PermissionDefault.OP))
+        requiresPermission(Permission("bmarker.command.set-create", PermissionDefault.OP))
 
         runs {
             sendStatusInfo(sender.bukkitSender, sender.textName, true)

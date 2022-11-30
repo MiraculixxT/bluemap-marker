@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "bm-marker",
+  "version": "1.1.0",
+
+  "name": "BlueMap Marker Manager",
+  "description": "A BlueMap addition plugin. Give your players the option to place markers on the map",
+  "authors": ["Miraculixx"],
+  "contact": {
+    "homepage": "https://mutils.de/",
+    "sources": "https://github.com/MiraculixxT/bluemap-marker"
+  },
+
+  "license": "MIT",
+  "icon": "assets/bm-marker/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "de.miraculixx.bmm.BMMarker"
+      }
+    ]
+  },
+  "mixins": [],
+
+  "custom": {
+    "modmenu": {
+      "parent": "bluemap"
+    }
+  },
+
+  "depends": {
+    "fabricloader": ">=0.14.10",
+    "fabric-api": "*",
+    "minecraft": "~1.19",
+    "java": ">=17",
+    "bluemap": "*"
+  },
+  "suggests": {}
+}

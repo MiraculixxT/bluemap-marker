@@ -3,7 +3,7 @@ package de.miraculixx.bmm.utils.message
 import de.bluecolored.bluemap.api.math.Color
 
 fun Color.stringify(): String {
-    return "(R:$red G:$blue B:$blue Opacity:$alpha)"
+    return "R:$red G:$green B:$blue Opacity:$alpha"
 }
 
 fun Double.round(decimals: Int): Double {

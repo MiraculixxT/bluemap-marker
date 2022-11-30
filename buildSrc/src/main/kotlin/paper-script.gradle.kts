@@ -17,7 +17,6 @@ repositories {
 
 dependencies {
     paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")
-    implementation("net.axay:kspigot:1.19.0")
     implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.2.1")
 }
 

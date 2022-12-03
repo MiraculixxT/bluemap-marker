@@ -293,10 +293,10 @@ class MarkerCommand : MarkerCommandInstance {
 
         // Worlds
         literal("map") {
-            argument<String>("map", StringArgumentType.greedyString()) {
+            argument<String>("map", StringArgumentType.word()) {
                 suggestList { MarkerManager.getAllMaps() }
                 runs {
-                    val value = getArgument<String>("map")
+                    val value = getArgument<String>("map").replace(' ','.')
                     setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.MAP, value, "map $value", true)
                 }
             }

@@ -90,7 +90,7 @@ object MarkerManager {
     fun addSet(rawID: String, mapName: String, set: MarkerSet): Boolean {
         val setID = "${rawID}_$mapName"
         val api = getAPI() ?: return false
-        val map = api.maps?.firstOrNull { it.name == mapName }
+        val map = api.maps?.firstOrNull { it.name == mapName.replace('.',' ') }
         if (map == null) {
             consoleAudience.sendMessage(prefix + cmp("Failed to access Map $mapName for set $rawID! Check if BlueMap loaded correctly and if you enter a valid map name!", cError))
             return false
@@ -109,7 +109,7 @@ object MarkerManager {
     fun removeSet(rawID: String, mapName: String): Boolean {
         val setID = "${rawID}_$mapName"
         val api = getAPI() ?: return false
-        val map = api.maps.firstOrNull { it.name == mapName } ?: return false
+        val map = api.maps.firstOrNull { it.name == mapName.replace('.',' ') } ?: return false
 
         map.markerSets.remove(setID)
         markerSets.remove(setID)
@@ -121,7 +121,7 @@ object MarkerManager {
      */
     fun getAllMaps(): List<String> {
         val api = getAPI() ?: return emptyList()
-        return api.maps.map { it.name }
+        return api.maps.map { it.name.replace(' ', '.') }
     }
 
     fun loadAllMarker(api: BlueMapAPI, sourceFolder: File) {
@@ -153,7 +153,7 @@ object MarkerManager {
             }
 
             markerSets[setID] = set
-            val map = api.maps.firstOrNull { it.name == mapName }
+            val map = api.maps.firstOrNull { it.name == mapName.replace('.',' ') }
             if (map == null) {
                 consoleAudience.sendMessage(
                     prefix + cmp(

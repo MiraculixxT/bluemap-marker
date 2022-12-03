@@ -243,7 +243,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             when (args?.getOrNull(0)?.lowercase()) {
                 "build" -> builder.buildSet(sender, name)
                 "cancel" -> builder.cancel(sender, name, true)
-                "map" -> builder.setMarkerArgument(sender, name, MarkerArg.MAP, value, "map $value", true)
+                "map" -> builder.setMarkerArgument(sender, name, MarkerArg.MAP, getMultiString(args), "map $value", true)
                 "toggleable" -> builder.setMarkerArgument(sender, name, MarkerArg.TOGGLEABLE, value, "toggleable $value", true)
                 "default_hidden" -> builder.setMarkerArgument(sender, name, MarkerArg.DEFAULT_HIDDEN, value, "default hidden $value", true)
                 "label" -> builder.setMarkerArgument(sender, name, MarkerArg.LABEL, getMultiString(args), "label ${getMultiString(args)}", true)

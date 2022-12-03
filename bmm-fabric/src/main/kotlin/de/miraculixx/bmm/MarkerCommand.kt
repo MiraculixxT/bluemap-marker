@@ -280,7 +280,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // Worlds
         literal("map") {
-            argument<String>("map", StringArgumentType.word()) { value ->
+            argument<String>("map", StringArgumentType.greedyString()) { value ->
                 suggestList { MarkerManager.getAllMaps() }
                 runs {
                     setMarkerArgument(source, source.textName, MarkerArg.MAP, value(), "map ${value()}", true)

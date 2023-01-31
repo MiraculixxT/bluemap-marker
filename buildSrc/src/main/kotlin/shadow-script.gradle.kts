@@ -7,8 +7,8 @@ plugins {
 tasks {
     shadowJar {
         dependencies {
-            exclude {
-                it.moduleGroup != "de.miraculixx"
+            include {
+                it.moduleGroup == "de.miraculixx"
             }
         }
     }

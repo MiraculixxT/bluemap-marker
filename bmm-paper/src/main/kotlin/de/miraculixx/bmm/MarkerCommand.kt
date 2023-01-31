@@ -31,7 +31,7 @@ class MarkerCommand : MarkerCommandInstance {
         literal("create") {
             requiresPermission(Permission("bmarker.command.create", PermissionDefault.OP))
             argument<String>("type", StringArgumentType.word()) {
-                suggestList { listOf("poi", "line", "shape", "extrude") }
+                suggestList { listOf("poi", "line", "shape", "extrude", "ellipse") }
                 runs {
                     create(sender.bukkitSender, sender.textName, getArgument("type"))
                 }
@@ -216,6 +216,22 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+        literal("x_radius") {
+            argument<Double>("x-radius", DoubleArgumentType.doubleArg(1.0)) {
+                runs {
+                    val value = getArgument<Double>("x-radius")
+                    setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.X_RADIUS, value, "x radius $value")
+                }
+            }
+        }
+        literal("z_radius") {
+            argument<Double>("z-radius", DoubleArgumentType.doubleArg(1.0)) {
+                runs {
+                    val value = getArgument<Double>("z-radius")
+                    setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.Z_RADIUS, value, "z radius $value")
+                }
+            }
+        }
 
         // Integer
         literal("line_width") {
@@ -223,6 +239,14 @@ class MarkerCommand : MarkerCommandInstance {
                 runs {
                     val value = getArgument<Int>("line-width")
                     setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.LINE_WIDTH, value, "line width $value")
+                }
+            }
+        }
+        literal("points") {
+            argument<Int>("points", IntegerArgumentType.integer(5)) {
+                runs {
+                    val value = getArgument<Int>("points")
+                    setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.POINTS, value, "ellipse points $value")
                 }
             }
         }

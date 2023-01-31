@@ -61,14 +61,19 @@ class MarkerBuilder(private val type: MarkerType): Builder {
                 if (vector2dList.isEmpty()) return null
                 shape(Shape(vector2dList), args[MarkerArg.HEIGHT]?.getFloat() ?: return null, args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: return null)
 
-                args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
-                args[MarkerArg.LINK]?.getString()?.let { link(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
-                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { depthTestEnabled(it) }
-                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth(it) }
-                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor(it) }
-                args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor(it) }
-                args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
-                args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
+                applyExtrudeData()
+            }.build()
+
+            MarkerType.ELLIPSE -> ExtrudeMarker.builder().apply {
+                applyBasics()
+                val position = args[MarkerArg.POSITION]?.getVector3d() ?: return null
+                val shape = Shape.createEllipse(position.x, position.z,
+                    args[MarkerArg.X_RADIUS]?.getDouble() ?: return null,
+                    args[MarkerArg.Z_RADIUS]?.getDouble() ?: return null,
+                    args[MarkerArg.POINTS]?.getInt() ?: return null)
+                shape(shape, position.y.toFloat(), args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: return null)
+
+                applyExtrudeData()
             }.build()
 
             else -> return null
@@ -80,6 +85,17 @@ class MarkerBuilder(private val type: MarkerType): Builder {
         label(label)
         args[MarkerArg.POSITION]?.getVector3d()?.let { position(it) }
         return true
+    }
+
+    private fun ExtrudeMarker.Builder.applyExtrudeData() {
+        args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
+        args[MarkerArg.LINK]?.getString()?.let { link(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
+        args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { depthTestEnabled(it) }
+        args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth(it) }
+        args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor(it) }
+        args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor(it) }
+        args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
+        args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
     }
 
     /*
@@ -125,7 +141,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
                     val line = marker as? LineMarker ?: return null
                     builder.getVec3List().addAll(line.line.points)
                     builder.args[MarkerArg.DETAIL] = ArgumentValue(line.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(line.link.orElse(null))
+                    builder.args[MarkerArg.LINK] = ArgumentValue(line.link.orElse(""))
                     builder.args[MarkerArg.NEW_TAB] = ArgumentValue(line.isNewTab)
                     builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(line.isDepthTestEnabled)
                     builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(line.lineWidth)
@@ -137,7 +153,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
                     val shape = marker as? ShapeMarker ?: return null
                     builder.getVec2List().addAll(shape.shape.points)
                     builder.args[MarkerArg.DETAIL] = ArgumentValue(shape.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(shape.link.orElse(null))
+                    builder.args[MarkerArg.LINK] = ArgumentValue(shape.link.orElse(""))
                     builder.args[MarkerArg.NEW_TAB] = ArgumentValue(shape.isNewTab)
                     builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(shape.isDepthTestEnabled)
                     builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(shape.lineWidth)
@@ -147,11 +163,11 @@ class MarkerBuilder(private val type: MarkerType): Builder {
                     builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(shape.minDistance)
                     builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(shape.maxDistance)
                 }
-                MarkerType.EXTRUDE -> {
+                MarkerType.EXTRUDE, MarkerType.ELLIPSE -> {
                     val extrude = marker as? ExtrudeMarker ?: return null
                     builder.getVec2List().addAll(extrude.shape.points)
                     builder.args[MarkerArg.DETAIL] = ArgumentValue(extrude.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(extrude.link.orElse(null))
+                    builder.args[MarkerArg.LINK] = ArgumentValue(extrude.link.orElse(""))
                     builder.args[MarkerArg.NEW_TAB] = ArgumentValue(extrude.isNewTab)
                     builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(extrude.isDepthTestEnabled)
                     builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(extrude.lineWidth)
@@ -162,6 +178,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
                     builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(extrude.minDistance)
                     builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(extrude.maxDistance)
                 }
+
                 MarkerType.MARKER_SET -> Unit
             }
             return builder

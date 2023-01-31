@@ -23,7 +23,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             when (args?.size ?: 0) {
                 0, 1 -> addAll(listOf("create", "delete", "edit", "set-create", "set-delete"))
                 2 -> when (args?.getOrNull(0) ?: "") {
-                    "create" -> addAll(listOf("extrude", "poi", "line", "shape"))
+                    "create" -> addAll(listOf("extrude", "poi", "line", "shape", "ellipse"))
                     "delete", "edit", "set-delete" -> addAll(MarkerManager.getAllMaps())
                 }
 
@@ -78,13 +78,13 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
         override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>?): MutableList<String> {
             return buildList {
                 when (args?.size ?: 0) {
-                    0, 1 -> addAll(listOf("build", "cancel", "icon", "link", "id", "label", "detail", "marker_set", "position", "anchor", "add_direction", "add_edge", "max_distance", "min_distance", "line_width", "height", "line_color", "fill_color", "new_tab", "depth_test"))
+                    0, 1 -> addAll(listOf("build", "cancel", "icon", "link", "id", "label", "detail", "marker_set", "position", "anchor", "add_direction", "add_edge", "max_distance", "min_distance", "line_width", "height", "line_color", "fill_color", "new_tab", "depth_test", "points", "x-radius", "z-radius"))
                     2 -> when (args?.getOrNull(0)) {
                         "position", "add_direction" -> add("~ ~ ~")
                         "anchor", "add_edge" -> add("~ ~")
                         "line_color", "fill_color" -> add("<red 0-255>")
                         "new_tab", "depth_test" -> addAll(listOf("true","false"))
-                        "max_distance", "min_distance", "line_width", "height", "max_height" -> add("<positiv-number>")
+                        "max_distance", "min_distance", "line_width", "height", "max_height", "points", "x-radius", "z-radius" -> add("<positiv-number>")
                         "id" -> add("<word>")
                         "label", "detail" -> add("<phrase>")
                         "link", "icon" -> add("<url>")
@@ -158,6 +158,9 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
                 }
                 "new_tab" -> builder.setMarkerArgument(sender, name, MarkerArg.NEW_TAB, value, "open new tab $value")
                 "depth_test" -> builder.setMarkerArgument(sender, name, MarkerArg.DEPTH_TEST, value, "depth test $value")
+                "points" -> builder.setMarkerArgument(sender, name, MarkerArg.POINTS, value, "ellipse points $value")
+                "x-radius" -> builder.setMarkerArgument(sender, name, MarkerArg.X_RADIUS, value, "x-radius $value")
+                "z-radius" -> builder.setMarkerArgument(sender, name, MarkerArg.Z_RADIUS, value, "z-radius $value")
 
                 else -> builder.sendStatusInfo(sender, name)
             }
@@ -215,7 +218,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             return buildString {
                 val list = args?.toList() ?: return ""
                 list.subList(1, list.size).forEach { append("$it ") }
-            }
+            }.removeSuffix(" ")
         }
     }
 
@@ -257,7 +260,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
             return buildString {
                 val list = args?.toList() ?: return ""
                 list.subList(1, list.size).forEach { append("$it ") }
-            }
+            }.removeSuffix(" ")
         }
     }
 

@@ -147,7 +147,7 @@ interface MarkerCommandInstance {
             if (MarkerManager.addMarker(markerSet, marker, markerID)) {
                 builder.remove(id)
                 sender.sendMessage(prefix + cmp("Marker created! It should appear on your BlueMap in a few seconds"))
-            } else sender.sendMessage(prefix + cmp("The marker set ", cError) + cmp(markerID, cError, underlined = true) + cmp(" does not exist (/$mainCommandPrefix set-create)", cError))
+            } else sender.sendMessage(prefix + cmp("The marker set ", cError) + cmp(markerSet, cError, underlined = true) + cmp(" does not exist (/$mainCommandPrefix set-create)", cError))
         }
     }
 

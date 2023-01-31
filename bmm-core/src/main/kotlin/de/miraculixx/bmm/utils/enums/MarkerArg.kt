@@ -19,7 +19,10 @@ enum class MarkerArg(val description: String, val isRequired: Boolean) {
     LINE_COLOR("Color of the line/outline (RGBA)\n- https://htmlcolorcodes.com -", false),
     FILL_COLOR("Color of the drawn field (RGBA)\n- https://htmlcolorcodes.com -", false),
     HEIGHT("The minimal height of the marker field.\nDefinition height for shape markers", true),
-    MAX_HEIGHT("The maximal height of the marker field\n(Extrude exclusive)", true),
+    MAX_HEIGHT("The maximal height of the marker field.\nSet to the same Y height/position\nfor a flat shape", true),
+    POINTS("The amount of points used to render\nthe circle/ellipse. More points\ncreate cleaner borders but to many\npoints affect performance!", true),
+    X_RADIUS("The ellipse radius to the +-x direction", true),
+    Z_RADIUS("The ellipse radius to the +-z direction", true),
 
     // Marker-Set exclusives
     MAP("Target BlueMap Map", true),

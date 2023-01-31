@@ -65,6 +65,27 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE
         )
     ),
+    ELLIPSE(
+        listOf(
+            MarkerArg.ID,
+            MarkerArg.MARKER_SET,
+            MarkerArg.LABEL,
+            MarkerArg.POSITION,
+            MarkerArg.MAX_HEIGHT,
+            MarkerArg.X_RADIUS,
+            MarkerArg.Z_RADIUS,
+            MarkerArg.POINTS,
+            MarkerArg.DETAIL,
+            MarkerArg.LINK,
+            MarkerArg.NEW_TAB,
+            MarkerArg.DEPTH_TEST,
+            MarkerArg.LINE_WIDTH,
+            MarkerArg.LINE_COLOR,
+            MarkerArg.FILL_COLOR,
+            MarkerArg.MIN_DISTANCE,
+            MarkerArg.MAX_DISTANCE
+        )
+    ),
 
     MARKER_SET(
         listOf(

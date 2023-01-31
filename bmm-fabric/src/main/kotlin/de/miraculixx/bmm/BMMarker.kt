@@ -24,8 +24,8 @@ class BMMarker : ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(ServerStarting { server: MinecraftServer? ->
             val adventure = FabricServerAudiences.of(server!!)
             consoleAudience = adventure.console()
-            File("config/bm-marker").mkdirs()
-            config = File("config/bm-marker/markers.json")
+            config = File("config/bm-marker")
+            if (!config.exists()) config.mkdirs()
             blueMapInstance = BlueMap(config)
         })
 

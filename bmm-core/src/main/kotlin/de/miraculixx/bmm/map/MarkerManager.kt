@@ -168,6 +168,8 @@ object MarkerManager {
     }
 
     fun saveAllMarker(sourceFolder: File) {
+        if (markerSets.isEmpty()) return
+
         val gson = MarkerGson.INSTANCE
         val folder = prepareConfigFolder(sourceFolder)
         val sets = File("${folder.path}/marker-sets.json")

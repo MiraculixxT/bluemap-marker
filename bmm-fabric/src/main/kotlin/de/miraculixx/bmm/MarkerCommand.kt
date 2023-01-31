@@ -30,7 +30,7 @@ class MarkerCommand : MarkerCommandInstance {
         literal("create") {
             requiresPermissionLevel(2)
             argument<String>("type", StringArgumentType.word()) { type ->
-                suggestList { listOf("poi", "line", "shape", "extrude") }
+                suggestList { listOf("poi", "line", "shape", "extrude", "ellipse") }
                 runs {
                     create(source, source.textName, type())
                 }
@@ -208,12 +208,33 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+        literal("x_radius") {
+            argument<Double>("x-radius", DoubleArgumentType.doubleArg(1.0)) { value ->
+                runs {
+                    setMarkerArgument(source, source.textName, MarkerArg.X_RADIUS, value(), "x radius ${value()}")
+                }
+            }
+        }
+        literal("z_radius") {
+            argument<Double>("z-radius", DoubleArgumentType.doubleArg(1.0)) { value ->
+                runs {
+                    setMarkerArgument(source, source.textName, MarkerArg.Z_RADIUS, value(), "z radius ${value()}")
+                }
+            }
+        }
 
         // Integer
         literal("line_width") {
             argument<Int>("line-width", IntegerArgumentType.integer(0)) { value ->
                 runs {
                     setMarkerArgument(source, source.textName, MarkerArg.LINE_WIDTH, value(), "line width ${value()}")
+                }
+            }
+        }
+        literal("points") {
+            argument<Int>("points", IntegerArgumentType.integer(5)) { value ->
+                runs {
+                    setMarkerArgument(source, source.textName, MarkerArg.POINTS, value(), "ellipse points ${value()}")
                 }
             }
         }

@@ -29,6 +29,8 @@ interface MarkerCommandInstance {
         get() = "bmarker-setup"
     val setupSetCommandPrefix: String
         get() = "bmarker-setup-set"
+    val visibilityCommandPrefix: String
+        get() = "bplayer"
     private val alreadyStarted: Component
         get() = prefix +
                 cmp("You already started a marker setup! ", cError) +
@@ -288,6 +290,22 @@ interface MarkerCommandInstance {
         } catch (e: Exception) {
             consoleAudience.sendMessage(prefix + cmp("Failed to convert marker input!", cError))
             consoleAudience.sendMessage(prefix + cmp(e.message ?: "Reason unknown", cError))
+        }
+    }
+
+    fun setPlayerVisibility(sender: Audience, targets: List<Pair<UUID, String>>, visible: Boolean) {
+        BlueMapAPI.getInstance().ifPresentOrElse({ api ->
+            if (targets.isEmpty()) {
+                sender.sendMessage(prefix + cmp("Could not found given player!", cError))
+                return@ifPresentOrElse
+            }
+            targets.forEach { target ->
+                api.webApp.setPlayerVisibility(target.first, visible)
+                val info = if (visible) cmp("visible", cSuccess) else cmp("invisible", cError)
+                sender.sendMessage(prefix + cmp(target.second, cMark) + cmp(" is now ") + info + cmp(" on your BlueMap!"))
+            }
+        }) {
+            sender.sendMessage(prefix + cmp("Failed to connect to BlueMap! Are you using the latest version?", cError))
         }
     }
 

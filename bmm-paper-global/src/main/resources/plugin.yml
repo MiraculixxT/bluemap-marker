@@ -27,3 +27,6 @@ commands:
   bmarker-setup-set:
     permission: "bmarker.command.set-create"
     description: "Modify values on your marker-set builder setup"
+  bplayer:
+    permission: "bmarker.command.visibility"
+    description: "Modify the visibility of all players on your BlueMap"

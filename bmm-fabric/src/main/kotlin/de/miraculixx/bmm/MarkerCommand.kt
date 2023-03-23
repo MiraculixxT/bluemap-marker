@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import com.mojang.brigadier.arguments.*
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import de.bluecolored.bluemap.api.math.Color
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
@@ -12,6 +13,7 @@ import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.round
 import de.miraculixx.bmm.utils.message.stringify
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.Coordinates
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
@@ -349,6 +351,17 @@ class MarkerCommand : MarkerCommandInstance {
         idLogic(true)
     }
 
+    val visibilityCommand = command(visibilityCommandPrefix) {
+        requiresPermissionLevel(3)
+
+        literal("hide") {
+            visibility(false)
+        }
+        literal("show") {
+            visibility(true)
+        }
+    }
+
 
     /*
      *
@@ -386,6 +399,15 @@ class MarkerCommand : MarkerCommandInstance {
                 runs {
                     setMarkerArgument(source, source.textName, MarkerArg.ID, value(), "ID ${value()}", isSet)
                 }
+            }
+        }
+    }
+
+    private fun LiteralCommandBuilder<CommandSourceStack>.visibility(visible: Boolean) {
+        argument<GameProfileArgument.Result>("target", GameProfileArgument.gameProfile()) { target ->
+            runs {
+                val profiles = target().getNames(source).map { it.id to it.name }
+                setPlayerVisibility(source, profiles, visible)
             }
         }
     }

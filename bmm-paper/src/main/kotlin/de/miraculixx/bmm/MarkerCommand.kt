@@ -14,6 +14,7 @@ import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.*
 import de.miraculixx.kpaper.commands.*
 import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.Coordinates
 import net.minecraft.commands.arguments.coordinates.Vec2Argument
 import net.minecraft.commands.arguments.coordinates.Vec3Argument
@@ -368,6 +369,17 @@ class MarkerCommand : MarkerCommandInstance {
         idLogic(true)
     }
 
+    val visibilityCommand = command(visibilityCommandPrefix) {
+        requiresPermission("bmarker.command.visibility")
+
+        literal("hide") {
+            visibility(false)
+        }
+        literal("show") {
+            visibility(true)
+        }
+    }
+
 
     /*
      *
@@ -411,6 +423,15 @@ class MarkerCommand : MarkerCommandInstance {
                     val value = getArgument<String>("id")
                     setMarkerArgument(sender.bukkitSender, sender.textName, MarkerArg.ID, value, "ID $value", isSet)
                 }
+            }
+        }
+    }
+
+    private fun LiteralArgumentBuilder<CommandSourceStack>.visibility(visible: Boolean) {
+        argument<GameProfileArgument.Result>("target", GameProfileArgument.gameProfile()) {
+            runs {
+                val profiles = getArgument<GameProfileArgument.Result>("target").getNames(sender).map { it.id to it.name }
+                setPlayerVisibility(sender.bukkitSender, profiles, visible)
             }
         }
     }

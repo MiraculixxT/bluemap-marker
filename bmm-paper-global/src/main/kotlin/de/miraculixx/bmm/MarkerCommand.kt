@@ -9,6 +9,7 @@ import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.*
+import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
@@ -268,16 +269,45 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
         }
     }
 
+    private class Visibility(val builder: MarkerCommand): TabExecutor {
+        override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>?): MutableList<String> {
+            return buildList {
+                when (args?.size ?: 0) {
+                    0, 1 -> addAll(listOf("show", "hide"))
+                    2 -> {
+                        val arg1 = args?.getOrNull(0)
+                        if (arg1 == "hide" || arg1 == "show") addAll(Bukkit.getOfflinePlayers().mapNotNull { it.name })
+                    }
+                }
+            }.toMutableList()
+        }
+
+        override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+            val target = args?.getOrNull(1)
+            val player = target?.let { Bukkit.getOfflinePlayer(it) }
+            val list = if (player != null) listOf(player.uniqueId to (player.name ?: "Unknown")) else emptyList()
+            when (args?.getOrNull(0)?.lowercase()) {
+                "show" -> builder.setPlayerVisibility(sender, list, true)
+                "hide" -> builder.setPlayerVisibility(sender, list, false)
+            }
+            return true
+        }
+    }
+
     init {
-        PluginManager.getCommand("bmarker")?.setExecutor(this)
-        PluginManager.getCommand("bmarker")?.tabCompleter = this
+        PluginManager.getCommand(mainCommandPrefix)?.setExecutor(this)
+        PluginManager.getCommand(mainCommandPrefix)?.tabCompleter = this
 
         val setupCMD = Setup(this)
-        PluginManager.getCommand("bmarker-setup")?.setExecutor(setupCMD)
-        PluginManager.getCommand("bmarker-setup")?.tabCompleter = setupCMD
+        PluginManager.getCommand(setupCommandPrefix)?.setExecutor(setupCMD)
+        PluginManager.getCommand(setupCommandPrefix)?.tabCompleter = setupCMD
 
         val setupSetCMD = SetupSet(this)
-        PluginManager.getCommand("bmarker-setup-set")?.setExecutor(setupSetCMD)
-        PluginManager.getCommand("bmarker-setup-set")?.tabCompleter = setupSetCMD
+        PluginManager.getCommand(setupSetCommandPrefix)?.setExecutor(setupSetCMD)
+        PluginManager.getCommand(setupSetCommandPrefix)?.tabCompleter = setupSetCMD
+
+        val visibilityCMD = Visibility(this)
+        PluginManager.getCommand(visibilityCommandPrefix)?.setExecutor(visibilityCMD)
+        PluginManager.getCommand(visibilityCommandPrefix)?.tabCompleter = visibilityCMD
     }
 }

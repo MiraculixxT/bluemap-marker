@@ -99,6 +99,25 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+
+        // /marker migrate
+        literal("migrate") {
+            requiresPermission(Permission("bmarker.command.migrate", PermissionDefault.OP))
+            runs {
+                migrateMarkers(sender.bukkitSender)
+            }
+            argument<String>("map", StringArgumentType.word()) {
+                requires { source -> !source.isPlayer }
+                suggestList { MarkerManager.getAllMaps() }
+                argument<String>("set-id", StringArgumentType.word()) {
+                    argument<String>("input", StringArgumentType.greedyString()) {
+                        runs {
+                            migrateMarkers(sender.bukkitSender, getArgument("input"), getArgument("set-id"), getArgument("map"))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     val setupMarkerCommand = command(setupCommandPrefix) {

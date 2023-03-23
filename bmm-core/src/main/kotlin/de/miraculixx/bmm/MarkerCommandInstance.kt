@@ -2,6 +2,8 @@ package de.miraculixx.bmm
 
 import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector3d
+import de.bluecolored.bluemap.api.BlueMapAPI
+import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
@@ -16,6 +18,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import java.util.UUID
 
 interface MarkerCommandInstance {
     val builder: MutableMap<String, MarkerBuilder>
@@ -241,6 +244,51 @@ interface MarkerCommandInstance {
                     cmp("Set", cMark) + cmp(" will clone this marker!")
         )
         sendStatusInfo(sender, id)
+    }
+
+    fun migrateMarkers(sender: Audience) {
+        BlueMapAPI.getInstance().ifPresentOrElse({ api ->
+            val info = prefix + cmp("Start migrating internal markers to BMM...")
+            consoleAudience.sendMessage(info)
+            sender.sendMessage(info)
+            api.maps.forEach { map ->
+                val name = map.name
+                val bmmMarkers = MarkerManager.getAllSetIDs()
+                val markers = map.markerSets.filter { !bmmMarkers.contains(it.key) }
+                if (markers.isEmpty()) {
+                    consoleAudience.sendMessage(prefix + cmp(" -> Skip Empty Map: $name"))
+                    return@forEach
+                }
+                consoleAudience.sendMessage(prefix + cmp(" -> Start Map: $name (${markers.size})"))
+                markers.forEach { (id, set) ->
+                    if (MarkerManager.addSet(id ?: UUID.randomUUID().toString(), name ?: "Unknown", set)) {
+                        consoleAudience.sendMessage(prefix + cmp("  - Set $id successfully migrated", cSuccess))
+                    } else consoleAudience.sendMessage(prefix + cmp("  - Set $id failed to migrate! Reason above", cError))
+                }
+                consoleAudience.sendMessage(prefix + cmp(" -> Finished Map: $name"))
+            }
+
+            val infoEnd = prefix + cmp("Finished to migrate internal markers to BMM! You can edit them now via command and remove them from the BlueMap config", cSuccess)
+            consoleAudience.sendMessage(infoEnd)
+            sender.sendMessage(infoEnd)
+        }) {
+            sender.sendMessage(prefix + cmp("Failed to connect to BlueMap! Are you using the latest version?", cError))
+        }
+    }
+
+    fun migrateMarkers(sender: Audience, input: String, rawID: String, mapName: String) {
+        var final = input.substringAfter('#')
+        if (final.startsWith("\"marker-sets\"")) {
+            final = final.removePrefix("\"marker-sets\": {").substringBeforeLast('}')
+        }
+        try {
+            val set = gson.fromJson(final, MarkerSet::class.java)
+            MarkerManager.addSet(rawID, mapName, set)
+            consoleAudience.sendMessage(prefix + cmp("Successfully migrated the marker set!", cSuccess))
+        } catch (e: Exception) {
+            consoleAudience.sendMessage(prefix + cmp("Failed to convert marker input!", cError))
+            consoleAudience.sendMessage(prefix + cmp(e.message ?: "Reason unknown", cError))
+        }
     }
 
 

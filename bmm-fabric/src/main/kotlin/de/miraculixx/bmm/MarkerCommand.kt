@@ -97,6 +97,25 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+
+        // /marker migrate
+        literal("migrate") {
+            requiresPermissionLevel(4)
+            runs {
+                migrateMarkers(source)
+            }
+            argument<String>("map", StringArgumentType.word()) { map ->
+                requires { source -> !source.isPlayer }
+                suggestList { MarkerManager.getAllMaps() }
+                argument<String>("set-id", StringArgumentType.word()) { setID ->
+                    argument<String>("input", StringArgumentType.greedyString()) { input ->
+                        runs {
+                            migrateMarkers(source, input(), setID(), map())
+                        }
+                    }
+                }
+            }
+        }
     }
 
     val setupMarkerCommand = command(setupCommandPrefix) {
@@ -304,7 +323,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<String>("map", StringArgumentType.word()) { value ->
                 suggestList { MarkerManager.getAllMaps() }
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.MAP, value().replace(' ','.'), "map ${value()}", true)
+                    setMarkerArgument(source, source.textName, MarkerArg.MAP, value().replace(' ', '.'), "map ${value()}", true)
                 }
             }
         }

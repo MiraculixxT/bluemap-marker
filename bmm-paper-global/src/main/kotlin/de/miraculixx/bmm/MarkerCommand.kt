@@ -21,7 +21,7 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
     override fun onTabComplete(sender: CommandSender, command: Command, label: String, args: Array<out String>?): MutableList<String> {
         return buildList {
             when (args?.size ?: 0) {
-                0, 1 -> addAll(listOf("create", "delete", "edit", "set-create", "set-delete"))
+                0, 1 -> addAll(listOf("create", "delete", "edit", "set-create", "set-delete", "migrate"))
                 2 -> when (args?.getOrNull(0) ?: "") {
                     "create" -> addAll(listOf("extrude", "poi", "line", "shape", "ellipse"))
                     "delete", "edit", "set-delete" -> addAll(MarkerManager.getAllMaps())
@@ -65,6 +65,10 @@ class MarkerCommand : TabExecutor, MarkerCommandInstance {
                 val confirm = args.getOrNull(3)?.toBoolean()
                 if (confirm == true) deleteSet(sender, true, args.getOrNull(2), args.getOrNull(1))
             } else noPermission("bmarker.command.set-delete", sender)
+
+            "migrate" -> if (sender.hasPermission("bmarker.command.migrate")) {
+                migrateMarkers(sender)
+            } else noPermission("bmarker.command.migrate", sender)
         }
 
         return true

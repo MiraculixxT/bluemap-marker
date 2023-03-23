@@ -6,7 +6,6 @@ import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
 import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
-import net.kyori.adventure.audience.Audience
 import java.io.File
 import java.util.function.Consumer
 

@@ -216,13 +216,7 @@ class MarkerCommand : MarkerCommandInstance {
                 runs {
                     val newDirection = pos().getPosition(source)
                     val value = Vector3d(newDirection.x.round(2), newDirection.y.round(2), newDirection.z.round(2))
-                    addMarkerArgumentList(
-                        source,
-                        source.textName,
-                        MarkerArg.ADD_POSITION,
-                        value,
-                        "new direction $value"
-                    )
+                    addMarkerArgumentList(source, source.textName, MarkerArg.ADD_POSITION, value, "new direction $value")
                 }
             }
         }
@@ -241,11 +235,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Double>("max-distance", DoubleArgumentType.doubleArg(0.0)) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.MAX_DISTANCE,
-                        value(),
-                        "maximal distance ${value()}"
+                        source, source.textName, MarkerArg.MAX_DISTANCE, value(), "maximal distance ${value()}"
                     )
                 }
             }
@@ -254,11 +244,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Double>("min-distance", DoubleArgumentType.doubleArg(0.0)) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.MIN_DISTANCE,
-                        value(),
-                        "minimal distance ${value()}"
+                        source, source.textName, MarkerArg.MIN_DISTANCE, value(), "minimal distance ${value()}"
                     )
                 }
             }
@@ -306,11 +292,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Float>("max-height", FloatArgumentType.floatArg()) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.MAX_HEIGHT,
-                        value(),
-                        "maximal height ${value()}"
+                        source, source.textName, MarkerArg.MAX_HEIGHT, value(), "maximal height ${value()}"
                     )
                 }
             }
@@ -329,11 +311,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Boolean>("new-tab", BoolArgumentType.bool()) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.NEW_TAB,
-                        value(),
-                        "open new tab on click ${value()}"
+                        source, source.textName, MarkerArg.NEW_TAB, value(), "open new tab on click ${value()}"
                     )
                 }
             }
@@ -374,12 +352,7 @@ class MarkerCommand : MarkerCommandInstance {
                 suggestList { MarkerManager.getAllMaps() }
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.MAP,
-                        value().replace(' ', '.'),
-                        "map ${value()}",
-                        true
+                        source, source.textName, MarkerArg.MAP, value().replace(' ', '.'), "map ${value()}", true
                     )
                 }
             }
@@ -390,12 +363,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Boolean>("toggleable", BoolArgumentType.bool()) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.TOGGLEABLE,
-                        value(),
-                        "toggleable ${value()}",
-                        true
+                        source, source.textName, MarkerArg.TOGGLEABLE, value(), "toggleable ${value()}", true
                     )
                 }
             }
@@ -404,12 +372,7 @@ class MarkerCommand : MarkerCommandInstance {
             argument<Boolean>("default-hidden", BoolArgumentType.bool()) { value ->
                 runs {
                     setMarkerArgument(
-                        source,
-                        source.textName,
-                        MarkerArg.DEFAULT_HIDDEN,
-                        value(),
-                        "default hidden ${value()}",
-                        true
+                        source, source.textName, MarkerArg.DEFAULT_HIDDEN, value(), "default hidden ${value()}", true
                     )
                 }
             }

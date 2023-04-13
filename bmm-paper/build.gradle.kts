@@ -7,5 +7,5 @@ plugins {
 
 dependencies {
     implementation(project(":bmm-core"))
-    implementation(project(":kpaper-light"))
+//    implementation(project(":kpaper-light"))
 }

@@ -7,8 +7,6 @@ import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStarting
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStopped
 import net.kyori.adventure.platform.fabric.FabricServerAudiences
 import net.minecraft.server.MinecraftServer
 import java.io.File
@@ -20,8 +18,7 @@ class BMMarker : ModInitializer {
 
     override fun onInitialize() {
         MarkerCommand()
-
-        ServerLifecycleEvents.SERVER_STARTING.register(ServerStarting { server: MinecraftServer? ->
+        ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server: MinecraftServer? ->
             val adventure = FabricServerAudiences.of(server!!)
             consoleAudience = adventure.console()
             config = File("config/bm-marker")
@@ -29,7 +26,7 @@ class BMMarker : ModInitializer {
             blueMapInstance = BlueMap(config)
         })
 
-        ServerLifecycleEvents.SERVER_STOPPED.register(ServerStopped {
+        ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifecycleEvents.ServerStopped {
             blueMapInstance.disable()
             MarkerManager.saveAllMarker(config)
             consoleAudience.sendMessage(prefix + cmp("Successfully saved all data! Good Bye :)"))

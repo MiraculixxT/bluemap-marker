@@ -190,7 +190,7 @@ object MarkerManager {
     private fun getAPI(): BlueMapAPI? {
         val instance = BlueMapAPI.getInstance()
         return if (!instance.isPresent) {
-            consoleAudience.sendMessage(prefix + cmp("Failed to access BlueMap API! Try /bluemap reload and look for errors or contact support", cError))
+//            consoleAudience.sendMessage(prefix + cmp("Failed to access BlueMap API! Try /bluemap reload and look for errors or contact support", cError))
             null
         } else instance.get()
     }

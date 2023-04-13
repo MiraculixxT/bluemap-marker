@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import com.mojang.brigadier.arguments.*
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import de.bluecolored.bluemap.api.math.Color
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager

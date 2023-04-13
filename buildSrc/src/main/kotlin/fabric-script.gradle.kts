@@ -4,7 +4,6 @@ import org.gradle.kotlin.dsl.withType
 
 plugins {
     id("fabric-loom")
-    id("io.github.juuxel.loom-quiltflower")
 }
 
 repositories {
@@ -17,9 +16,7 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings(loom.layered {
-        officialMojangMappings()
-    })
+    mappings(loom.officialMojangMappings())
     implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.2.1")
 }
 

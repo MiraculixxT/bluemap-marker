@@ -17,6 +17,8 @@ repositories {
 dependencies {
     paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")
     implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.2.1")
+    implementation("dev.jorel:commandapi-kotlin:8.8.0")
+    implementation("dev.jorel:commandapi-shade:8.8.0")
 }
 
 tasks {

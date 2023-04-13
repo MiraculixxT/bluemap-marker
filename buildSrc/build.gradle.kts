@@ -23,8 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
     // Fabric implementation
-    implementation("net.fabricmc:fabric-loom:1.0-SNAPSHOT")
-    implementation("io.github.juuxel:loom-quiltflower:1.7.4")
+    implementation("net.fabricmc:fabric-loom:1.1-SNAPSHOT")
 
     // Paper implementation
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.9")

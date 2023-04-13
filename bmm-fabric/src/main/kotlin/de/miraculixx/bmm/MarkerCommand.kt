@@ -11,6 +11,7 @@ import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.round
 import de.miraculixx.bmm.utils.message.stringify
+import me.lucko.fabric.api.permissions.v0.Permissions
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.Coordinates
@@ -26,10 +27,14 @@ class MarkerCommand : MarkerCommandInstance {
     override val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
 
     val mainCommand = command(mainCommandPrefix) {
-        requiresPermissionLevel(2)
+        requires {
+            Permissions.require("bmarker.command.main", 2).test(it)
+        }
         // /marker create <type>
         literal("create") {
-            requiresPermissionLevel(2)
+            requires {
+                Permissions.require("bmarker.command.create", 2).test(it)
+            }
             argument<String>("type", StringArgumentType.word()) { type ->
                 suggestList { listOf("poi", "line", "shape", "extrude", "ellipse") }
                 runs {
@@ -40,7 +45,9 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker delete <map> <set-id> <marker-id>
         literal("delete") {
-            requiresPermissionLevel(3)
+            requires {
+                Permissions.require("bmarker.command.delete", 3).test(it)
+            }
             argument<String>("map", StringArgumentType.word()) { map ->
                 suggestList { MarkerManager.getAllMaps() }
                 argument<String>("marker-set", StringArgumentType.word()) { markerSet ->
@@ -57,7 +64,9 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker edit <map> <set-id> <marker-id>
         literal("edit") {
-            requiresPermissionLevel(2)
+            requires {
+                Permissions.require("bmarker.command.edit", 2).test(it)
+            }
             argument<String>("map", StringArgumentType.word()) { map ->
                 suggestList { MarkerManager.getAllMaps() }
                 argument<String>("marker-set", StringArgumentType.word()) { markerSet ->
@@ -74,7 +83,9 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-create
         literal("set-create") {
-            requiresPermissionLevel(4)
+            requires {
+                Permissions.require("bmarker.command.set-create", 4).test(it)
+            }
             runs {
                 createSet(source, source.textName)
             }
@@ -82,7 +93,9 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-delete <map> <id> <true>
         literal("set-delete") {
-            requiresPermissionLevel(4)
+            requires {
+                Permissions.require("bmarker.command.set-delete", 4).test(it)
+            }
             argument<String>("map", StringArgumentType.word()) { map ->
                 suggestList { MarkerManager.getAllMaps() }
                 argument<String>("set-id", StringArgumentType.word()) { setID ->
@@ -101,7 +114,9 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker migrate
         literal("migrate") {
-            requiresPermissionLevel(4)
+            requires {
+                Permissions.require("bmarker.command.migrate", 4).test(it)
+            }
             runs {
                 migrateMarkers(source)
             }
@@ -120,7 +135,9 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val setupMarkerCommand = command(setupCommandPrefix) {
-        requiresPermissionLevel(2)
+        requires {
+            Permissions.require("bmarker.command.create", 2).test(it)
+        }
 
         runs {
             sendStatusInfo(source, source.textName)
@@ -199,7 +216,13 @@ class MarkerCommand : MarkerCommandInstance {
                 runs {
                     val newDirection = pos().getPosition(source)
                     val value = Vector3d(newDirection.x.round(2), newDirection.y.round(2), newDirection.z.round(2))
-                    addMarkerArgumentList(source, source.textName, MarkerArg.ADD_POSITION, value, "new direction $value")
+                    addMarkerArgumentList(
+                        source,
+                        source.textName,
+                        MarkerArg.ADD_POSITION,
+                        value,
+                        "new direction $value"
+                    )
                 }
             }
         }
@@ -217,14 +240,26 @@ class MarkerCommand : MarkerCommandInstance {
         literal("max_distance") {
             argument<Double>("max-distance", DoubleArgumentType.doubleArg(0.0)) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.MAX_DISTANCE, value(), "maximal distance ${value()}")
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.MAX_DISTANCE,
+                        value(),
+                        "maximal distance ${value()}"
+                    )
                 }
             }
         }
         literal("min_distance") {
             argument<Double>("min-distance", DoubleArgumentType.doubleArg(0.0)) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.MIN_DISTANCE, value(), "minimal distance ${value()}")
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.MIN_DISTANCE,
+                        value(),
+                        "minimal distance ${value()}"
+                    )
                 }
             }
         }
@@ -270,7 +305,13 @@ class MarkerCommand : MarkerCommandInstance {
         literal("max_height") {
             argument<Float>("max-height", FloatArgumentType.floatArg()) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.MAX_HEIGHT, value(), "maximal height ${value()}")
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.MAX_HEIGHT,
+                        value(),
+                        "maximal height ${value()}"
+                    )
                 }
             }
         }
@@ -287,7 +328,13 @@ class MarkerCommand : MarkerCommandInstance {
         literal("new_tab") {
             argument<Boolean>("new-tab", BoolArgumentType.bool()) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.NEW_TAB, value(), "open new tab on click ${value()}")
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.NEW_TAB,
+                        value(),
+                        "open new tab on click ${value()}"
+                    )
                 }
             }
         }
@@ -301,7 +348,9 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val setupSetCommand = command(setupSetCommandPrefix) {
-        requiresPermissionLevel(3)
+        requires {
+            Permissions.require("bmarker.command.set-create", 3).test(it)
+        }
 
         runs {
             sendStatusInfo(source, source.textName, true)
@@ -324,7 +373,14 @@ class MarkerCommand : MarkerCommandInstance {
             argument<String>("map", StringArgumentType.word()) { value ->
                 suggestList { MarkerManager.getAllMaps() }
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.MAP, value().replace(' ', '.'), "map ${value()}", true)
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.MAP,
+                        value().replace(' ', '.'),
+                        "map ${value()}",
+                        true
+                    )
                 }
             }
         }
@@ -333,14 +389,28 @@ class MarkerCommand : MarkerCommandInstance {
         literal("toggleable") {
             argument<Boolean>("toggleable", BoolArgumentType.bool()) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.TOGGLEABLE, value(), "toggleable ${value()}", true)
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.TOGGLEABLE,
+                        value(),
+                        "toggleable ${value()}",
+                        true
+                    )
                 }
             }
         }
         literal("default_hidden") {
             argument<Boolean>("default-hidden", BoolArgumentType.bool()) { value ->
                 runs {
-                    setMarkerArgument(source, source.textName, MarkerArg.DEFAULT_HIDDEN, value(), "default hidden ${value()}", true)
+                    setMarkerArgument(
+                        source,
+                        source.textName,
+                        MarkerArg.DEFAULT_HIDDEN,
+                        value(),
+                        "default hidden ${value()}",
+                        true
+                    )
                 }
             }
         }
@@ -351,7 +421,9 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val visibilityCommand = command(visibilityCommandPrefix) {
-        requiresPermissionLevel(3)
+        requires {
+            Permissions.require("bmarker.command.visibility", 3).test(it)
+        }
 
         literal("hide") {
             visibility(false)

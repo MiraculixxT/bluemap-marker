@@ -35,7 +35,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
 		}
 
 		val bufferedImage: BufferedImage?
-        try {
+        return try {
             if (url == null) {
                 // URL was null, assuming local path from BlueMap webroot
                 val optional: Optional<BlueMapAPI> = BlueMapAPI.getInstance()
@@ -47,13 +47,13 @@ class MarkerBuilder(private val type: MarkerType): Builder {
             }
 
 		    if (bufferedImage == null) return Vector2i.ZERO // Image could not be ImageIO.read
-        } catch (e: Exception) {
-            return Vector2i.ZERO // Image could not be loaded
-        }
 
-		val width: Int = bufferedImage.width
-		val height: Int = bufferedImage.height
-		return Vector2i(width / 2, height / 2)
+            val width: Int = bufferedImage.width
+            val height: Int = bufferedImage.height
+            Vector2i(width / 2, height / 2)
+        } catch (e: Exception) {
+            Vector2i.ZERO // Image could not be loaded
+        }
 	}
 
     fun buildMarker(): Marker? {

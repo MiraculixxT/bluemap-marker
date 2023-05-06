@@ -132,7 +132,7 @@ object MarkerManager {
 
         val setIDs = Json.decodeFromString<List<String>>(file.readText())
         setIDs.forEach { setID ->
-            val data = setID.split('_')
+            val data = setID.split("_", limit = 2)
             val mapName = data.getOrNull(1) ?: return@forEach
             val rawID = data.getOrNull(0) ?: return@forEach
             val markerFile = File("${folder.path}/${setID}.json")

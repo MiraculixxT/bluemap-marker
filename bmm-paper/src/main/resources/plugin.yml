@@ -1,5 +1,5 @@
 main: de.miraculixx.bmm.BMMarker
-version: 1.4.1
+version: 1.4.2
 name: BlueMap-Marker
 description: "A BlueMap addition plugin. Give your players the option to place markers on the map"
 author: Miraculixx
@@ -16,4 +16,3 @@ libraries:
   - "net.kyori:adventure-api:4.11.0"
   - "net.kyori:adventure-text-minimessage:4.11.0"
   - "net.kyori:adventure-text-serializer-plain:4.11.0"
-  - "net.axay:kspigot:1.19.0"

@@ -1,5 +1,6 @@
 package de.miraculixx.bmm
 
+import de.miraculixx.bmm.api.Loader
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
@@ -23,7 +24,7 @@ class BMMarker : ModInitializer {
             consoleAudience = adventure.console()
             config = File("config/bm-marker")
             if (!config.exists()) config.mkdirs()
-            blueMapInstance = BlueMap(config)
+            blueMapInstance = BlueMap(config, Loader.FABRIC, server.serverVersion)
         })
 
         ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifecycleEvents.ServerStopped {

@@ -1,5 +1,6 @@
 package de.miraculixx.bmm
 
+import de.miraculixx.bmm.api.Loader
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
@@ -25,7 +26,7 @@ class BMMarker : JavaPlugin() {
         MarkerCommand()
 
         // BlueMap Management
-        blueMapInstance = BlueMap(dataFolder)
+        blueMapInstance = BlueMap(dataFolder, Loader.PAPER, server.minecraftVersion)
     }
 
     override fun onEnable() {

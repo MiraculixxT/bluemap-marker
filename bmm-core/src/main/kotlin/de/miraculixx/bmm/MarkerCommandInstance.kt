@@ -418,7 +418,12 @@ interface MarkerCommandInstance {
         )
     }
 
-    fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, value: Any, message: String, isSet: Boolean = false) {
+    fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, value: Any?, message: String, isSet: Boolean = false) {
+        if (value == null) {
+            sender.playSound(Sound.sound(Key.key("entity.enderman.teleport"), Sound.Source.MASTER, 1f, 1f))
+            sender.sendMessage(prefix + cmp("Please enter any value!", cError))
+            return
+        }
         val builder = getBuilder(sender, id, isSet) ?: return
         builder.setArg(type, ArgumentValue(value))
         sendAppliedSuccess(sender, id, message, isSet)

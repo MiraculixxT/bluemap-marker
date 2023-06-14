@@ -14,10 +14,21 @@ repositories {
     }
 }
 
+val transitiveInclude: Configuration by configurations.creating {
+    exclude(group = "com.mojang")
+    exclude(group = "org.jetbrains.kotlin")
+    exclude(group = "org.jetbrains.kotlinx")
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.officialMojangMappings())
     implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.2.1")
+    transitiveInclude(implementation("org.yaml:snakeyaml:1.33")!!)
+
+    transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
+        include(it.moduleVersion.id.toString())
+    }
 }
 
 tasks {

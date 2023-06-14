@@ -1,6 +1,5 @@
 package de.miraculixx.bmm
 
-import de.miraculixx.bmm.api.Loader
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
@@ -8,6 +7,7 @@ import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.loader.api.FabricLoader
 import net.kyori.adventure.platform.fabric.FabricServerAudiences
 import net.minecraft.server.MinecraftServer
 import java.io.File
@@ -24,7 +24,8 @@ class BMMarker : ModInitializer {
             consoleAudience = adventure.console()
             config = File("config/bm-marker")
             if (!config.exists()) config.mkdirs()
-            blueMapInstance = BlueMap(config, Loader.FABRIC, server.serverVersion)
+            val container = FabricLoader.getInstance().getModContainer("bm-marker").get()
+            blueMapInstance = BlueMap(config, container.metadata.version.friendlyString.toIntOrNull() ?: 0)
         })
 
         ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifecycleEvents.ServerStopped {

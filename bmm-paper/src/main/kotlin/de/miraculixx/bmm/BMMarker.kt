@@ -1,13 +1,12 @@
 package de.miraculixx.bmm
 
-import de.miraculixx.bmm.api.Loader
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.message.cmp
 import de.miraculixx.bmm.utils.message.consoleAudience
 import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.prefix
 import dev.jorel.commandapi.CommandAPI
-import dev.jorel.commandapi.CommandAPIConfig
+import dev.jorel.commandapi.CommandAPIBukkitConfig
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("unused")
@@ -15,6 +14,7 @@ class BMMarker : JavaPlugin() {
     companion object {
         lateinit var INSTANCE: JavaPlugin
     }
+
     private lateinit var blueMapInstance: BlueMap
 
     override fun onLoad() {
@@ -22,15 +22,16 @@ class BMMarker : JavaPlugin() {
         consoleAudience = server.consoleSender
 
         // Load Content
-        CommandAPI.onLoad(CommandAPIConfig().silentLogs(true))
+        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
         MarkerCommand()
 
         // BlueMap Management
-        blueMapInstance = BlueMap(dataFolder, Loader.PAPER, server.minecraftVersion)
+        blueMapInstance = BlueMap(dataFolder, description.version.toIntOrNull() ?: 0)
     }
 
     override fun onEnable() {
-        CommandAPI.onEnable(this)
+        server.pluginManager.registerEvents(GlobalListener, this)
+        CommandAPI.onEnable()
     }
 
     override fun onDisable() {

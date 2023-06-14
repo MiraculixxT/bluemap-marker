@@ -12,7 +12,6 @@ import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.round
 import de.miraculixx.bmm.utils.message.stringify
-import dev.jorel.commandapi.ArgumentTree
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.*
 import dev.jorel.commandapi.kotlindsl.*
@@ -366,7 +365,7 @@ class MarkerCommand : MarkerCommandInstance {
      * Extensions to prevent duplication
      *
      */
-    private fun ArgumentTree.colorLogic(arg: MarkerArg) {
+    private fun Argument<*>.colorLogic(arg: MarkerArg) {
         integerArgument("color-r", 0, 255) {
             integerArgument("color-g", 0, 255) {
                 integerArgument("color-b", 0, 255) {
@@ -407,7 +406,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
     }
 
-    private fun ArgumentTree.visibility(visible: Boolean) {
+    private fun Argument<*>.visibility(visible: Boolean) {
         entitySelectorArgumentManyPlayers("target") {
             playerExecutor { sender, args ->
                 val profiles = (args[0] as Collection<Player>).map { it.uniqueId to it.name }

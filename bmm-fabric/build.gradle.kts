@@ -13,10 +13,10 @@ repositories {
 dependencies {
     implementation(project(":bmm-core"))
     include(project(":bmm-core"))
-    modImplementation("net.silkmc:silk-commands:1.10.0")
-    modImplementation("net.fabricmc:fabric-loader:0.14.21")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.8.0")!!)
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.83.1+1.20.1")
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.9.5+kotlin.1.8.22")
+    modImplementation("net.silkmc:silk-commands:1.9.2")
+    modImplementation("net.fabricmc:fabric-loader:0.14.11")
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.5.2")!!)
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.76.0+1.19.2")
+    modImplementation("net.fabricmc:fabric-language-kotlin:1.9.6+kotlin.1.8.22")
     modImplementation(include("me.lucko", "fabric-permissions-api", "0.2-SNAPSHOT"))
 }

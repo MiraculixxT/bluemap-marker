@@ -37,7 +37,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
 		val bufferedImage: BufferedImage?
         return try {
             if (url == null) {
-                // URL was null, assuming local path from BlueMap webroot
+                // URL was null, assuming a local path from BlueMap webroot
                 val optional: Optional<BlueMapAPI> = BlueMapAPI.getInstance()
                 if (optional.isEmpty) return Vector2i.ZERO //BlueMap is not loaded, so can't get webroot
 

@@ -17,7 +17,6 @@ import dev.jorel.commandapi.arguments.*
 import dev.jorel.commandapi.kotlindsl.*
 import dev.jorel.commandapi.wrappers.Location2D
 import org.bukkit.Location
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @Suppress("unused")
@@ -25,7 +24,9 @@ class MarkerCommand : MarkerCommandInstance {
     override val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
     override val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
 
-    val mainCommand = commandTree(mainCommandPrefix, { sender: CommandSender -> sender.hasPermission("bmarker.command.main") }) {
+    val mainCommand = commandTree(mainCommandPrefix) {
+        withPermission("bmarker.command.main")
+
         // /marker create <type>
         argument(LiteralArgument("create").withPermission("bmarker.command.create")) {
             argument(TextArgument("type").replaceSuggestions(ArgumentSuggestions.strings(listOf("poi", "line", "shape", "extrude", "ellipse")))) {
@@ -108,7 +109,9 @@ class MarkerCommand : MarkerCommandInstance {
         }
     }
 
-    val setupMarkerCommand = commandTree(setupCommandPrefix, { sender: CommandSender -> sender.hasPermission("bmarker.command.create") }) {
+    val setupMarkerCommand = commandTree(setupCommandPrefix) {
+        withPermission("bmarker.command.create")
+
         playerExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name)
         }
@@ -300,7 +303,9 @@ class MarkerCommand : MarkerCommandInstance {
         }
     }
 
-    val setupSetCommand = commandTree(setupSetCommandPrefix, { sender: CommandSender -> sender.hasPermission("bmarker.command.set-create") }) {
+    val setupSetCommand = commandTree(setupSetCommandPrefix) {
+        withPermission("bmarker.command.set-create")
+
         playerExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name, true)
         }
@@ -350,7 +355,9 @@ class MarkerCommand : MarkerCommandInstance {
         idLogic(true)
     }
 
-    val visibilityCommand = commandTree(visibilityCommandPrefix, { sender: CommandSender -> sender.hasPermission("bmarker.command.visibility") }) {
+    val visibilityCommand = commandTree(visibilityCommandPrefix) {
+        withPermission("bmarker.command.visibility")
+
         literalArgument("hide") {
             visibility(false)
         }

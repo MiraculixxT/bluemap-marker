@@ -1,9 +1,9 @@
 main: de.miraculixx.bmm.BMMarker
-version: 150
+version: 151
 name: BlueMap-Marker
 description: "A BlueMap addition plugin. Give your players the option to place markers on the map"
 author: Miraculixx
-website: https://mutils.de
+website: https://mutils.net
 load: STARTUP
 api-version: 1.16
 depend:
@@ -13,3 +13,5 @@ libraries:
   - "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
   - "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4"
   - "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+  - "dev.jorel:commandapi-bukkit-kotlin:9.1.0"
+  - "dev.jorel:commandapi-bukkit-shade:9.1.0"

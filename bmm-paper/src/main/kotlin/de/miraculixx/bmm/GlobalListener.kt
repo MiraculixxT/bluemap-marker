@@ -15,8 +15,8 @@ object GlobalListener: Listener {
     @EventHandler
     fun playerJoinEvent(it: PlayerJoinEvent) {
         val player = it.player
-        if (APIConnector.isOutdated && player.hasPermission("mweb.updater")) {
-            player.sendMessage(prefix + cmp("You are running an outdated version of MWeb!"))
+        if (APIConnector.isOutdated && player.hasPermission("bmm.updater")) {
+            player.sendMessage(prefix + cmp("You are running an outdated version of BMM!"))
             player.sendMessage(prefix + APIConnector.outdatedMessage)
             player.sendMessage(prefix + cmp("Click ") + cmp("here", cMark).clickEvent(ClickEvent.openUrl("https://modrinth.com/mod/bmarker")) + cmp(" to install the newest version."))
         }

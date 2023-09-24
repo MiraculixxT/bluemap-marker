@@ -12,12 +12,6 @@ import net.kyori.adventure.platform.fabric.FabricServerAudiences
 import net.minecraft.server.MinecraftServer
 import java.io.File
 
-fun showMessage(message: String) = ""
-
-fun pluginStart() {
-    showMessage("Hello World!")
-}
-
 class BMMarker : ModInitializer {
     private lateinit var blueMapInstance: BlueMap
     private lateinit var config: File
@@ -31,6 +25,7 @@ class BMMarker : ModInitializer {
             if (!config.exists()) config.mkdirs()
             val container = FabricLoader.getInstance().getModContainer("bm-marker").get()
             blueMapInstance = BlueMap(config, container.metadata.version.friendlyString.toIntOrNull() ?: 0)
+            GlobalListener
         })
 
         ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifecycleEvents.ServerStopped {

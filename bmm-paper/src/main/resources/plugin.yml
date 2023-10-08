@@ -9,9 +9,9 @@ api-version: 1.16
 depend:
   - "BlueMap"
 libraries:
-  - "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"
+  - "org.jetbrains.kotlin:kotlin-stdlib:1.9.10"
   - "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
   - "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4"
   - "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
-  - "dev.jorel:commandapi-bukkit-kotlin:9.1.0"
-  - "dev.jorel:commandapi-bukkit-shade:9.1.0"
+  - "dev.jorel:commandapi-bukkit-kotlin:9.2.0"
+  - "dev.jorel:commandapi-bukkit-shade:9.2.0"

@@ -13,5 +13,5 @@ repositories {
 
 dependencies {
     implementation("org.yaml:snakeyaml:1.33")
-    implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.2.1")
+    implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.5.1")
 }

@@ -25,7 +25,8 @@ class BlueMap(sourceFolder: File, version: Int) {
             val s = json.decodeFromString<Settings>(configFile.takeIf { f -> f.exists() }?.readText()?.ifBlank { "{}" } ?: "{}")
             language = s.language
         }
-        localization = Localization(File(sourceFolder, "language"), settings.language, listOf(), prefix)
+        val languages = listOf("en_US", "de_DE").map { key -> key to javaClass.getResourceAsStream("/language/$key.yml") }
+        localization = Localization(File(sourceFolder, "language"), settings.language, languages, prefix)
         MarkerManager.loadAllMarker(it, sourceFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully enabled Marker Command addition!"))
         CoroutineScope(Dispatchers.Default).launch {

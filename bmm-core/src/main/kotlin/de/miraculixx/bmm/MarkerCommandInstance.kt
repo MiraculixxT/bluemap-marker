@@ -373,7 +373,7 @@ interface MarkerCommandInstance {
             val color = if (!isSet) if (arg.isRequired) cError else NamedTextColor.GRAY else NamedTextColor.GREEN
             sender.sendMessage(
                 dash +
-                        (cmp(msgString("argument.${arg.name}"), color) + //arg.name.replace('_', ' ')
+                        (cmp(msgString("arg.${arg.name}"), color) + //arg.name.replace('_', ' ')
                                 midDash +
                                 if (isSet) cmp(value?.getString() ?: msgNotSet, cMark) else nothingSet)
                             .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(msgString("arg-desc.${arg.name}")) + hoverAddition)

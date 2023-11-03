@@ -8,7 +8,7 @@
 #------------------------------------------------------------#
 
 creator: Miraculixx
-version: 1.0
+version: 1.0.0
 
 #-----------------------------------------#
 #           Common Translations           #
@@ -32,7 +32,7 @@ command:
   alreadyStarted2: "<red> it before creating a new one" #m (Cancel or build ...)
   notValidMarker: "<red>This is not a valid marker! (<input-1>)" #m #v1
   mustProvideID: "<red>Please provide a marker ID and a target marker-set!" #m
-  switchLang: "<lime>Switched language to <u>en_US<!u>!"
+  switchLang: "<green>Switched language to <u>en_US<!u>!"
   switchLangFailed: "<red>Your provided language does not exist!"
 
 

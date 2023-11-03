@@ -8,7 +8,7 @@
 #------------------------------------------------------------#
 
 creator: Miraculixx
-version: 1.0
+version: 1.0.0
 
 #-----------------------------------------#
 #           Common Translations           #
@@ -32,7 +32,7 @@ command:
   alreadyStarted2: "<red> vor dem neuerstellen!" #m (Cancel or build ...)
   notValidMarker: "<red>Dies ist kein valider Marker! (<input-1>)" #m #v1
   mustProvideID: "<red>Bitte gebe eine Marker ID und ein Markerset an!" #m
-  switchLang: "<lime>Sprache gewechselt zu <u>de_DE<!u>!" #m
+  switchLang: "<green>Sprache gewechselt zu <u>de_DE<!u>!" #m
   switchLangFailed: "<red>Deine angegebene Sprache existiert nicht!" #m
 
 

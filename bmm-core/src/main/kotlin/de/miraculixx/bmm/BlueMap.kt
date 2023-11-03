@@ -10,18 +10,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import java.io.File
 import java.util.function.Consumer
 
+var localization: Localization? = null
+
 class BlueMap(sourceFolder: File, version: Int) {
+    private val configFile = File(sourceFolder, "settings.json")
+
     private val onEnable = Consumer<BlueMapAPI> {
         consoleAudience.sendMessage(prefix + cmp("Connect to BlueMap API..."))
-        val configFile = File(sourceFolder, "settings.json")
         settings.apply {
             val s = json.decodeFromString<Settings>(configFile.takeIf { f -> f.exists() }?.readText()?.ifBlank { "{}" } ?: "{}")
             language = s.language
         }
-//        Localization(File(sourceFolder, "language"), settings.language, listOf(), prefix)
+        localization = Localization(File(sourceFolder, "language"), settings.language, listOf(), prefix)
         MarkerManager.loadAllMarker(it, sourceFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully enabled Marker Command addition!"))
         CoroutineScope(Dispatchers.Default).launch {
@@ -32,6 +36,7 @@ class BlueMap(sourceFolder: File, version: Int) {
     private val onDisable = Consumer<BlueMapAPI> {
         consoleAudience.sendMessage(prefix + cmp("Disconnecting from BlueMap API..."))
         MarkerManager.saveAllMarker(sourceFolder)
+        configFile.writeText(json.encodeToString(settings))
         consoleAudience.sendMessage(prefix + cmp("Successfully saved all data. Waiting for BlueMap to reload..."))
     }
 

@@ -107,6 +107,17 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+
+        // /marker language
+        literalArgument("language") {
+            withPermission("bmarker.command.language")
+            stringArgument("key") {
+                replaceSuggestions(ArgumentSuggestions.stringCollection { getLanguageKeys() })
+                anyExecutor { sender, args ->
+                    changeLanguage(sender, args[0] as String)
+                }
+            }
+        }
     }
 
     val setupMarkerCommand = commandTree(setupCommandPrefix) {

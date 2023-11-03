@@ -13,6 +13,7 @@ import de.miraculixx.bmm.utils.enumOf
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 import de.miraculixx.bmm.utils.message.*
+import de.miraculixx.bmm.utils.settings
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
@@ -32,12 +33,11 @@ interface MarkerCommandInstance {
     val visibilityCommandPrefix: String
         get() = "bplayer"
     private val alreadyStarted: Component
-        get() = prefix +
-                cmp("You already started a marker setup! ", cError) +
-                cmp("Cancel", cError, underlined = true).addClick("/$setupCommandPrefix cancel", true) +
-                cmp(" or ", cError) +
-                cmp("build", cError, underlined = true).addClick("/$setupCommandPrefix build", true) +
-                cmp(" it before creating a new one", cError)
+        get() = prefix + msg("command.alreadyStarted") +
+                cmp(msgCancel, cError, underlined = true).addClick("/$setupCommandPrefix cancel", true) +
+                cmp(" $msgOr ", cError) +
+                cmp(msgBuild, cError, underlined = true).addClick("/$setupCommandPrefix build", true) +
+                msg("command.alreadyStarted")
 
     /*
      *
@@ -50,7 +50,7 @@ interface MarkerCommandInstance {
         } else {
             val markerType = enumOf<MarkerType>(type?.uppercase())
             if (markerType == null) {
-                sender.sendMessage(prefix + cmp("This is not a valid marker! ($type)", cError))
+                sender.sendMessage(prefix + msg("command.notValidMarker", listOf(type ?: "Unknown")))
                 return
             }
             builder[id] = MarkerBuilder(markerType)
@@ -69,11 +69,11 @@ interface MarkerCommandInstance {
         if (builderSet.contains(id)) {
             sender.sendMessage(
                 prefix +
-                        cmp("You already started a marker-set setup! ", cError) +
-                        cmp("Cancel", cError, underlined = true).addClick("/$setupSetCommandPrefix cancel", true) +
-                        cmp(" or ", cError) +
-                        cmp("build", cError, underlined = true).addClick("/$setupSetCommandPrefix build", true) +
-                        cmp(" it before creating a new one", cError)
+                        msg("command.alreadyStarted") +
+                        cmp(msgCancel, cError, underlined = true).addClick("/$setupSetCommandPrefix cancel", true) +
+                        cmp(" $msgOr ", cError) +
+                        cmp(msgBuild, cError, underlined = true).addClick("/$setupSetCommandPrefix build", true) +
+                        msg("command.alreadyStarted")
             )
         } else {
             builderSet[id] = MarkerSetBuilder()
@@ -342,11 +342,12 @@ interface MarkerCommandInstance {
         val builder = getBuilder(sender, id, isMarkerSet) ?: return
         val type = builder.getType()
         val appliedArgs = builder.getArgs()
-        val nothingSet = cmp("Not Set", italic = true)
+        val nothingSet = cmp(msgNotSet, italic = true)
         val dash = cmp("- ")
         val midDash = cmp(" ≫ ", NamedTextColor.DARK_GRAY)
         val cmd = if (isMarkerSet) "/$setupSetCommandPrefix" else "/$setupCommandPrefix"
-        sender.sendMessage(cmp(" \n") + prefix + cmp("Your current setup state (${type.name})"))
+        val hoverAddition = cmp("\n\n" + msgString("event.clickToAdd"), cMark)
+        sender.sendMessage(cmp(" \n") + prefix + cmp(msgString("event.currentSetup", listOf(type.name))))
         type.args.forEach { arg ->
             // List values displayed in a different way than single values
             if (arg == MarkerArg.ADD_POSITION || arg == MarkerArg.ADD_EDGE) {
@@ -359,10 +360,10 @@ interface MarkerCommandInstance {
                 val color = if (!isSet) cError else NamedTextColor.GREEN
                 sender.sendMessage(
                     dash +
-                            (cmp(arg.name.replace('_', ' '), color) +
+                            (cmp(msgString("arg.${arg.name}"), color) +
                                     midDash +
                                     if (isSet) cmp("[${list.size} Values]", cMark) else nothingSet)
-                                .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to add a value", cMark))
+                                .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(msgString("arg-desc.${arg.name}")) + hoverAddition)
                 )
                 return@forEach
             }
@@ -372,19 +373,19 @@ interface MarkerCommandInstance {
             val color = if (!isSet) if (arg.isRequired) cError else NamedTextColor.GRAY else NamedTextColor.GREEN
             sender.sendMessage(
                 dash +
-                        (cmp(arg.name.replace('_', ' '), color) +
+                        (cmp(msgString("argument.${arg.name}"), color) + //arg.name.replace('_', ' ')
                                 midDash +
-                                if (isSet) cmp(value?.getString() ?: "Not Set", cMark) else nothingSet)
-                            .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(arg.description) + cmp("\n\nClick to modify value", cMark))
+                                if (isSet) cmp(value?.getString() ?: msgNotSet, cMark) else nothingSet)
+                            .addSuggest("$cmd ${arg.name.lowercase()} ").addHover(cmp(msgString("arg-desc.${arg.name}")) + hoverAddition)
             )
         }
         sender.sendMessage(
             cmp("                 ", cHighlight, strikethrough = true) +
                     cmp("[ ", cHighlight, strikethrough = false) +
-                    cmp("BUILD", cSuccess, bold = true, strikethrough = false).addClick("$cmd build")
-                        .addHover(cmp("Build a new marker with applied\nsettings. Red highlighted values\nare required!")) +
+                    cmp(msgBuild.uppercase(), cSuccess, bold = true, strikethrough = false).addClick("$cmd build")
+                        .addHover(cmp(msgString("event.buildHover"))) +
                     cmp(" | ") +
-                    cmp("CANCEL", cError, bold = true, strikethrough = false).addClick("$cmd cancel").addHover(cmp("Cancel the current marker builder.\nThis will delete all your values!")) +
+                    cmp(msgCancel.uppercase(), cError, bold = true, strikethrough = false).addClick("$cmd cancel").addHover(cmp(msgString("event.cancelHover"))) +
                     cmp(" ]", cHighlight) +
                     cmp("                 ", cHighlight, strikethrough = true)
         )
@@ -437,6 +438,15 @@ interface MarkerCommandInstance {
         }
         sendAppliedSuccess(sender, id, message, isSet)
     }
+
+    fun changeLanguage(sender: Audience, language: String) {
+        if (localization?.setLanguage(language) == true) {
+            settings.language = language
+            sender.sendMessage(prefix + msg("command.switchLang"))
+        } else sender.sendMessage(prefix + msg("command.switchLangFailed"))
+    }
+
+    fun getLanguageKeys() = localization?.getLoadedKeys() ?: emptyList()
 
     private fun invalidData(sender: Audience, setID: String?, markerID: String?) {
         sender.sendMessage(prefix + cmp("Invalid set-ID or marker-ID! ($setID - $markerID)", cError))

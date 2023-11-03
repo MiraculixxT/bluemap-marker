@@ -132,6 +132,19 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+
+        // /marker language
+        literal("language") {
+            requires {
+                Permissions.require("bmarker.command.language", 4).test(it)
+            }
+            argument<String>("key", StringArgumentType.word()) { key ->
+                suggestList { getLanguageKeys() }
+                runs {
+                    changeLanguage(source, key())
+                }
+            }
+        }
     }
 
     val setupMarkerCommand = command(setupCommandPrefix) {

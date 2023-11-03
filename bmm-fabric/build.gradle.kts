@@ -14,3 +14,9 @@ dependencies {
     implementation(project(":bmm-core"))
     include(project(":bmm-core"))
 }
+
+sourceSets {
+    main {
+        resources.srcDirs("$rootDir/data/")
+    }
+}

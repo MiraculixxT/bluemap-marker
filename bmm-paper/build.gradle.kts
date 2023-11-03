@@ -8,3 +8,9 @@ plugins {
 dependencies {
     implementation(project(":bmm-core"))
 }
+
+sourceSets {
+    main {
+        resources.srcDirs("$rootDir/data/")
+    }
+}

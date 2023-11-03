@@ -20,6 +20,7 @@ common:
   build: "Erstellen"
   or: "oder"
   notSet: "Nicht gesetzt"
+  use: "Nutze"
 
 
 #-----------------------------------------#
@@ -31,9 +32,25 @@ command:
   alreadyStarted: "<red>Du hast bereits angefangen einen Marker zu erstellen!" #m
   alreadyStarted2: "<red> vor dem neuerstellen!" #m (Cancel or build ...)
   notValidMarker: "<red>Dies ist kein valider Marker! (<input-1>)" #m #v1
+  notValidSet: "<red>Ungültige set-ID oder Map Name! (<input-1> - <input-2>)" #m #v2
   mustProvideID: "<red>Bitte gebe eine Marker ID und ein Markerset an!" #m
-  switchLang: "<green>Sprache gewechselt zu <u>de_DE<!u>!" #m
+  mustProvideIDSet: "<red>Bitte gebe eine marker-set ID und eine Zielwelt an!" #m
+  mustAlphanumeric: "<red>IDs müssen alphanumerisch sein (nur Buchstaben und Zahlen)" #m
+  switchLang: "<green>Die Sprache wurde zu Deutsch gewechselt!" #m
   switchLangFailed: "<red>Deine angegebene Sprache existiert nicht!" #m
+  createMarker: "<gray>Marker<input-1> setup gestartet! Änderer Werte mit  " #m #v1 (using <command> ...)
+  createMarker2: "<gray> und bestätige dein setup mit " #m (<command> ... <command>)
+  createdMarker: "<green>Marker erstellt! Es sollte in ein paar Sekunden auf deiner BlueMap erscheinen" #m
+  createdSet: "<green>Marker-Set erstellt! Nutze es um neue Marker drin zu erstellen mit "
+  deleteMarker: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
+  deleteSet: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker-set gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
+  confirmDelete: "<red>Bist du dir wirklich sicher das '<input-1>' set auf der Map '<input-2>' zu löschen? Bitte bestätige es mit " #m #v2
+  idAlreadyExist: "<red>Die ID <u><input-1></u existiert bereits in dem set/der Welt!" #m #v1
+  markerReplaced: "<grey>Der alte Marker wird ersetzt mit dem neuen..." #m
+  canceledSetup: "<grey>Aktuelles Marker<input-1> setup abgebrochen!" #m #v1
+  notValidPlayer: "<red>Konnte den angegebenen Spieler nicht finden!" #m
+  changedVisibility: "<grey><color:#6e94ff><input-1></color> ist jetzt <input-2> auf deiner BlueMap" #m #v2
+
 
 
 #-----------------------------------------#
@@ -85,24 +102,24 @@ arg-desc:
   MARKER_SET: "Markerset, in dem die Markierung\ngespeichert werden soll (Welt)"
   POSITION: "Position wo der Marker gesetzt\nwird. (NICHT die Welt)"
   LABEL: "Angezeigter Name in der Marker Liste/Menü"
-  ICON: "Image URL for displayed image on\ngiven position (POI exclusive)"
-  ANCHOR: "Offset for displayed image/html code (in pixel)"
-  MAX_DISTANCE: "Max distance to the camera at\nwhich the marker is shown"
-  MIN_DISTANCE: "Min distance to the camera at\nwhich the marker is shown"
-  ADD_POSITION: "Add more positions to a marker\nto define his path (Line exclusive)"
-  ADD_EDGE: "Add more edges to a marker\nto define his shape"
-  DETAIL: "Description that is shown on marker click"
-  LINK: "A redirect link on marker click"
-  NEW_TAB: "If the redirect link is opened\nin a new tab or replace BlueMap tab"
-  DEPTH_TEST: "If false the marker will always\nrender above everything. Otherwise\nit will respect blocking layers"
-  LINE_WIDTH: "The width of the line/outline (in pixel)"
-  LINE_COLOR: "Color of the line/outline (RGBA)\n- https://htmlcolorcodes.com -"
-  FILL_COLOR: "Color of the drawn field (RGBA)\n- https://htmlcolorcodes.com -"
-  HEIGHT: "The minimal height of the marker field.\nDefinition height for shape markers"
-  MAX_HEIGHT: "The maximal height of the marker field.\nSet to the same Y height/position\nfor a flat shape"
-  POINTS: "The amount of points used to render\nthe circle/ellipse. More points\ncreate cleaner borders but to many\npoints affect performance!"
-  X_RADIUS: "The ellipse radius to the +-x direction"
-  Z_RADIUS: "The ellipse radius to the +-z direction"
-  MAP: "Target BlueMap Map\nThis is not world exclusive!"
-  TOGGLEABLE: "If this is true, the marker-set\ncan be enabled or disabled in the menu"
-  DEFAULT_HIDDEN: "If this is true, the marker-set\nwill be hidden by default and can be\nenabled by the user. If 'TOGGELABLE' is\nfalse, this is the forced state"
+  ICON: "Bild URL für ein angezeigtes Bild\nbei der gegebenen Position (POI exklusiv)"
+  ANCHOR: "Verschiebung für das angezeigte \nBild/Html Code (in Pixel)"
+  MAX_DISTANCE: "Max Distanz zu der Kamera\nbei welcher der Marker sichtbar ist"
+  MIN_DISTANCE: "Min Distanz zu der Kamera\nbei welcher der Marker sichtbar ist"
+  ADD_POSITION: "Füge neue Positionen zum Marker\nhinzu um die Linie zu bilden (Line exklusiv)"
+  ADD_EDGE: "Füge neue Ecken zu dem Marker\nhinzu um die Form zu bilden"
+  DETAIL: "Beschreibung welche sichtbar ist\nbeim anklicken"
+  LINK: "Eine Verlinkung beim anklicken"
+  NEW_TAB: "Ob der angeklickte Link in einem\nneuen Tab geöffnet werden soll oder im selben"
+  DEPTH_TEST: "Wenn false, wird der Marker immer über allem\nangezeigt. Andernfalls respektiert er blockierende Ebenen."
+  LINE_WIDTH: "Die Dicke der Umrandung/Linie (in Pixel)"
+  LINE_COLOR: "Farbe der Umrandung/Linie (RGBA)\n- https://htmlcolorcodes.com -"
+  FILL_COLOR: "Farbe des inneres Feldes (RGBA)\n- https://htmlcolorcodes.com -"
+  HEIGHT: "Die minimale Höhe des Markierungsfeldes.\nDefinitionshöhe für Form Marker"
+  MAX_HEIGHT: "Die maximale Höhe des Markerfelds.\nFür eine flache Form auf dieselbe Y-Höhe/Position eingestellt."
+  POINTS: "Die Anzahl der Punkte, die zum Rendern des\nKreises/der Ellipse verwendet werden. Mehr Punkte\nerzeugen sauberere Ränder, aber zu viele\nPunkte beeinträchtigen die Leistung!"
+  X_RADIUS: "Der Ellipsen Radius in der +-x Richtung"
+  Z_RADIUS: "Der Ellipsen Radius in der +-z Richtung"
+  MAP: "Ziel BlueMap Map\nDies ist nicht die Welt!"
+  TOGGLEABLE: "Wenn true kann das Marker-Set im\nMenü aktiviert oder deaktiviert werden"
+  DEFAULT_HIDDEN: "Wenn true ist das Marker-Set standardmäßig\nausgeblendet und kann vom Benutzer aktiviert werden.\nWenn 'ÄNDERBAR' false ist, ist dies der erzwungene Zustand"

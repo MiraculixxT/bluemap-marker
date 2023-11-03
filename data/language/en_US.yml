@@ -48,7 +48,7 @@ command:
   idAlreadyExist: "<red>The ID <u><input-1></u already exist in this set/world!" #m #v1
   markerReplaced: "<grey>The old marker will be replaced with your new one..." #m
   canceledSetup: "<grey>Canceled current marker<input-1> setup!" #m #v1
-  notValidPlayer: "<red>Could not found given player!"
+  notValidPlayer: "<red>Could not found given player!" #m
   changedVisibility: "<grey><color:#6e94ff><input-1></color> is now <input-2> on your BlueMap" #m #v2
 
 

@@ -20,6 +20,7 @@ common:
   build: "Build"
   or: "or"
   notSet: "Not Set"
+  use: "Use"
 
 
 #-----------------------------------------#
@@ -31,9 +32,24 @@ command:
   alreadyStarted: "<red>You already started a marker setup!" #m
   alreadyStarted2: "<red> it before creating a new one" #m (Cancel or build ...)
   notValidMarker: "<red>This is not a valid marker! (<input-1>)" #m #v1
+  notValidSet: "<red>Invalid set-ID or map name! (<input-1> - <input-2>)" #m #v2
   mustProvideID: "<red>Please provide a marker ID and a target marker-set!" #m
-  switchLang: "<green>Switched language to <u>en_US<!u>!"
-  switchLangFailed: "<red>Your provided language does not exist!"
+  mustProvideIDSet: "<red>Please provide a marker-set ID and a target world!" #m
+  mustAlphanumeric: "<red>IDs must be alphanumeric (only contains letters and numbers)" #m
+  switchLang: "<green>Switched language to <u>en_US</u>!" #m
+  switchLangFailed: "<red>Your provided language does not exist!" #m
+  createMarker: "<gray>Marker<input-1> setup started! Modify values using " #m #v1 (using <command> ...)
+  createMarker2: "<gray> and finish your setup with " #m (<command> ... <command>)
+  createdMarker: "<green>Marker created! It should appear on your BlueMap in a few seconds" #m
+  createdSet: "<green>Marker-Set created! Use it too add new markers inside this set with "
+  deleteMarker: "<gray>Successfully deleted <color:#6e94ff><input-1></color> marker! It should disappear from your BlueMap in a few seconds" #m #v1
+  deleteSet: "<gray>Successfully deleted <color:#6e94ff><input-1></color> marker-set! It should disappear from your BlueMap in a few seconds" #m #v1
+  confirmDelete: "<red>Are you really sure you want to delete the '<input-1>' set on map '<input-2>'? Please confirm by typing " #m #v2
+  idAlreadyExist: "<red>The ID <u><input-1></u already exist in this set/world!" #m #v1
+  markerReplaced: "<grey>The old marker will be replaced with your new one..." #m
+  canceledSetup: "<grey>Canceled current marker<input-1> setup!" #m #v1
+  notValidPlayer: "<red>Could not found given player!"
+  changedVisibility: "<grey><color:#6e94ff><input-1></color> is now <input-2> on your BlueMap" #m #v2
 
 
 #-----------------------------------------#

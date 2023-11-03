@@ -56,9 +56,9 @@ interface MarkerCommandInstance {
             builder[id] = MarkerBuilder(markerType)
             sender.sendMessage(
                 prefix +
-                        cmp("Marker setup started! Modify values using ") +
-                        cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("Use /$setupCommandPrefix <arg> <value>")) +
-                        cmp(" and finish your setup with ") +
+                        msg("command.createMarker", listOf("")) +
+                        cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("$msgUse /$setupCommandPrefix <arg> <value>")) +
+                        msg("command.createMarker2") +
                         cmp("/$setupCommandPrefix build", cMark, underlined = true).addClick("/$setupCommandPrefix build", true)
             )
             sendStatusInfo(sender, id)
@@ -79,9 +79,9 @@ interface MarkerCommandInstance {
             builderSet[id] = MarkerSetBuilder()
             sender.sendMessage(
                 prefix +
-                        cmp("Marker-Set setup started! Modify values using ") +
-                        cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("Use /$setupSetCommandPrefix <arg> <value>")) +
-                        cmp(" and finish your setup with ") +
+                        msg("command.createMarker", listOf("-Set")) +
+                        cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("$msgUse /$setupSetCommandPrefix <arg> <value>")) +
+                        msg("command.createMarker2") +
                         cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addClick("/$setupSetCommandPrefix build", true)
             )
             sendStatusInfo(sender, id, true)
@@ -95,14 +95,14 @@ interface MarkerCommandInstance {
         }
 
         if (MarkerManager.removeMarker("${setID}_$mapName", markerID)) {
-            sender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(markerID, cMark) + cmp(" marker! It should disappear from your BlueMap in a few seconds"))
-        } else sender.sendMessage(prefix + cmp("This marker does not exist!", cError))
+            sender.sendMessage(prefix + msg("command.deleteMarker", listOf(markerID)))
+        } else sender.sendMessage(prefix + msg("command.notValidMarker", listOf(markerID)))
     }
 
     fun confirmDelete(sender: Audience, setID: String, mapName: String) {
         sender.sendMessage(
             prefix +
-                    cmp("Are you really sure you want to delete the '$setID' set on map '$mapName'? Please confirm by typing ", cError) +
+                    msg("command.confirmDelete", listOf(setID, mapName)) +
                     cmp("/$mainCommandPrefix set-delete $mapName $setID true", cError, underlined = true)
         )
     }
@@ -110,11 +110,11 @@ interface MarkerCommandInstance {
     fun deleteSet(sender: Audience, confirm: Boolean, setID: String?, mapName: String?) {
         if (!confirm) return
         if (setID == null || mapName == null) {
-            sender.sendMessage(prefix + cmp("Invalid set-ID or map name! ($setID - $mapName)", cError))
+            sender.sendMessage(prefix + msg("command.notValidSet", listOf(setID ?: "Unknown", mapName ?: "Unknown")))
             return
         }
         if (MarkerManager.removeSet(setID, mapName)) {
-            sender.sendMessage(prefix + cmp("Successfully deleted ") + cmp(setID, cMark) + cmp(" marker-set! It should disappear from your BlueMap in a few seconds"))
+            sender.sendMessage(prefix + msg("command.deleteSet", listOf(setID)))
         } else sender.sendMessage(prefix + cmp("This marker-set does not exist or BlueMap is not loaded!", cError))
     }
 
@@ -125,16 +125,16 @@ interface MarkerCommandInstance {
             val markerSet = build?.getArgs()?.get(MarkerArg.MARKER_SET)?.getString()
             val markerID = build?.getArgs()?.get(MarkerArg.ID)?.getString()
             if (markerSet == null || markerID == null) {
-                sender.sendMessage(prefix + cmp("Please provide a marker ID and a target marker-set!", cError))
+                sender.sendMessage(prefix + msg("command.mustProvideID"))
                 return
             }
             if (!validateID(markerID)) {
-                sender.sendMessage(prefix + cmp("IDs must be alphanumeric (only contains letters and numbers)", cError))
+                sender.sendMessage(prefix + msg("command.mustAlphanumeric"))
                 return
             }
             if (MarkerManager.getAllMarkers(markerSet).contains(markerID)) {
-                sender.sendMessage(prefix + cmp("The ID ", cError) + cmp(markerID, cError, underlined = true) + cmp(" already exist in this set!", cError))
-                sender.sendMessage(prefix + cmp("The old marker will be replaced with your new one..."))
+                sender.sendMessage(prefix + msg("command.idAlreadyExist", listOf(id)))
+                sender.sendMessage(prefix + msg("command.markerReplaced"))
                 MarkerManager.removeMarker(markerSet, markerID)
             }
 
@@ -151,7 +151,7 @@ interface MarkerCommandInstance {
             }
             if (MarkerManager.addMarker(markerSet, marker, markerID)) {
                 builder.remove(id)
-                sender.sendMessage(prefix + cmp("Marker created! It should appear on your BlueMap in a few seconds"))
+                sender.sendMessage(prefix + msg("command.createdMarker"))
             } else sender.sendMessage(prefix + cmp("The marker set ", cError) + cmp(markerSet, cError, underlined = true) + cmp(" does not exist (/$mainCommandPrefix set-create)", cError))
         }
     }
@@ -163,15 +163,15 @@ interface MarkerCommandInstance {
             val mapName = build?.getArgs()?.get(MarkerArg.MAP)?.getString()
             val setID = build?.getArgs()?.get(MarkerArg.ID)?.getString()
             if (setID == null || mapName == null) {
-                sender.sendMessage(prefix + cmp("Please provide a marker-set ID and a target world!", cError))
+                sender.sendMessage(prefix + msg("command.mustProvideIDSet"))
                 return
             }
             if (!validateID(setID)) {
-                sender.sendMessage(prefix + cmp("IDs must be alphanumeric (only contains letters and numbers)", cError))
+                sender.sendMessage(prefix + msg("command.mustAlphanumeric"))
                 return
             }
             if (MarkerManager.getAllSetIDs(mapName).contains(setID)) {
-                sender.sendMessage(prefix + cmp("The ID ", cError) + cmp(setID, cError, underlined = true) + cmp(" already exist in this world!", cError))
+                sender.sendMessage(prefix + msg("command.idAlreadyExist", listOf(id)))
                 return
             }
 
@@ -195,8 +195,8 @@ interface MarkerCommandInstance {
 
             sender.sendMessage(
                 prefix +
-                        cmp("Marker-Set created! Use it too add new markers inside this set with ") +
-                        cmp("/$mainCommandPrefix create", cMark, underlined = true).addSuggest("/$mainCommandPrefix create ").addHover(cmp("/$mainCommandPrefix create <type>"))
+                        msg("command.createdSet") +
+                        cmp("/$mainCommandPrefix create", cMark, underlined = true).addSuggest("/$mainCommandPrefix create ").addHover(cmp("$msgUse /$mainCommandPrefix create <type>"))
             )
         }
     }
@@ -204,7 +204,7 @@ interface MarkerCommandInstance {
     fun cancel(sender: Audience, id: String, isSet: Boolean = false) {
         val removed = if (isSet) builderSet.remove(id) else builder.remove(id)
         if (removed == null) noBuilder(sender, isSet)
-        else sender.sendMessage(prefix + cmp("Canceled current marker${if (isSet) "-set" else ""} setup!"))
+        else sender.sendMessage(prefix + msg("command.canceledSetup", listOf(if (isSet) "-set" else "")))
     }
 
     fun edit(sender: Audience, id: String, setID: String?, markerID: String?) {
@@ -296,13 +296,13 @@ interface MarkerCommandInstance {
     fun setPlayerVisibility(sender: Audience, targets: List<Pair<UUID, String>>, visible: Boolean) {
         BlueMapAPI.getInstance().ifPresentOrElse({ api ->
             if (targets.isEmpty()) {
-                sender.sendMessage(prefix + cmp("Could not found given player!", cError))
+                sender.sendMessage(prefix + msg("command.notValidPlayer"))
                 return@ifPresentOrElse
             }
             targets.forEach { target ->
                 api.webApp.setPlayerVisibility(target.first, visible)
-                val info = if (visible) cmp("visible", cSuccess) else cmp("invisible", cError)
-                sender.sendMessage(prefix + cmp(target.second, cMark) + cmp(" is now ") + info + cmp(" on your BlueMap!"))
+                val info = if (visible) "<green>visible</green>" else "<red>invisible</red>"
+                sender.sendMessage(prefix + msg("command.changedVisibility", listOf(target.second, info)))
             }
         }) {
             sender.sendMessage(prefix + cmp("Failed to connect to BlueMap! Are you using the latest version?", cError))

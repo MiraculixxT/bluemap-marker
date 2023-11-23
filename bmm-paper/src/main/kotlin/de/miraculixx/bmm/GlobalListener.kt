@@ -10,7 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 
-object GlobalListener: Listener {
+object GlobalListener : Listener {
 
     @EventHandler
     fun playerJoinEvent(it: PlayerJoinEvent) {

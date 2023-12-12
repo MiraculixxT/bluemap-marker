@@ -41,11 +41,11 @@ command:
   createMarker: "<gray>Marker<input-1> setup started! Modify values using " #m #v1 (using <command> ...)
   createMarker2: "<gray> and finish your setup with " #m (<command> ... <command>)
   createdMarker: "<green>Marker created! It should appear on your BlueMap in a few seconds" #m
-  createdSet: "<green>Marker-Set created! Use it too add new markers inside this set with "
+  createdSet: "<green>Marker-Set created! Use it to add new markers inside this set with "
   deleteMarker: "<gray>Successfully deleted <color:#6e94ff><input-1></color> marker! It should disappear from your BlueMap in a few seconds" #m #v1
   deleteSet: "<gray>Successfully deleted <color:#6e94ff><input-1></color> marker-set! It should disappear from your BlueMap in a few seconds" #m #v1
   confirmDelete: "<red>Are you really sure you want to delete the '<input-1>' set on map '<input-2>'? Please confirm by typing " #m #v2
-  idAlreadyExist: "<red>The ID <u><input-1></u already exist in this set/world!" #m #v1
+  idAlreadyExist: "<red>The ID <u><input-1></u> already exist in this set/world!" #m #v1
   markerReplaced: "<grey>The old marker will be replaced with your new one..." #m
   canceledSetup: "<grey>Canceled current marker<input-1> setup!" #m #v1
   notValidPlayer: "<red>Could not found given player!" #m
@@ -105,8 +105,8 @@ arg-desc:
   ANCHOR: "Offset for displayed image/html code (in pixel)"
   MAX_DISTANCE: "Max distance to the camera at\nwhich the marker is shown"
   MIN_DISTANCE: "Min distance to the camera at\nwhich the marker is shown"
-  ADD_POSITION: "Add more positions to a marker\nto define his path (Line exclusive)"
-  ADD_EDGE: "Add more edges to a marker\nto define his shape"
+  ADD_POSITION: "Add more positions to a marker\nto define the path (Line exclusive)"
+  ADD_EDGE: "Add more edges to a marker\nto define the shape"
   DETAIL: "Description that is shown on marker click"
   LINK: "A redirect link on marker click"
   NEW_TAB: "If the redirect link is opened\nin a new tab or replace BlueMap tab"

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bm-marker",
-  "version": "160",
+  "version": "161",
 
   "name": "BlueMap Marker Manager",
   "description": "A BlueMap addition plugin. Give your players the option to place markers on the map",
@@ -32,10 +32,10 @@
   },
 
   "depends": {
-    "fabricloader": ">=0.14.21",
-    "silk-all": ">=1.10.1",
-    "fabric-api": ">=0.84.0+1.20.1",
-    "fabric-language-kotlin": ">=1.9.6+kotlin.1.8.22",
+    "fabricloader": ">=0.15.2",
+    "silk-all": ">=1.10.3",
+    "fabric-api": ">=0.91.3+1.20.4",
+    "fabric-language-kotlin": ">=1.10.16+kotlin.1.9.21",
     "minecraft": "~1.20",
     "java": ">=17",
     "bluemap": "*"

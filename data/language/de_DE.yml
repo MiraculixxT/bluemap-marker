@@ -45,7 +45,7 @@ command:
   deleteMarker: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
   deleteSet: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker-set gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
   confirmDelete: "<red>Bist du dir wirklich sicher das '<input-1>' set auf der Map '<input-2>' zu löschen? Bitte bestätige es mit " #m #v2
-  idAlreadyExist: "<red>Die ID <u><input-1></u existiert bereits in dem set/der Welt!" #m #v1
+  idAlreadyExist: "<red>Die ID <u><input-1></u> existiert bereits in dem set/der Welt!" #m #v1
   markerReplaced: "<grey>Der alte Marker wird ersetzt mit dem neuen..." #m
   canceledSetup: "<grey>Aktuelles Marker<input-1> setup abgebrochen!" #m #v1
   notValidPlayer: "<red>Konnte den angegebenen Spieler nicht finden!" #m

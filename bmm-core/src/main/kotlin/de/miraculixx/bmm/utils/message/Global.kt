@@ -5,4 +5,4 @@ import net.kyori.adventure.text.format.NamedTextColor
 
 val prefix = cmp("BMM", cHighlight) + cmp(" >> ", NamedTextColor.DARK_GRAY)
 lateinit var consoleAudience: Audience
-const val debug = true
+const val debug = false

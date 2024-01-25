@@ -13,6 +13,10 @@ repositories {
         setUrl("https://jitpack.io")
     }
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+        name = "sonatype-oss-snapshots1"
+        mavenContent { snapshotsOnly() }
+    }
 }
 
 val transitiveInclude: Configuration by configurations.creating {
@@ -28,7 +32,7 @@ dependencies {
     modImplementation("net.silkmc:silk-commands:1.10.3")
     modImplementation("net.silkmc:silk-core:1.10.3")
     modImplementation("net.fabricmc:fabric-loader:0.15.2")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.10.1")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.11.0-SNAPSHOT")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:0.91.3+1.20.4")
     modImplementation("net.fabricmc:fabric-language-kotlin:1.10.16+kotlin.1.9.21")
     modImplementation(include("me.lucko", "fabric-permissions-api", "0.2-SNAPSHOT"))

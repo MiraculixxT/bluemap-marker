@@ -23,7 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     // Fabric implementation
-    implementation("net.fabricmc:fabric-loom:1.4-SNAPSHOT")
+    implementation("net.fabricmc:fabric-loom:1.5-SNAPSHOT")
 
     // Paper implementation
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.+")
@@ -31,4 +31,5 @@ dependencies {
 
     implementation("gradle.plugin.com.github.johnrengelman:shadow:8.+")
     implementation(pluginDep("com.modrinth.minotaur", "2.+"))
+    implementation(pluginDep("io.github.dexman545.outlet", "1.6.+"))
 }

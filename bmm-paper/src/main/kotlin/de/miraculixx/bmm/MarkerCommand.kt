@@ -30,7 +30,7 @@ class MarkerCommand : MarkerCommandInstance {
         // /marker create <type>
         argument(LiteralArgument("create").withPermission("bmarker.command.create")) {
             argument(TextArgument("type").replaceSuggestions(ArgumentSuggestions.strings(listOf("poi", "line", "shape", "extrude", "ellipse")))) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     create(sender, sender.name, args[0].toString())
                 }
             }
@@ -44,7 +44,7 @@ class MarkerCommand : MarkerCommandInstance {
                         val args = it.previousArgs
                         MarkerManager.getAllMarkers("${args[1]}_${args[0]}").keys
                     })) {
-                        playerExecutor { sender, args ->
+                        anyExecutor { sender, args ->
                             delete(sender, args[0].toString(), args[1].toString(), args[2].toString())
                         }
                     }
@@ -60,7 +60,7 @@ class MarkerCommand : MarkerCommandInstance {
                         val args = it.previousArgs
                         MarkerManager.getAllMarkers("${args[1]}_${args[0]}").keys
                     })) {
-                        playerExecutor { sender, args ->
+                        anyExecutor { sender, args ->
                             val markerSet = "${args[1]}_${args[0]}"
                             edit(sender, sender.name, markerSet, args[2].toString())
                         }
@@ -71,7 +71,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-create
         argument(LiteralArgument("set-create").withPermission("bmarker.command.set-create")) {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 createSet(sender, sender.name)
             }
         }
@@ -80,11 +80,11 @@ class MarkerCommand : MarkerCommandInstance {
         argument(LiteralArgument("set-delete").withPermission("bmarker.command.set-delete")) {
             argument(TextArgument("map").replaceSuggestions(ArgumentSuggestions.stringCollection { MarkerManager.getAllMaps() })) {
                 argument(TextArgument("set-id").replaceSuggestions(ArgumentSuggestions.stringCollection { MarkerManager.getAllSetIDs(it.previousArgs[0].toString()) })) {
-                    playerExecutor { sender, args ->
+                    anyExecutor { sender, args ->
                         confirmDelete(sender, args[1].toString(), args[0].toString())
                     }
                     booleanArgument("confirm") {
-                        playerExecutor { sender, args ->
+                        anyExecutor { sender, args ->
                             deleteSet(sender, args[2] == true, args[1].toString(), args[0].toString())
                         }
                     }
@@ -94,7 +94,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker migrate
         argument(LiteralArgument("migrate").withPermission("bmarker.command.migrate")) {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 migrateMarkers(sender)
             }
             argument(TextArgument("map").replaceSuggestions(ArgumentSuggestions.stringCollection { MarkerManager.getAllMaps() })) {
@@ -123,18 +123,18 @@ class MarkerCommand : MarkerCommandInstance {
     val setupMarkerCommand = commandTree(setupCommandPrefix) {
         withPermission("bmarker.command.create")
 
-        playerExecutor { sender, _ ->
+        anyExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name)
         }
 
         // SETUP COMMANDS
         literalArgument("build") {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 build(sender, sender.name)
             }
         }
         literalArgument("cancel") {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 cancel(sender, sender.name)
             }
         }
@@ -142,7 +142,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Single String / URL
         literalArgument("icon") {
             greedyStringArgument("icon") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.ICON, value, "icon URL $value")
                 }
@@ -150,7 +150,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("link") {
             greedyStringArgument("link") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.LINK, value, "icon URL $value")
                 }
@@ -162,7 +162,7 @@ class MarkerCommand : MarkerCommandInstance {
         labelLogic(false)
         literalArgument("detail") {
             greedyStringArgument("detail") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.DETAIL, value, "detail $value")
                 }
@@ -172,7 +172,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Dimensions / Worlds
         literalArgument("marker_set") {
             argument(TextArgument("marker-set").replaceSuggestions(ArgumentSuggestions.stringCollection { MarkerManager.getAllSetIDs() })) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.MARKER_SET, value, "marker-set $value")
                 }
@@ -182,7 +182,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Locations
         literalArgument("position") {
             locationArgument("position", LocationType.PRECISE_POSITION) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val position = args[0] as Location
                     val value = Vector3d(position.x.round(2), position.y.round(2), position.z.round(2))
                     setMarkerArgument(sender, sender.name, MarkerArg.POSITION, value, "position $value")
@@ -191,7 +191,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("anchor") {
             location2DArgument("anchor", LocationType.PRECISE_POSITION) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val anchor = args[0] as Location2D
                     val value = Vector2i(anchor.x, anchor.z)
                     setMarkerArgument(sender, sender.name, MarkerArg.ANCHOR, value, "anchor $value")
@@ -200,7 +200,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("add_position") {
             locationArgument("add-position", LocationType.PRECISE_POSITION) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val newDirection = args[0] as Location
                     val value = Vector3d(newDirection.x.round(2), newDirection.y.round(2), newDirection.z.round(2))
                     addMarkerArgumentList(sender, sender.name, MarkerArg.ADD_POSITION, value, "new direction $value")
@@ -209,7 +209,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("add_edge") {
             location2DArgument("anchor", LocationType.PRECISE_POSITION) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val edge = args[0] as Location2D
                     val value = Vector2d(edge.x.round(2), edge.z.round(2))
                     addMarkerArgumentList(sender, sender.name, MarkerArg.ADD_EDGE, value, "new edge $value")
@@ -220,7 +220,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Doubles
         literalArgument("max_distance") {
             doubleArgument("max-distance", 0.0) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.MAX_DISTANCE, value, "maximal distance $value")
                 }
@@ -228,7 +228,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("min_distance") {
             doubleArgument("min-distance", 0.0) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.MIN_DISTANCE, value, "minimal distance $value")
                 }
@@ -236,7 +236,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("x_radius") {
             doubleArgument("x-radius", 1.0) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.X_RADIUS, value, "x radius $value")
                 }
@@ -244,7 +244,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("z_radius") {
             doubleArgument("z-radius", 1.0) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.Z_RADIUS, value, "z radius $value")
                 }
@@ -254,7 +254,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Integer
         literalArgument("line_width") {
             integerArgument("line-width", 0) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.LINE_WIDTH, value, "line width $value")
                 }
@@ -262,7 +262,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("points") {
             integerArgument("points", 5) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.POINTS, value, "ellipse points $value")
                 }
@@ -272,7 +272,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Floats
         literalArgument("height") {
             floatArgument("height") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.HEIGHT, value, "height $value")
                 }
@@ -280,7 +280,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("max_height") {
             floatArgument("max-height") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.MAX_HEIGHT, value, "maximal height $value")
                 }
@@ -298,7 +298,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Booleans
         literalArgument("new_tab") {
             booleanArgument("new-tab") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.NEW_TAB, value, "open new tab on click $value")
                 }
@@ -306,9 +306,17 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("depth_test") {
             booleanArgument("depth-test") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.DEPTH_TEST, value, "depth test $value")
+                }
+            }
+        }
+        literalArgument("listed") {
+            booleanArgument("listed") {
+                anyExecutor { sender, args ->
+                    val value = args[0]
+                    setMarkerArgument(sender, sender.name, MarkerArg.LISTED, value, "listing $value")
                 }
             }
         }
@@ -317,18 +325,18 @@ class MarkerCommand : MarkerCommandInstance {
     val setupSetCommand = commandTree(setupSetCommandPrefix) {
         withPermission("bmarker.command.set-create")
 
-        playerExecutor { sender, _ ->
+        anyExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name, true)
         }
 
         // SETUP COMMANDS
         literalArgument("build") {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 buildSet(sender, sender.name)
             }
         }
         literalArgument("cancel") {
-            playerExecutor { sender, _ ->
+            anyExecutor { sender, _ ->
                 cancel(sender, sender.name, true)
             }
         }
@@ -336,7 +344,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Worlds
         literalArgument("map") {
             argument(TextArgument("map").replaceSuggestions(ArgumentSuggestions.stringCollection { MarkerManager.getAllMaps() })) {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0].toString().replace(' ', '.')
                     setMarkerArgument(sender, sender.name, MarkerArg.MAP, value, "map $value", true)
                 }
@@ -346,7 +354,7 @@ class MarkerCommand : MarkerCommandInstance {
         // Booleans
         literalArgument("toggleable") {
             booleanArgument("toggleable") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.TOGGLEABLE, value, "toggleable $value", true)
                 }
@@ -354,7 +362,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
         literalArgument("default_hidden") {
             booleanArgument("default-hidden") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.DEFAULT_HIDDEN, value, "default hidden $value", true)
                 }
@@ -388,7 +396,7 @@ class MarkerCommand : MarkerCommandInstance {
             integerArgument("color-g", 0, 255) {
                 integerArgument("color-b", 0, 255) {
                     floatArgument("opacity", 0f, 1f) {
-                        playerExecutor { sender, args ->
+                        anyExecutor { sender, args ->
                             val colorR = args[0].toString().toIntOrNull() ?: 0
                             val colorG = args[1].toString().toIntOrNull() ?: 0
                             val colorB = args[2].toString().toIntOrNull() ?: 0
@@ -405,7 +413,7 @@ class MarkerCommand : MarkerCommandInstance {
     private fun CommandTree.labelLogic(isSet: Boolean) {
         literalArgument("label") {
             greedyStringArgument("label") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.LABEL, value, "label $value", isSet)
                 }
@@ -416,7 +424,7 @@ class MarkerCommand : MarkerCommandInstance {
     private fun CommandTree.idLogic(isSet: Boolean) {
         literalArgument("id") {
             textArgument("id") {
-                playerExecutor { sender, args ->
+                anyExecutor { sender, args ->
                     val value = args[0]
                     setMarkerArgument(sender, sender.name, MarkerArg.ID, value, "ID $value", isSet)
                 }
@@ -426,7 +434,7 @@ class MarkerCommand : MarkerCommandInstance {
 
     private fun Argument<*>.visibility(visible: Boolean) {
         entitySelectorArgumentManyPlayers("target") {
-            playerExecutor { sender, args ->
+            anyExecutor { sender, args ->
                 val profiles = (args[0] as Collection<Player>).map { it.uniqueId to it.name }
                 setPlayerVisibility(sender, profiles, visible)
             }

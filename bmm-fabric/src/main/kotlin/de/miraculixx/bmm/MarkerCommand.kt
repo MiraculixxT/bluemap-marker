@@ -336,6 +336,13 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+        literal("listed") {
+            argument<Boolean>("listed", BoolArgumentType.bool()) { value ->
+                runs {
+                    setMarkerArgument(source, source.textName, MarkerArg.LISTED, value(), "listing ${value()}")
+                }
+            }
+        }
     }
 
     val setupSetCommand = command(setupSetCommandPrefix) {

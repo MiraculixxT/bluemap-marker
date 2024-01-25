@@ -123,6 +123,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
         val label = args[MarkerArg.LABEL]?.getString() ?: return false
         label(label)
         args[MarkerArg.POSITION]?.getVector3d()?.let { position(it) }
+        args[MarkerArg.LISTED]?.getBoolean()?.let { listed(it) }
         return true
     }
 

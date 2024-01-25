@@ -7,9 +7,11 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LABEL,
             MarkerArg.MARKER_SET,
             MarkerArg.POSITION,
+            MarkerArg.ANCHOR,
             MarkerArg.ICON,
             MarkerArg.MIN_DISTANCE,
-            MarkerArg.MAX_DISTANCE
+            MarkerArg.MAX_DISTANCE,
+            MarkerArg.LISTED
         )
     ),
     LINE(
@@ -25,7 +27,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_WIDTH,
             MarkerArg.LINE_COLOR,
             MarkerArg.MIN_DISTANCE,
-            MarkerArg.MAX_DISTANCE
+            MarkerArg.MAX_DISTANCE,
+            MarkerArg.LISTED
         )
     ),
     SHAPE(
@@ -43,7 +46,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_COLOR,
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
-            MarkerArg.MAX_DISTANCE
+            MarkerArg.MAX_DISTANCE,
+            MarkerArg.LISTED
         )
     ),
     EXTRUDE(
@@ -62,7 +66,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_COLOR,
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
-            MarkerArg.MAX_DISTANCE
+            MarkerArg.MAX_DISTANCE,
+            MarkerArg.LISTED
         )
     ),
     ELLIPSE(
@@ -83,7 +88,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_COLOR,
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
-            MarkerArg.MAX_DISTANCE
+            MarkerArg.MAX_DISTANCE,
+            MarkerArg.LISTED
         )
     ),
 

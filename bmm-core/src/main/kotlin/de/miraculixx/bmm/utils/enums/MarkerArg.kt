@@ -23,6 +23,7 @@ enum class MarkerArg(val isRequired: Boolean) {
     POINTS(true),
     X_RADIUS(true),
     Z_RADIUS(true),
+    LISTED(false),
 
     // Marker-Set exclusives
     MAP(true),

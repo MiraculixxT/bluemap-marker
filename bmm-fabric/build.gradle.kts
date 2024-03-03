@@ -10,7 +10,7 @@ plugins {
     id("io.github.dexman545.outlet")
 }
 
-version = "1.6.2-fabric"
+version = "1.6.3-fabric"
 
 repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")

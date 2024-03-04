@@ -10,14 +10,21 @@ import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
+import de.miraculixx.bmm.utils.message.cmp
+import de.miraculixx.bmm.utils.message.plus
 import de.miraculixx.bmm.utils.message.round
 import de.miraculixx.bmm.utils.message.stringify
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.*
 import dev.jorel.commandapi.kotlindsl.*
 import dev.jorel.commandapi.wrappers.Location2D
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.fileSize
 
 @Suppress("unused")
 class MarkerCommand : MarkerCommandInstance {
@@ -116,6 +123,45 @@ class MarkerCommand : MarkerCommandInstance {
                 anyExecutor { sender, args ->
                     changeLanguage(sender, args[0] as String)
                 }
+            }
+        }
+
+        literalArgument("size") {
+            anyExecutor { sender, _ ->
+                sender.sendMessage(cmp("Prepare calculating..."))
+
+                val fileFolder = File("bluemap/web/maps")
+                val worldFolders = fileFolder.listFiles()?.filter { it.isDirectory } ?: emptyList()
+                val assetFolders = worldFolders.map { it.listFiles()?.first { it.name == "assets" } }
+                val tileFolders = worldFolders.map { it?.listFiles()?.first { it.name == "tiles" } }
+
+                val dataMap = buildMap {
+                    put("Variable Assets", "empty" to -1L)
+                    worldFolders.forEach { put(it.name, "empty" to -1L) }
+                }.toMutableMap()
+
+                val timeStart = System.currentTimeMillis()
+                val assetSize = assetFolders.sumOf { FileSizeCalculator.calculateFolderSize(it?.toPath()) }
+                dataMap["Variable Assets"] = FileSizeCalculator.humanReadableByteCountBin(assetSize) to System.currentTimeMillis() - timeStart
+                sender.printSize(dataMap)
+
+                tileFolders.forEach { world ->
+                    val timeWorldStart = System.currentTimeMillis()
+                    val worldSize = FileSizeCalculator.calculateFolderSize(world?.toPath())
+                    dataMap[world?.parentFile?.name ?: "Unknown"] = FileSizeCalculator.humanReadableByteCountBin(worldSize) to System.currentTimeMillis() - timeWorldStart
+                    sender.printSize(dataMap)
+                }
+            }
+        }
+    }
+
+    private fun Audience.printSize(sizes: Map<String, Pair<String, Long>>) { // Size to Time
+        sendMessage(cmp("\n".repeat(20)))
+        sizes.forEach { (name, data) ->
+            if (data.second == -1L) {
+                sendMessage(cmp("• ") + cmp(name, NamedTextColor.YELLOW, true) + cmp(" >> ") + cmp("Loading...", italic = true))
+            } else {
+                sendMessage(cmp("• ") + cmp(name, NamedTextColor.GREEN, true) + cmp(" >> ") + cmp("${data.first} (${data.second}ms)", italic = true))
             }
         }
     }

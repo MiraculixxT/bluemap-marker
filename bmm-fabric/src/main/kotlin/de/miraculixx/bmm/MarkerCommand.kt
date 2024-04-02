@@ -458,7 +458,15 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     private fun LiteralCommandBuilder<CommandSourceStack>.visibility(visible: Boolean) {
+        runs {
+            val player = source.player ?: return@runs
+            setPlayerVisibility(source, listOf(player.uuid to player.scoreboardName), visible)
+        }
+
         argument<GameProfileArgument.Result>("target", GameProfileArgument.gameProfile()) { target ->
+            requires {
+                Permissions.require("bmarker.command.visibility-other", 3).test(it)
+            }
             runs {
                 val profiles = target().getNames(source).map { it.id to it.name }
                 setPlayerVisibility(source, profiles, visible)

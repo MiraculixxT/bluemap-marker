@@ -11,11 +11,9 @@ import de.miraculixx.bmm.map.data.ArgumentValue
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
-import java.awt.image.BufferedImage
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.Optional
+import java.net.URI
 import javax.imageio.ImageIO
+import kotlin.jvm.optionals.getOrNull
 
 
 class MarkerBuilder(private val type: MarkerType): Builder {
@@ -24,43 +22,30 @@ class MarkerBuilder(private val type: MarkerType): Builder {
     private val vector2dList: MutableList<Vector2d> = mutableListOf()
 
 	private fun getAnchor(argumentValue: ArgumentValue?, iconPath: String): Vector2i {
-		val vec: Vector2i? = argumentValue?.getVector2i()
-		if (vec != null) return vec // Anchor was manually set
+        argumentValue?.getVector2i()?.let { return it } // Anchor was manually set
 
 		// Anchor was not set, trying to get it from the image
-		val url: URL? = try {
-			URL(iconPath)
-		} catch (e: MalformedURLException) {
-			null
-		}
+		val url = runCatching { URI(iconPath).toURL() }.getOrNull()
 
-		val bufferedImage: BufferedImage?
-        return try {
-            if (url == null) {
+        return runCatching {
+            val bufferedImage = if (url === null) {
                 // URL was null, assuming a local path from BlueMap webroot
-                val optional: Optional<BlueMapAPI> = BlueMapAPI.getInstance()
-                if (optional.isEmpty) return Vector2i.ZERO //BlueMap is not loaded, so can't get webroot
-
-                optional.get().webApp.webRoot.resolve(iconPath).toFile().let { bufferedImage = ImageIO.read(it) }
+                val blueMapAPI = BlueMapAPI.getInstance().getOrNull() ?: return Vector2i.ZERO //BlueMap is not loaded, so can't get webroot
+                blueMapAPI.webApp.webRoot.resolve(iconPath).toFile().let { ImageIO.read(it) }
             } else {
-                bufferedImage = ImageIO.read(url)
-            }
+                ImageIO.read(url)
+            } ?: return Vector2i.ZERO // Image could not be ImageIO.read
 
-		    if (bufferedImage == null) return Vector2i.ZERO // Image could not be ImageIO.read
-
-            val width: Int = bufferedImage.width
-            val height: Int = bufferedImage.height
-            Vector2i(width / 2, height / 2)
-        } catch (e: Exception) {
-            Vector2i.ZERO // Image could not be loaded
-        }
+            Vector2i(bufferedImage.width / 2, bufferedImage.height / 2)
+        }.getOrElse { Vector2i.ZERO }
 	}
 
-    fun buildMarker(): Marker? {
+    fun build(): Marker? {
         return when (type) {
             MarkerType.POI -> POIMarker.builder().apply {
                 applyBasics()
 
+                args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
                 args[MarkerArg.ICON]?.getString()?.let { icon(it, getAnchor(args[MarkerArg.ANCHOR], it)) }
                 args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
                 args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }

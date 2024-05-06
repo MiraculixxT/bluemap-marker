@@ -5,7 +5,7 @@ plugins {
     `shadow-script`
 }
 
-version = "1.6.3-paper"
+version = "1.6.4-paper"
 
 dependencies {
     implementation(project(":bmm-core"))

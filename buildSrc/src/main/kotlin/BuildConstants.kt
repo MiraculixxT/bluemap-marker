@@ -1,3 +1,3 @@
 object BuildConstants {
-    const val minecraftVersion = "1.20.4"
+    const val minecraftVersion = "1.20.6"
 }

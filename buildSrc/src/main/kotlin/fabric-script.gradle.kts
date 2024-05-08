@@ -32,7 +32,7 @@ dependencies {
     modImplementation("net.silkmc:silk-commands:1.10.4")
     modImplementation("net.silkmc:silk-core:1.10.4")
     modImplementation("net.fabricmc:fabric-loader:0.15.11")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.12.1-SNAPSHOT")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.13.0")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:0.97.8+1.20.6")
     modImplementation("net.fabricmc:fabric-language-kotlin:1.10.16+kotlin.1.9.21")
     modImplementation(include("me.lucko", "fabric-permissions-api", "0.3.1"))

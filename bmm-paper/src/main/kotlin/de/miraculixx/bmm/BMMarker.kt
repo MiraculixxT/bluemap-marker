@@ -22,7 +22,7 @@ class BMMarker : JavaPlugin() {
         consoleAudience = server.consoleSender
 
         // Load Content
-        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
+        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true).useMojangMappings(true))
         MarkerCommand()
 
         // BlueMap Management

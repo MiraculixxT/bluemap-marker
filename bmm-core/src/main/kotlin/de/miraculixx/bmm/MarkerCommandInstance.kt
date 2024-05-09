@@ -139,7 +139,7 @@ interface MarkerCommandInstance {
             }
 
             val marker = try {
-                build.buildMarker()
+                build.build()
             } catch (e: Exception) {
                 sendBuildError(sender, "/$setupCommandPrefix")
                 e.printStackTrace()

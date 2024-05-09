@@ -4,7 +4,7 @@ import de.miraculixx.bmm.utils.message.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 
 object APIConnector {
     var isOutdated = false
@@ -12,13 +12,13 @@ object APIConnector {
 
     fun checkVersion(currentVersion: Int): Boolean {
         val version = try {
-            val url = URL("https://api.mutils.de/public/version")
+            val url = URI("https://api.mutils.de/public/version").toURL()
             val con = url.openConnection() as HttpURLConnection
-            con.requestMethod = "GET";
+            con.requestMethod = "GET"
             con.setRequestProperty("User-Agent", "MUtils-API-1.1")
             con.setRequestProperty("Service", "BMM")
-            con.doInput = true;
-            con.doOutput = true;
+            con.doInput = true
+            con.doOutput = true
             con.connect()
             json.decodeFromString<Version>(con.inputStream.readBytes().decodeToString())
         } catch (e: Exception) {

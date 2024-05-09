@@ -28,14 +28,14 @@ val transitiveInclude: Configuration by configurations.creating {
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.officialMojangMappings())
-    implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.6.2")
-    modImplementation("net.silkmc:silk-commands:1.10.3")
-    modImplementation("net.silkmc:silk-core:1.10.3")
-    modImplementation("net.fabricmc:fabric-loader:0.15.2")
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.11.0-SNAPSHOT")!!)
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.91.3+1.20.4")
+    implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.7.1")
+    modImplementation("net.silkmc:silk-commands:1.10.4")
+    modImplementation("net.silkmc:silk-core:1.10.4")
+    modImplementation("net.fabricmc:fabric-loader:0.15.11")
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.13.0")!!)
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.97.8+1.20.6")
     modImplementation("net.fabricmc:fabric-language-kotlin:1.10.16+kotlin.1.9.21")
-    modImplementation(include("me.lucko", "fabric-permissions-api", "0.2-SNAPSHOT"))
+    modImplementation(include("me.lucko", "fabric-permissions-api", "0.3.1"))
     transitiveInclude(implementation("org.yaml:snakeyaml:2.2")!!)
 
     transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
@@ -46,7 +46,7 @@ dependencies {
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = "21"
             freeCompilerArgs += "-Xskip-prerelease-check"
         }
     }

@@ -14,16 +14,16 @@ repositories {
 
 dependencies {
     fun pluginDep(id: String, version: String) = "${id}:${id}.gradle.plugin:${version}"
-    val kotlinVersion = "1.9.21"
+    val kotlinVersion = "1.9.23"
 
     compileOnly(kotlin("gradle-plugin", kotlinVersion))
     runtimeOnly(kotlin("gradle-plugin", kotlinVersion))
     compileOnly(pluginDep("org.jetbrains.kotlin.plugin.serialization", kotlinVersion))
     runtimeOnly(pluginDep("org.jetbrains.kotlin.plugin.serialization", kotlinVersion))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Fabric implementation
-    implementation("net.fabricmc:fabric-loom:1.5-SNAPSHOT")
+    implementation("net.fabricmc:fabric-loom:1.6-SNAPSHOT")
 
     // Paper implementation
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.+")

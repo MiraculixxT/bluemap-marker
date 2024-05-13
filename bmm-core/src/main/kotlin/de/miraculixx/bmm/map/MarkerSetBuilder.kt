@@ -10,6 +10,7 @@ import de.miraculixx.bmm.utils.enums.MarkerType
 
 class MarkerSetBuilder: Builder {
     private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
+    override var page = 0
 
     fun buildMarkerSet(): MarkerSet? {
         return MarkerSet.builder().apply {

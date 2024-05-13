@@ -24,6 +24,7 @@ class MarkerBuilder(private val type: MarkerType): Builder {
     private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
     private val vector3dList: MutableList<Vector3d> = mutableListOf()
     private val vector2dList: MutableList<Vector2d> = mutableListOf()
+    override var page = 0
 
 	private fun getAnchor(argumentValue: ArgumentValue?, iconPath: String): Vector2i {
         argumentValue?.getVector2i()?.let { return it } // Anchor was manually set

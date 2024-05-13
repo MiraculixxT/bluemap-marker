@@ -7,6 +7,8 @@ import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 
 interface Builder {
+    var page: Int
+
     fun getType(): MarkerType
     fun getArgs(): Map<MarkerArg, ArgumentValue>
     fun setArg(arg: MarkerArg, value: ArgumentValue)

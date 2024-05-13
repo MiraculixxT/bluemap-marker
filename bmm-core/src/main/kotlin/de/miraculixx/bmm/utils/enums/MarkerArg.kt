@@ -1,6 +1,6 @@
 package de.miraculixx.bmm.utils.enums
 
-enum class MarkerArg(val isRequired: Boolean) {
+enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false) {
     ID(true),
     MARKER_SET(true),
     POSITION(true),
@@ -9,8 +9,8 @@ enum class MarkerArg(val isRequired: Boolean) {
     ANCHOR(false),
     MAX_DISTANCE(false),
     MIN_DISTANCE(false),
-    ADD_POSITION(true),
-    ADD_EDGE(true),
+    ADD_POSITION(true, true),
+    ADD_EDGE(true, true),
     DETAIL(false),
     LINK(false),
     NEW_TAB(false),

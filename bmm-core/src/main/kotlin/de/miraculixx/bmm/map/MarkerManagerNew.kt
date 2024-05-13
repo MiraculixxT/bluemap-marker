@@ -8,15 +8,24 @@ import de.miraculixx.mcommons.text.*
 import java.io.File
 import java.util.UUID
 
+
+/**
+ * Marker Concept
+ *
+ * - Creating Sets like normal based on bluemap maps
+ * - Creating Markers like normal based on sets
+ *
+ * - Creating Template Sets based on bluemap maps.
+ * Those sets will have a unique name that will be the new command name.
+ * Template sets can be populated by template markers.
+ * Players then can enter `/<set-template> place <marker-template> <name>` to place a marker.
+ */
 object MarkerManagerNew {
     // Storage Files
     private val fileTemplateSet = File(sourceFolder, "templates/sets.json")
-    private val fileTemplateMarker = File(sourceFolder, "templates/markers.json")
     private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
 
-    private val templatesSet: Map<String, MarkerTemplate> = fileTemplateSet.loadConfig(emptyMap()) // <name, data>
-    private val templateMarkers: Map<String, MarkerTemplate> = fileTemplateMarker.loadConfig(emptyMap()) // <name, data>
-
+    private val templateSets: Map<String, MarkerTemplate> = fileTemplateSet.loadConfig(emptyMap()) // <name, data>
     private val markerSets: MutableMap<String, BMarkerSet> = mutableMapOf()
 
 
@@ -34,8 +43,6 @@ object MarkerManagerNew {
                     consoleAudience.sendMessage(prefix + cmp("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...", cError))
                     return@forEach
                 }
-
-                s
 
             }
         }

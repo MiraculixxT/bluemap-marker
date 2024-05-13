@@ -1,10 +1,10 @@
 package de.miraculixx.bmm
 
 import de.miraculixx.bmm.map.MarkerManager
-import de.miraculixx.bmm.utils.message.cmp
-import de.miraculixx.bmm.utils.message.consoleAudience
-import de.miraculixx.bmm.utils.message.plus
-import de.miraculixx.bmm.utils.message.prefix
+import de.miraculixx.mcommons.text.cmp
+import de.miraculixx.mcommons.text.consoleAudience
+import de.miraculixx.mcommons.text.plus
+import de.miraculixx.mcommons.text.prefix
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.loader.api.FabricLoader

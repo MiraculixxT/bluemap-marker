@@ -1,14 +1,10 @@
 package de.miraculixx.bmm
 
 import de.bluecolored.bluemap.api.BlueMapAPI
-import de.miraculixx.bmm.api.APIConnector
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.Settings
 import de.miraculixx.bmm.utils.message.*
 import de.miraculixx.bmm.utils.settings
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import java.io.File
@@ -29,9 +25,6 @@ class BlueMap(sourceFolder: File, version: Int) {
         localization = Localization(File(sourceFolder, "language"), settings.language, languages, prefix)
         MarkerManager.loadAllMarker(it, sourceFolder)
         consoleAudience.sendMessage(prefix + cmp("Successfully enabled Marker Command addition!"))
-        CoroutineScope(Dispatchers.Default).launch {
-            APIConnector.checkVersion(version)
-        }
     }
 
     private val onDisable = Consumer<BlueMapAPI> {

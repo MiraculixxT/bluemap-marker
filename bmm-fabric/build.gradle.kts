@@ -1,7 +1,6 @@
 import dex.plugins.outlet.v2.util.ReleaseType
 
 plugins {
-    `kotlin-script`
     `core-script`
     `fabric-script`
     `adventure-script`

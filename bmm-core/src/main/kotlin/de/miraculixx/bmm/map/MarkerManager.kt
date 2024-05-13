@@ -6,6 +6,8 @@ import de.bluecolored.bluemap.api.gson.MarkerGson
 import de.bluecolored.bluemap.api.markers.Marker
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.utils.message.*
+import de.miraculixx.mcommons.serializer.jsonPretty
+import de.miraculixx.mcommons.text.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -172,7 +174,7 @@ object MarkerManager {
 
         val folder = prepareConfigFolder(sourceFolder)
         val sets = File("${folder.path}/marker-sets.json")
-        sets.writeText(json.encodeToString(markerSets.keys))
+        sets.writeText(jsonPretty.encodeToString(markerSets.keys))
         markerSets.forEach { (id, set) ->
             val file = File("${folder.path}/$id.json")
             file.writeText(gson.toJson(set))

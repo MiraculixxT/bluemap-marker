@@ -29,4 +29,5 @@ enum class MarkerArg(val isRequired: Boolean) {
     MAP(true),
     TOGGLEABLE(false),
     DEFAULT_HIDDEN(false),
+    ;
 }

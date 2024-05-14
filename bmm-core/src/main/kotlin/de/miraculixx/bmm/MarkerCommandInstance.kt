@@ -232,7 +232,7 @@ interface MarkerCommandInstance {
             sender.sendMessage(prefix + cmp("Could not resolve marker type ", cError) + cmp(marker.type, cError, underlined = true) + cmp("! Outdated?", cError))
             return
         }
-        val newBuilder = MarkerBuilder.of(marker, markerType, markerID, setID)
+        val newBuilder = MarkerBuilder.ofMarker(marker, markerType, markerID, setID)
         if (newBuilder == null) {
             sender.sendMessage(prefix + cmp("Something unexpected went wrong while reading marker data... Please contact support", cError))
             return

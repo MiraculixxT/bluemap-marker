@@ -7,30 +7,28 @@ import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.markers.*
 import de.bluecolored.bluemap.api.math.Line
 import de.bluecolored.bluemap.api.math.Shape
-import de.miraculixx.bmm.map.data.ArgumentValue
+import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
-import java.awt.image.BufferedImage
-import java.net.MalformedURLException
 import java.net.URI
-import java.net.URL
-import java.util.*
 import javax.imageio.ImageIO
 import kotlin.jvm.optionals.getOrNull
 
 
-class MarkerBuilder(private val type: MarkerType): Builder {
-    private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
+class MarkerBuilder(
+    private val type: MarkerType,
+    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf()
+) : Builder {
     private val vector3dList: MutableList<Vector3d> = mutableListOf()
     private val vector2dList: MutableList<Vector2d> = mutableListOf()
     override var page = 0
 
-	private fun getAnchor(argumentValue: ArgumentValue?, iconPath: String): Vector2i {
-        argumentValue?.getVector2i()?.let { return it } // Anchor was manually set
+    private fun getAnchor(Box: Box<Any>?, iconPath: String): Vector2i {
+        Box?.getVector2i()?.let { return it } // Anchor was manually set
 
-		// Anchor was not set, trying to get it from the image
-		val url = runCatching { URI(iconPath).toURL() }.getOrNull()
+        // Anchor was not set, trying to get it from the image
+        val url = runCatching { URI(iconPath).toURL() }.getOrNull()
 
         return runCatching {
             val bufferedImage = if (url === null) {
@@ -43,39 +41,6 @@ class MarkerBuilder(private val type: MarkerType): Builder {
 
             Vector2i(bufferedImage.width / 2, bufferedImage.height / 2)
         }.getOrElse { Vector2i.ZERO }
-	}
-
-    private fun getAnchors(argumentValue: ArgumentValue?, iconPath: String): Vector2i {
-        val vec: Vector2i? = argumentValue?.getVector2i()
-        if (vec != null) return vec // Anchor was manually set
-
-        // Anchor was not set, trying to get it from the image
-        val url: URL? = try {
-            URL(iconPath)
-        } catch (e: MalformedURLException) {
-            null
-        }
-
-        val bufferedImage: BufferedImage?
-        return try {
-            if (url == null) {
-                // URL was null, assuming a local path from BlueMap webroot
-                val optional: Optional<BlueMapAPI> = BlueMapAPI.getInstance()
-                if (optional.isEmpty) return Vector2i.ZERO //BlueMap is not loaded, so can't get webroot
-
-                optional.get().webApp.webRoot.resolve(iconPath).toFile().let { bufferedImage = ImageIO.read(it) }
-            } else {
-                bufferedImage = ImageIO.read(url)
-            }
-
-            if (bufferedImage == null) return Vector2i.ZERO // Image could not be ImageIO.read
-
-            val width: Int = bufferedImage.width
-            val height: Int = bufferedImage.height
-            Vector2i(width / 2, height / 2)
-        } catch (e: Exception) {
-            Vector2i.ZERO // Image could not be loaded
-        }
     }
 
     fun build(): Marker? {
@@ -129,10 +94,12 @@ class MarkerBuilder(private val type: MarkerType): Builder {
             MarkerType.ELLIPSE -> ExtrudeMarker.builder().apply {
                 applyBasics()
                 val position = args[MarkerArg.POSITION]?.getVector3d() ?: return null
-                val shape = Shape.createEllipse(position.x, position.z,
+                val shape = Shape.createEllipse(
+                    position.x, position.z,
                     args[MarkerArg.X_RADIUS]?.getDouble() ?: return null,
                     args[MarkerArg.Z_RADIUS]?.getDouble() ?: return null,
-                    args[MarkerArg.POINTS]?.getInt() ?: return null)
+                    args[MarkerArg.POINTS]?.getInt() ?: return null
+                )
                 shape(shape, position.y.toFloat(), args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: return null)
 
                 applyExtrudeData()
@@ -168,11 +135,11 @@ class MarkerBuilder(private val type: MarkerType): Builder {
         return type
     }
 
-    override fun getArgs(): Map<MarkerArg, ArgumentValue> {
+    override fun getArgs(): Map<MarkerArg, Box<Any>> {
         return args
     }
 
-    override fun setArg(arg: MarkerArg, value: ArgumentValue) {
+    override fun setArg(arg: MarkerArg, value: Box<Any>) {
         args[arg] = value
     }
 
@@ -185,66 +152,73 @@ class MarkerBuilder(private val type: MarkerType): Builder {
     }
 
     companion object {
-        fun of(marker: Marker, type: MarkerType, markerID: String, setID: String): MarkerBuilder? {
+        fun ofMarker(marker: Marker, type: MarkerType, markerID: String, setID: String): MarkerBuilder? {
             val builder = MarkerBuilder(type)
-            builder.args[MarkerArg.LABEL] = ArgumentValue(marker.label)
-            builder.args[MarkerArg.POSITION] = ArgumentValue(marker.position)
-            builder.args[MarkerArg.ID] = ArgumentValue(markerID)
-            builder.args[MarkerArg.MARKER_SET] = ArgumentValue(setID)
+            builder.args[MarkerArg.LABEL] = Box(marker.label)
+            builder.args[MarkerArg.POSITION] = Box(marker.position)
+            builder.args[MarkerArg.ID] = Box(markerID)
+            builder.args[MarkerArg.MARKER_SET] = Box(setID)
 
             when (type) {
                 MarkerType.POI -> {
                     val poi = marker as? POIMarker ?: return null
-                    builder.args[MarkerArg.ICON] = ArgumentValue(poi.iconAddress)
-                    builder.args[MarkerArg.ANCHOR] = ArgumentValue(poi.anchor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(poi.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(poi.maxDistance)
+                    builder.args[MarkerArg.ICON] = Box(poi.iconAddress)
+                    builder.args[MarkerArg.ANCHOR] = Box(poi.anchor)
+                    builder.args[MarkerArg.MIN_DISTANCE] = Box(poi.minDistance)
+                    builder.args[MarkerArg.MAX_DISTANCE] = Box(poi.maxDistance)
                 }
+
                 MarkerType.LINE -> {
                     val line = marker as? LineMarker ?: return null
                     builder.getVec3List().addAll(line.line.points)
-                    builder.args[MarkerArg.DETAIL] = ArgumentValue(line.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(line.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = ArgumentValue(line.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(line.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(line.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = ArgumentValue(line.lineColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(line.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(line.maxDistance)
+                    builder.args[MarkerArg.DETAIL] = Box(line.detail)
+                    builder.args[MarkerArg.LINK] = Box(line.link.orElse(""))
+                    builder.args[MarkerArg.NEW_TAB] = Box(line.isNewTab)
+                    builder.args[MarkerArg.DEPTH_TEST] = Box(line.isDepthTestEnabled)
+                    builder.args[MarkerArg.LINE_WIDTH] = Box(line.lineWidth)
+                    builder.args[MarkerArg.LINE_COLOR] = Box(line.lineColor)
+                    builder.args[MarkerArg.MIN_DISTANCE] = Box(line.minDistance)
+                    builder.args[MarkerArg.MAX_DISTANCE] = Box(line.maxDistance)
                 }
+
                 MarkerType.SHAPE -> {
                     val shape = marker as? ShapeMarker ?: return null
                     builder.getVec2List().addAll(shape.shape.points)
-                    builder.args[MarkerArg.DETAIL] = ArgumentValue(shape.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(shape.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = ArgumentValue(shape.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(shape.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(shape.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = ArgumentValue(shape.lineColor)
-                    builder.args[MarkerArg.HEIGHT] = ArgumentValue(shape.shapeY)
-                    builder.args[MarkerArg.FILL_COLOR] = ArgumentValue(shape.fillColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(shape.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(shape.maxDistance)
+                    builder.args[MarkerArg.DETAIL] = Box(shape.detail)
+                    builder.args[MarkerArg.LINK] = Box(shape.link.orElse(""))
+                    builder.args[MarkerArg.NEW_TAB] = Box(shape.isNewTab)
+                    builder.args[MarkerArg.DEPTH_TEST] = Box(shape.isDepthTestEnabled)
+                    builder.args[MarkerArg.LINE_WIDTH] = Box(shape.lineWidth)
+                    builder.args[MarkerArg.LINE_COLOR] = Box(shape.lineColor)
+                    builder.args[MarkerArg.HEIGHT] = Box(shape.shapeY)
+                    builder.args[MarkerArg.FILL_COLOR] = Box(shape.fillColor)
+                    builder.args[MarkerArg.MIN_DISTANCE] = Box(shape.minDistance)
+                    builder.args[MarkerArg.MAX_DISTANCE] = Box(shape.maxDistance)
                 }
+
                 MarkerType.EXTRUDE, MarkerType.ELLIPSE -> {
                     val extrude = marker as? ExtrudeMarker ?: return null
                     builder.getVec2List().addAll(extrude.shape.points)
-                    builder.args[MarkerArg.DETAIL] = ArgumentValue(extrude.detail)
-                    builder.args[MarkerArg.LINK] = ArgumentValue(extrude.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = ArgumentValue(extrude.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = ArgumentValue(extrude.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = ArgumentValue(extrude.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = ArgumentValue(extrude.lineColor)
-                    builder.args[MarkerArg.HEIGHT] = ArgumentValue(extrude.shapeMinY)
-                    builder.args[MarkerArg.MAX_HEIGHT] = ArgumentValue(extrude.shapeMaxY)
-                    builder.args[MarkerArg.FILL_COLOR] = ArgumentValue(extrude.fillColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = ArgumentValue(extrude.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = ArgumentValue(extrude.maxDistance)
+                    builder.args[MarkerArg.DETAIL] = Box(extrude.detail)
+                    builder.args[MarkerArg.LINK] = Box(extrude.link.orElse(""))
+                    builder.args[MarkerArg.NEW_TAB] = Box(extrude.isNewTab)
+                    builder.args[MarkerArg.DEPTH_TEST] = Box(extrude.isDepthTestEnabled)
+                    builder.args[MarkerArg.LINE_WIDTH] = Box(extrude.lineWidth)
+                    builder.args[MarkerArg.LINE_COLOR] = Box(extrude.lineColor)
+                    builder.args[MarkerArg.HEIGHT] = Box(extrude.shapeMinY)
+                    builder.args[MarkerArg.MAX_HEIGHT] = Box(extrude.shapeMaxY)
+                    builder.args[MarkerArg.FILL_COLOR] = Box(extrude.fillColor)
+                    builder.args[MarkerArg.MIN_DISTANCE] = Box(extrude.minDistance)
+                    builder.args[MarkerArg.MAX_DISTANCE] = Box(extrude.maxDistance)
                 }
 
                 MarkerType.MARKER_SET -> Unit
             }
             return builder
+        }
+
+        fun ofArguments(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): Marker? {
+            return MarkerBuilder(type, attributes).build()
         }
     }
 }

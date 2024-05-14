@@ -3,13 +3,14 @@ package de.miraculixx.bmm.map
 import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.MarkerSet
-import de.miraculixx.bmm.map.data.ArgumentValue
+import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 
-class MarkerSetBuilder: Builder {
-    private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
+class MarkerSetBuilder(
+    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf()
+) : Builder {
     override var page = 0
 
     fun buildMarkerSet(): MarkerSet? {
@@ -27,11 +28,11 @@ class MarkerSetBuilder: Builder {
         return MarkerType.MARKER_SET
     }
 
-    override fun getArgs(): Map<MarkerArg, ArgumentValue> {
+    override fun getArgs(): Map<MarkerArg, Box<Any>> {
         return args
     }
 
-    override fun setArg(arg: MarkerArg, value: ArgumentValue) {
+    override fun setArg(arg: MarkerArg, value: Box<Any>) {
         args[arg] = value
     }
 
@@ -41,5 +42,11 @@ class MarkerSetBuilder: Builder {
 
     override fun getVec2List(): MutableList<Vector2d> {
         return mutableListOf()
+    }
+
+    companion object {
+        fun ofArguments(args: MutableMap<MarkerArg, Box<Any>>): MarkerSet? {
+            return MarkerSetBuilder(args).buildMarkerSet()
+        }
     }
 }

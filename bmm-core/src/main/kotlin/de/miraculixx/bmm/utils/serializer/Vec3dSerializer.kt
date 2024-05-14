@@ -1,4 +1,4 @@
-package de.miraculixx.bmm.utils
+package de.miraculixx.bmm.utils.serializer
 
 import com.flowpowered.math.vector.Vector3d
 import kotlinx.serialization.KSerializer

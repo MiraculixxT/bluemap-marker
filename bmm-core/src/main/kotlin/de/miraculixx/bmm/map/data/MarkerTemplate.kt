@@ -7,7 +7,6 @@ import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManagerNew
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
-import de.miraculixx.mcommons.serializer.UUIDSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -39,7 +38,8 @@ data class MarkerTemplate(
         blueMapSets.putAll(
             maps.mapNotNull { mapID ->
                 api.getMap(mapID).getOrNull()?.let { map ->
-                    templateSet.copy().load(api, markerSetID, map) // Copy template-set and load it
+                    // Get already loaded set or copy template-set and load it
+                    MarkerManagerNew.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet ?: templateSet.copy().load(api, markerSetID, map)
                 }?.let { mapID to it }
             }.toMap()
         )

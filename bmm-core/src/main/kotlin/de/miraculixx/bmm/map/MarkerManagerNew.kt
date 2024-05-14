@@ -35,10 +35,10 @@ object MarkerManagerNew {
     private val folderTemplateSets = File(sourceFolder, "templates")
     private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
 
-    val templateSets: MutableMap<String, MarkerTemplate> = mutableMapOf() // <name, data>
-    val markerSets: MutableMap<String, BMarkerSet> = mutableMapOf() // <id, data>
+    val templateSets: MutableMap<String, MarkerTemplate> = mutableMapOf() // <templateName -> template>
+    val blueMapMaps: MutableMap<String, MutableMap<String, BMarkerSet>> = mutableMapOf() // <mapID -> <setID -> set>>
 
-    private val json = Json {
+    private val markerJson = Json {
         ignoreUnknownKeys = true
         prettyPrint = true
         serializersModule = SerializersModule {
@@ -57,61 +57,50 @@ object MarkerManagerNew {
             sendError("BlueMapAPI is not available! Disabling MarkerManager...")
             return
         }
-
-        // Load templates
-        folderTemplateSets.listFiles()?.forEach { file ->
-
-            // Parsing template file
-            if (file.extension != "json") return@forEach
-            val template = file.loadConfig(MarkerTemplate(""), json).takeUnless { it.name.isEmpty() }
-            if (template == null) {
-                sendError("Template file '${file.name}' is invalid! Skipping it...")
-                return@forEach
-            }
-            templateSets[template.name] = template
-
-
-        }
-
-
-
         val invalidUUID = UUID(0,0)
-        folderSets.listFiles()?.forEach { file ->
+
+        // Load normal sets
+        folderSets.listFiles()?.forEach { file -> // List all world folders
             if (!file.isDirectory) return@forEach
             val mapID = file.name
             file.listFiles()?.forEach sets@{ setFile ->
 
+                // Load set
                 if (file.extension != "json") return@sets
                 val setID = setFile.nameWithoutExtension
-                val set = file.loadConfig(BMarkerSet(invalidUUID)).takeUnless { it.owner == invalidUUID }
+                val set = file.loadConfig(BMarkerSet(invalidUUID), markerJson).takeUnless { it.owner == invalidUUID }
                 if (set == null) {
                     sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
                     return@forEach
                 }
-
-                // Load set markers
+                set.load(blueMapAPI!!, setID, blueMapAPI!!.getMap(mapID).getOrNull() ?: return@sets)
 
             }
         }
+
+        // Load template sets
+        folderTemplateSets.listFiles()?.forEach { file ->
+            if (file.extension != "json") return
+            val template = file.loadConfig(MarkerTemplate("", markerSetID = ""), markerJson)
+            if (template.name.isEmpty()) {
+                sendError("Template file '${file.name}' is invalid! Skipping it...")
+                return@forEach
+            }
+            template.load(blueMapAPI!!)
+        }
+    }
+
+    fun save() {
+
     }
 
 
-    /**
-     * Add a set to the given BlueMap map
-     * @param map id of the map
-     */
-    fun addMarkerSet(mapID: String, markerSet: MarkerSet, markerSetID: String): Boolean {
-        val api = blueMapAPI ?: return noBlueMapAPI()
-        val map = api.getMap(mapID).getOrNull() ?: return false
-        map.markerSets[markerSetID] = markerSet
-        markerSets
-    }
 
     fun sendError(info: String) {
         consoleAudience.sendMessage(prefix + cmp(info, cError))
     }
 
-    private fun noBlueMapAPI(): Boolean {
+    fun noBlueMapAPI(): Boolean {
         sendError("BlueMapAPI is not available! Please contact support if this error persists.")
         return false
     }

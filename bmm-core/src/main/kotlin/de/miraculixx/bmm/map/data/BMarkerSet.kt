@@ -39,7 +39,7 @@ data class BMarkerSet(
         }
 
         // Place set
-        MarkerManagerNew.markerSets[setID] = this // only needed if the set is new, otherwise this will do nothing
+        MarkerManagerNew.blueMapMaps[map.id]?.put(setID, this) // only needed if the set is new, otherwise this will do nothing
         val sets = api.getMap(map.id).getOrNull()?.markerSets
         if (sets == null) {
             MarkerManagerNew.sendError("Failed to load BlueMap map '${map.name}'! Required by marker set '$setID'.")

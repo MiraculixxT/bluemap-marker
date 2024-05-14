@@ -1,7 +1,5 @@
 package de.miraculixx.bmm.map
 
-import com.flowpowered.math.vector.Vector2d
-import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.interfaces.Builder
@@ -9,16 +7,18 @@ import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 
 class MarkerSetBuilder(
-    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf()
+    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf(),
+    private val blueMapSet: MarkerSet = MarkerSet("<unset>")
 ) : Builder {
     override var page = 0
 
-    fun buildMarkerSet(): MarkerSet? {
-        return MarkerSet.builder().apply {
-            label(args[MarkerArg.LABEL]?.getString() ?: return null)
-            toggleable(args[MarkerArg.TOGGLEABLE]?.getBoolean() ?: true)
-            defaultHidden(args[MarkerArg.DEFAULT_HIDDEN]?.getBoolean() ?: false)
-        }.build()
+    fun apply(): MarkerSet {
+        return blueMapSet.apply {
+            args[MarkerArg.LABEL]?.getString()?.let { label = it }
+            args[MarkerArg.TOGGLEABLE]?.getBoolean()?.let { isToggleable = it }
+            args[MarkerArg.DEFAULT_HIDDEN]?.getBoolean()?.let { isDefaultHidden = it }
+            args[MarkerArg.LISTING_POSITION]?.getInt()?.let { sorting = it }
+        }
     }
 
     /*
@@ -36,17 +36,13 @@ class MarkerSetBuilder(
         args[arg] = value
     }
 
-    override fun getVec3List(): MutableList<Vector3d> {
-        return mutableListOf()
-    }
-
-    override fun getVec2List(): MutableList<Vector2d> {
-        return mutableListOf()
-    }
-
     companion object {
-        fun ofArguments(args: MutableMap<MarkerArg, Box<Any>>): MarkerSet? {
-            return MarkerSetBuilder(args).buildMarkerSet()
+        fun createSet(args: MutableMap<MarkerArg, Box<Any>>): MarkerSet {
+            return MarkerSetBuilder(args).apply()
+        }
+
+        fun editSet(set: MarkerSet, changedArgs: MutableMap<MarkerArg, Box<Any>>) {
+            MarkerSetBuilder(changedArgs, set).apply()
         }
     }
 }

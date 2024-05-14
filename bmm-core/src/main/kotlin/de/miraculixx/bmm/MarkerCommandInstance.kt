@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.map.data.ArgumentValue
 import de.miraculixx.bmm.map.interfaces.Builder

@@ -1,8 +1,6 @@
 package de.miraculixx.bmm.map.interfaces
 
-import com.flowpowered.math.vector.Vector2d
-import com.flowpowered.math.vector.Vector3d
-import de.miraculixx.bmm.map.data.ArgumentValue
+import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 
@@ -10,8 +8,6 @@ interface Builder {
     var page: Int
 
     fun getType(): MarkerType
-    fun getArgs(): Map<MarkerArg, ArgumentValue>
-    fun setArg(arg: MarkerArg, value: ArgumentValue)
-    fun getVec3List(): MutableList<Vector3d>
-    fun getVec2List(): MutableList<Vector2d>
+    fun getArgs(): Map<MarkerArg, Box<Any>>
+    fun setArg(arg: MarkerArg, value: Box<Any>)
 }

@@ -7,7 +7,6 @@ import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.math.Color
 import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.message.round

@@ -1,12 +1,10 @@
 package de.miraculixx.bmm
 
 import de.bluecolored.bluemap.api.BlueMapAPI
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.Settings
 import de.miraculixx.bmm.utils.settings
 import de.miraculixx.mcommons.serializer.jsonPretty
 import de.miraculixx.mcommons.text.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import java.io.File
 import java.util.Locale

@@ -5,10 +5,12 @@ import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.data.BMarkerSet
 import de.miraculixx.bmm.map.data.MarkerTemplate
 import de.miraculixx.bmm.utils.serializer.ColorSerializer
+import de.miraculixx.bmm.utils.serializer.Vec2dSerializer
 import de.miraculixx.bmm.utils.serializer.Vec2iSerializer
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
 import de.miraculixx.bmm.utils.sourceFolder
 import de.miraculixx.mcommons.extensions.loadConfig
+import de.miraculixx.mcommons.extensions.saveConfig
 import de.miraculixx.mcommons.serializer.UUIDSerializer
 import de.miraculixx.mcommons.text.*
 import kotlinx.serialization.json.Json
@@ -45,6 +47,7 @@ object MarkerManagerNew {
             contextual(UUIDSerializer)
             contextual(Vec3dSerializer)
             contextual(Vec2iSerializer)
+            contextual(Vec2dSerializer)
             contextual(ColorSerializer)
         }
     }
@@ -54,7 +57,7 @@ object MarkerManagerNew {
     fun load() {
         blueMapAPI = BlueMapAPI.getInstance().getOrNull()
         if (blueMapAPI == null) {
-            sendError("BlueMapAPI is not available! Disabling MarkerManager...")
+            noBlueMapAPI()
             return
         }
         val invalidUUID = UUID(0,0)
@@ -91,11 +94,40 @@ object MarkerManagerNew {
     }
 
     fun save() {
+        // Prepare workspace
+        if (blueMapAPI == null) {
+            noBlueMapAPI()
+            return
+        }
+        folderSets.mkdirs()
+        folderTemplateSets.mkdirs()
 
+        // Save normal sets
+        blueMapMaps.forEach { (mapID, sets) ->
+            val worldName = blueMapAPI!!.getMap(mapID).getOrNull()?.name
+            if (worldName == null) {
+                sendError("Cannot find map '$mapID'! All sets inside this map will not save or update.")
+                return@forEach
+            }
+            val worldFolder = File(folderSets, worldName)
+            if (!worldFolder.exists()) worldFolder.mkdir()
+            sets.forEach { (setID, set) ->
+                val file = File(worldFolder, "$setID.json")
+                file.saveConfig(set, markerJson)
+            }
+        }
+
+        // Save template sets
+        templateSets.forEach { (templateName, template) ->
+            val file = File(folderTemplateSets, "$templateName.json")
+            file.saveConfig(template, markerJson)
+        }
     }
 
 
-
+    //
+    // Error Handling Messages
+    //
     fun sendError(info: String) {
         consoleAudience.sendMessage(prefix + cmp(info, cError))
     }

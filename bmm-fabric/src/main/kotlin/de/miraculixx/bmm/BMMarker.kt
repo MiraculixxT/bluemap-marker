@@ -1,6 +1,5 @@
 package de.miraculixx.bmm
 
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.mcommons.text.cmp
 import de.miraculixx.mcommons.text.consoleAudience
 import de.miraculixx.mcommons.text.plus

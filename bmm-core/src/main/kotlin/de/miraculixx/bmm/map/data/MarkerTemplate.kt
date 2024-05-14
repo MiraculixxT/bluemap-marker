@@ -55,7 +55,7 @@ data class MarkerTemplate(
                 this[MarkerArg.LABEL] = Box(data.displayName.replace("%PLAYER%", data.playerName))
                 this[MarkerArg.DETAIL]?.let { this[MarkerArg.DETAIL] = Box(it.getString().replace("%PLAYER%", data.playerName)) }
             }
-            val finalMarker = MarkerBuilder.ofArguments(markerArgs, templateMarker.type)
+            val finalMarker = MarkerBuilder.createMarker(markerArgs, templateMarker.type)
 
             // Place marker
             data.placedMaps.forEach { mapID ->

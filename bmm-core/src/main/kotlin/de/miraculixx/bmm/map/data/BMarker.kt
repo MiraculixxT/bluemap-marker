@@ -23,15 +23,18 @@ data class BMarker(
 
     fun load(markerID: String, set: MarkerSet): Marker? {
         // Load marker
-        blueMapMarker = MarkerBuilder.ofArguments(attributes, type)
-        if (blueMapMarker == null) {
-            MarkerManagerNew.sendError("Marker '$markerID' in set '${set.label}' has invalid attributes!")
-            MarkerManagerNew.sendError(" - Attributes: $attributes")
-            return null
-        }
+        blueMapMarker = MarkerBuilder.createMarker(attributes, type)
 
         // Place marker
         set.markers[markerID] = blueMapMarker
         return blueMapMarker
+    }
+
+    fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
+        if (blueMapMarker == null) {
+            MarkerManagerNew.sendError("Failed to update marker (not loaded). Did BlueMap boot up correctly?")
+            return
+        }
+        MarkerBuilder.editMarker(blueMapMarker!!, changedArgs, type)
     }
 }

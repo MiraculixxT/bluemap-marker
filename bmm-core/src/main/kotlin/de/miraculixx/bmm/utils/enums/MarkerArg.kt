@@ -29,5 +29,6 @@ enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false) {
     MAP(true),
     TOGGLEABLE(false),
     DEFAULT_HIDDEN(false),
+    LISTING_POSITION(false),
     ;
 }

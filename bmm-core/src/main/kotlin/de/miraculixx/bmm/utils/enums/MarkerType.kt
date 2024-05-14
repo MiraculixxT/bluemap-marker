@@ -1,5 +1,15 @@
 package de.miraculixx.bmm.utils.enums
 
+import com.flowpowered.math.vector.Vector3d
+import de.bluecolored.bluemap.api.markers.ExtrudeMarker
+import de.bluecolored.bluemap.api.markers.LineMarker
+import de.bluecolored.bluemap.api.markers.Marker
+import de.bluecolored.bluemap.api.markers.MarkerSet
+import de.bluecolored.bluemap.api.markers.POIMarker
+import de.bluecolored.bluemap.api.markers.ShapeMarker
+import de.bluecolored.bluemap.api.math.Line
+import de.bluecolored.bluemap.api.math.Shape
+
 enum class MarkerType(val args: List<MarkerArg>) {
     POI(
         listOf(
@@ -99,7 +109,20 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAP,
             MarkerArg.LABEL,
             MarkerArg.TOGGLEABLE,
-            MarkerArg.DEFAULT_HIDDEN
+            MarkerArg.DEFAULT_HIDDEN,
+            MarkerArg.LISTING_POSITION,
         )
     )
+    ;
+
+    fun getEmptyMarker(): Marker {
+        val unset = "<unset>"
+        return when (this) {
+            POI -> POIMarker(unset, Vector3d())
+            LINE -> LineMarker(unset, Line())
+            SHAPE -> ShapeMarker(unset, Shape(), 0f)
+            EXTRUDE, ELLIPSE -> ExtrudeMarker(unset, Shape(), 0f, 0f)
+            MARKER_SET -> throw IllegalArgumentException("MarkerSet is not a marker type")
+        }
+    }
 }

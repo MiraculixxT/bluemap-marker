@@ -1,8 +1,6 @@
 package de.miraculixx.bmm.map
 
-import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
-import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.markers.*
 import de.bluecolored.bluemap.api.math.Line
@@ -18,14 +16,80 @@ import kotlin.jvm.optionals.getOrNull
 
 class MarkerBuilder(
     private val type: MarkerType,
-    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf()
+    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf(),
+    private val blueMapMarker: Marker = type.getEmptyMarker()
 ) : Builder {
-    private val vector3dList: MutableList<Vector3d> = mutableListOf()
-    private val vector2dList: MutableList<Vector2d> = mutableListOf()
     override var page = 0
 
-    private fun getAnchor(Box: Box<Any>?, iconPath: String): Vector2i {
-        Box?.getVector2i()?.let { return it } // Anchor was manually set
+    fun apply(): Marker {
+        return when (val marker = blueMapMarker) {
+            is POIMarker -> marker.apply {
+                applyBasics()
+
+                args[MarkerArg.ICON]?.getString()?.let { setIcon(it, getAnchor(args[MarkerArg.ANCHOR], it)) }
+            }
+
+            is LineMarker -> marker.apply {
+                applyBasics()
+
+                args[MarkerArg.ADD_POSITION]?.getVector3dList()?.let { line = Line(it) }
+                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
+                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
+                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
+            }
+
+            is ShapeMarker -> marker.apply {
+                applyBasics()
+
+                args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let { setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f) }
+                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
+                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
+                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
+                args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor = it }
+            }
+
+            is ExtrudeMarker -> marker.apply {
+                applyBasics()
+
+                if (this@MarkerBuilder.type == MarkerType.ELLIPSE) {
+                    val position = args[MarkerArg.POSITION]?.getVector3d()
+                    val x = args[MarkerArg.X_RADIUS]?.getDouble()
+                    if (position != null && x != null) {
+                        val shape = Shape.createEllipse(position.x, position.z, x, args[MarkerArg.Z_RADIUS]?.getDouble() ?: x, args[MarkerArg.POINTS]?.getInt() ?: 50)
+                        setShape(shape, position.y.toFloat(), args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: (position.y.toFloat() + 1f))
+                    }
+                } else {
+                    args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let { setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f, args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: 51f) }
+                }
+
+                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
+                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
+                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
+                args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor = it }
+            }
+
+            else -> blueMapMarker
+        }
+    }
+
+    private fun Marker.applyBasics() {
+        label = args[MarkerArg.LABEL]?.getString()
+        args[MarkerArg.POSITION]?.getVector3d()?.let { position = it }
+        args[MarkerArg.LISTED]?.getBoolean()?.let { isListed = it }
+
+        if (this is DistanceRangedMarker) {
+            args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance = it }
+            args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance = it }
+        }
+
+        if (this is ObjectMarker) {
+            args[MarkerArg.LINK]?.getString()?.let { setLink(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
+            args[MarkerArg.DETAIL]?.getString()?.let { detail = it }
+        }
+    }
+
+    private fun getAnchor(box: Box<Any>?, iconPath: String): Vector2i {
+        box?.getVector2i()?.let { return it } // Anchor was manually set
 
         // Anchor was not set, trying to get it from the image
         val url = runCatching { URI(iconPath).toURL() }.getOrNull()
@@ -43,182 +107,25 @@ class MarkerBuilder(
         }.getOrElse { Vector2i.ZERO }
     }
 
-    fun build(): Marker? {
-        return when (type) {
-            MarkerType.POI -> POIMarker.builder().apply {
-                applyBasics()
+    override fun getType() = type
 
-                args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
-                args[MarkerArg.ICON]?.getString()?.let { icon(it, getAnchor(args[MarkerArg.ANCHOR], it)) }
-                args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
-                args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
-            }.build()
-
-            MarkerType.LINE -> LineMarker.builder().apply {
-                applyBasics()
-                if (vector3dList.isEmpty()) return null
-                line(Line(vector3dList))
-
-                args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
-                args[MarkerArg.LINK]?.getString()?.let { link(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
-                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { depthTestEnabled(it) }
-                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth(it) }
-                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor(it) }
-                args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
-                args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
-            }.build()
-
-            MarkerType.SHAPE -> ShapeMarker.builder().apply {
-                applyBasics()
-                if (vector2dList.isEmpty()) return null
-                shape(Shape(vector2dList), args[MarkerArg.HEIGHT]?.getFloat() ?: return null)
-
-                args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
-                args[MarkerArg.LINK]?.getString()?.let { link(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
-                args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { depthTestEnabled(it) }
-                args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth(it) }
-                args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor(it) }
-                args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor(it) }
-                args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
-                args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
-            }.build()
-
-            MarkerType.EXTRUDE -> ExtrudeMarker.builder().apply {
-                applyBasics()
-                if (vector2dList.isEmpty()) return null
-                shape(Shape(vector2dList), args[MarkerArg.HEIGHT]?.getFloat() ?: return null, args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: return null)
-
-                applyExtrudeData()
-            }.build()
-
-            MarkerType.ELLIPSE -> ExtrudeMarker.builder().apply {
-                applyBasics()
-                val position = args[MarkerArg.POSITION]?.getVector3d() ?: return null
-                val shape = Shape.createEllipse(
-                    position.x, position.z,
-                    args[MarkerArg.X_RADIUS]?.getDouble() ?: return null,
-                    args[MarkerArg.Z_RADIUS]?.getDouble() ?: return null,
-                    args[MarkerArg.POINTS]?.getInt() ?: return null
-                )
-                shape(shape, position.y.toFloat(), args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: return null)
-
-                applyExtrudeData()
-            }.build()
-
-            else -> return null
-        }
-    }
-
-    private fun <T : Marker, B : Marker.Builder<T, B>> Marker.Builder<T, B>.applyBasics(): Boolean {
-        val label = args[MarkerArg.LABEL]?.getString() ?: return false
-        label(label)
-        args[MarkerArg.POSITION]?.getVector3d()?.let { position(it) }
-        args[MarkerArg.LISTED]?.getBoolean()?.let { listed(it) }
-        return true
-    }
-
-    private fun ExtrudeMarker.Builder.applyExtrudeData() {
-        args[MarkerArg.DETAIL]?.getString()?.let { detail(it) }
-        args[MarkerArg.LINK]?.getString()?.let { link(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
-        args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { depthTestEnabled(it) }
-        args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth(it) }
-        args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor(it) }
-        args[MarkerArg.FILL_COLOR]?.getColor()?.let { fillColor(it) }
-        args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance(it) }
-        args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance(it) }
-    }
-
-    /*
-    Getter and setter
-     */
-    override fun getType(): MarkerType {
-        return type
-    }
-
-    override fun getArgs(): Map<MarkerArg, Box<Any>> {
-        return args
-    }
+    override fun getArgs() = args
 
     override fun setArg(arg: MarkerArg, value: Box<Any>) {
         args[arg] = value
     }
 
-    override fun getVec2List(): MutableList<Vector2d> {
-        return vector2dList
-    }
-
-    override fun getVec3List(): MutableList<Vector3d> {
-        return vector3dList
-    }
-
     companion object {
-        fun ofMarker(marker: Marker, type: MarkerType, markerID: String, setID: String): MarkerBuilder? {
-            val builder = MarkerBuilder(type)
-            builder.args[MarkerArg.LABEL] = Box(marker.label)
-            builder.args[MarkerArg.POSITION] = Box(marker.position)
-            builder.args[MarkerArg.ID] = Box(markerID)
-            builder.args[MarkerArg.MARKER_SET] = Box(setID)
-
-            when (type) {
-                MarkerType.POI -> {
-                    val poi = marker as? POIMarker ?: return null
-                    builder.args[MarkerArg.ICON] = Box(poi.iconAddress)
-                    builder.args[MarkerArg.ANCHOR] = Box(poi.anchor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = Box(poi.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = Box(poi.maxDistance)
-                }
-
-                MarkerType.LINE -> {
-                    val line = marker as? LineMarker ?: return null
-                    builder.getVec3List().addAll(line.line.points)
-                    builder.args[MarkerArg.DETAIL] = Box(line.detail)
-                    builder.args[MarkerArg.LINK] = Box(line.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = Box(line.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = Box(line.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = Box(line.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = Box(line.lineColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = Box(line.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = Box(line.maxDistance)
-                }
-
-                MarkerType.SHAPE -> {
-                    val shape = marker as? ShapeMarker ?: return null
-                    builder.getVec2List().addAll(shape.shape.points)
-                    builder.args[MarkerArg.DETAIL] = Box(shape.detail)
-                    builder.args[MarkerArg.LINK] = Box(shape.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = Box(shape.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = Box(shape.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = Box(shape.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = Box(shape.lineColor)
-                    builder.args[MarkerArg.HEIGHT] = Box(shape.shapeY)
-                    builder.args[MarkerArg.FILL_COLOR] = Box(shape.fillColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = Box(shape.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = Box(shape.maxDistance)
-                }
-
-                MarkerType.EXTRUDE, MarkerType.ELLIPSE -> {
-                    val extrude = marker as? ExtrudeMarker ?: return null
-                    builder.getVec2List().addAll(extrude.shape.points)
-                    builder.args[MarkerArg.DETAIL] = Box(extrude.detail)
-                    builder.args[MarkerArg.LINK] = Box(extrude.link.orElse(""))
-                    builder.args[MarkerArg.NEW_TAB] = Box(extrude.isNewTab)
-                    builder.args[MarkerArg.DEPTH_TEST] = Box(extrude.isDepthTestEnabled)
-                    builder.args[MarkerArg.LINE_WIDTH] = Box(extrude.lineWidth)
-                    builder.args[MarkerArg.LINE_COLOR] = Box(extrude.lineColor)
-                    builder.args[MarkerArg.HEIGHT] = Box(extrude.shapeMinY)
-                    builder.args[MarkerArg.MAX_HEIGHT] = Box(extrude.shapeMaxY)
-                    builder.args[MarkerArg.FILL_COLOR] = Box(extrude.fillColor)
-                    builder.args[MarkerArg.MIN_DISTANCE] = Box(extrude.minDistance)
-                    builder.args[MarkerArg.MAX_DISTANCE] = Box(extrude.maxDistance)
-                }
-
-                MarkerType.MARKER_SET -> Unit
-            }
-            return builder
+        fun editMarker(marker: Marker, changedArgs: MutableMap<MarkerArg, Box<Any>>, type: MarkerType) {
+            MarkerBuilder(type, changedArgs, marker).apply()
         }
 
-        fun ofArguments(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): Marker? {
-            return MarkerBuilder(type, attributes).build()
+        fun createMarker(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): Marker {
+            return MarkerBuilder(type, attributes).apply()
+        }
+
+        fun createBuilder(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): MarkerBuilder {
+            return MarkerBuilder(type, attributes)
         }
     }
 }

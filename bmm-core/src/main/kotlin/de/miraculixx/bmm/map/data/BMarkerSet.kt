@@ -25,12 +25,7 @@ data class BMarkerSet(
 
     fun load(api: BlueMapAPI, setID: String, map: BlueMapMap): MarkerSet? {
         // Load set
-        val set = MarkerSetBuilder.ofArguments(attributes)
-        if (set == null) {
-            MarkerManagerNew.sendError("MarkerSet '$setID' in map '${map.name}' has invalid attributes!")
-            MarkerManagerNew.sendError(" - Attributes: $attributes")
-            return null
-        }
+        val set = MarkerSetBuilder.createSet(attributes)
         blueMapMarkerSet = set
 
         // Load markers
@@ -48,5 +43,13 @@ data class BMarkerSet(
         }
         sets[setID] = set
         return set
+    }
+
+    fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
+        if (blueMapMarkerSet == null) {
+            MarkerManagerNew.sendError("Failed to update marker set (not loaded). Did BlueMap boot up correctly?")
+            return
+        }
+        MarkerSetBuilder.editSet(blueMapMarkerSet!!, changedArgs)
     }
 }

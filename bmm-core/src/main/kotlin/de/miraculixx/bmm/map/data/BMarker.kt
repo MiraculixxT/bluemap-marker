@@ -3,7 +3,7 @@ package de.miraculixx.bmm.map.data
 import de.bluecolored.bluemap.api.markers.Marker
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerManagerNew
+import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 import de.miraculixx.mcommons.serializer.UUIDSerializer
@@ -32,7 +32,7 @@ data class BMarker(
 
     fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
         if (blueMapMarker == null) {
-            MarkerManagerNew.sendError("Failed to update marker (not loaded). Did BlueMap boot up correctly?")
+            MarkerManager.sendError("Failed to update marker (not loaded). Did BlueMap boot up correctly?")
             return
         }
         MarkerBuilder.editMarker(blueMapMarker!!, changedArgs, type)

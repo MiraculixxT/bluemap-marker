@@ -4,7 +4,7 @@ import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerManagerNew
+import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
 import kotlinx.serialization.Contextual
@@ -39,7 +39,7 @@ data class MarkerTemplate(
             maps.mapNotNull { mapID ->
                 api.getMap(mapID).getOrNull()?.let { map ->
                     // Get already loaded set or copy template-set and load it
-                    MarkerManagerNew.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet ?: templateSet.copy().load(api, markerSetID, map)
+                    MarkerManager.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet ?: templateSet.copy().load(api, markerSetID, map)
                 }?.let { mapID to it }
             }.toMap()
         )
@@ -48,7 +48,7 @@ data class MarkerTemplate(
         playerMarkers.forEach playerMarker@{ (_, data) ->
             val templateMarker = templateMarker[data.templateName]
             if (templateMarker == null) {
-                MarkerManagerNew.sendError("Template marker '${data.displayName}' in template '${name}' is invalid! Skipping it...")
+                MarkerManager.sendError("Template marker '${data.displayName}' in template '${name}' is invalid! Skipping it...")
                 return@playerMarker
             }
             val markerArgs = templateMarker.attributes.toMutableMap().apply {
@@ -63,7 +63,7 @@ data class MarkerTemplate(
             }
         }
 
-        MarkerManagerNew.templateSets[name] = this // only needed if the set is new, otherwise this will do nothing
+        MarkerManager.templateSets[name] = this // only needed if the set is new, otherwise this will do nothing
     }
 }
 

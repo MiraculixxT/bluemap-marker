@@ -1,7 +1,6 @@
 package de.miraculixx.bmm.map
 
 import de.bluecolored.bluemap.api.BlueMapAPI
-import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.data.BMarkerSet
 import de.miraculixx.bmm.map.data.MarkerTemplate
 import de.miraculixx.bmm.utils.serializer.ColorSerializer
@@ -32,7 +31,7 @@ import kotlin.jvm.optionals.getOrNull
  * Template sets can be populated by template markers.
  * Players then can enter `/<set-template> place <marker-template> <name>` to place a marker.
  */
-object MarkerManagerNew {
+object MarkerManager {
     // Storage Files
     private val folderTemplateSets = File(sourceFolder, "templates")
     private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
@@ -51,15 +50,9 @@ object MarkerManagerNew {
             contextual(ColorSerializer)
         }
     }
-    private var blueMapAPI: BlueMapAPI? = null
 
 
-    fun load() {
-        blueMapAPI = BlueMapAPI.getInstance().getOrNull()
-        if (blueMapAPI == null) {
-            noBlueMapAPI()
-            return
-        }
+    fun load(api: BlueMapAPI) {
         val invalidUUID = UUID(0,0)
 
         // Load normal sets
@@ -76,7 +69,7 @@ object MarkerManagerNew {
                     sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
                     return@forEach
                 }
-                set.load(blueMapAPI!!, setID, blueMapAPI!!.getMap(mapID).getOrNull() ?: return@sets)
+                set.load(api, setID, api.getMap(mapID).getOrNull() ?: return@sets)
 
             }
         }
@@ -89,22 +82,18 @@ object MarkerManagerNew {
                 sendError("Template file '${file.name}' is invalid! Skipping it...")
                 return@forEach
             }
-            template.load(blueMapAPI!!)
+            template.load(api)
         }
     }
 
-    fun save() {
+    fun save(api: BlueMapAPI) {
         // Prepare workspace
-        if (blueMapAPI == null) {
-            noBlueMapAPI()
-            return
-        }
         folderSets.mkdirs()
         folderTemplateSets.mkdirs()
 
         // Save normal sets
         blueMapMaps.forEach { (mapID, sets) ->
-            val worldName = blueMapAPI!!.getMap(mapID).getOrNull()?.name
+            val worldName = api.getMap(mapID).getOrNull()?.name
             if (worldName == null) {
                 sendError("Cannot find map '$mapID'! All sets inside this map will not save or update.")
                 return@forEach
@@ -130,10 +119,5 @@ object MarkerManagerNew {
     //
     fun sendError(info: String) {
         consoleAudience.sendMessage(prefix + cmp(info, cError))
-    }
-
-    fun noBlueMapAPI(): Boolean {
-        sendError("BlueMapAPI is not available! Please contact support if this error persists.")
-        return false
     }
 }

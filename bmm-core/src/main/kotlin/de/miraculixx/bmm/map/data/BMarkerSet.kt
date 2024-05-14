@@ -3,7 +3,7 @@ package de.miraculixx.bmm.map.data
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.BlueMapMap
 import de.bluecolored.bluemap.api.markers.MarkerSet
-import de.miraculixx.bmm.map.MarkerManagerNew
+import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.mcommons.serializer.UUIDSerializer
@@ -34,11 +34,11 @@ data class BMarkerSet(
         }
 
         // Place set
-        MarkerManagerNew.blueMapMaps[map.id]?.put(setID, this) // only needed if the set is new, otherwise this will do nothing
+        MarkerManager.blueMapMaps[map.id]?.put(setID, this) // only needed if the set is new, otherwise this will do nothing
         val sets = api.getMap(map.id).getOrNull()?.markerSets
         if (sets == null) {
-            MarkerManagerNew.sendError("Failed to load BlueMap map '${map.name}'! Required by marker set '$setID'.")
-            MarkerManagerNew.sendError(" - Available Maps: ${api.maps.map { it.name }}")
+            MarkerManager.sendError("Failed to load BlueMap map '${map.name}'! Required by marker set '$setID'.")
+            MarkerManager.sendError(" - Available Maps: ${api.maps.map { it.name }}")
             return null
         }
         sets[setID] = set
@@ -47,7 +47,7 @@ data class BMarkerSet(
 
     fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
         if (blueMapMarkerSet == null) {
-            MarkerManagerNew.sendError("Failed to update marker set (not loaded). Did BlueMap boot up correctly?")
+            MarkerManager.sendError("Failed to update marker set (not loaded). Did BlueMap boot up correctly?")
             return
         }
         MarkerSetBuilder.editSet(blueMapMarkerSet!!, changedArgs)

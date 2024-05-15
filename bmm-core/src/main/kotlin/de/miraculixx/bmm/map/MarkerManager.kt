@@ -72,7 +72,7 @@ object MarkerManager {
                     sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
                     return@forEach
                 }
-                set.load(api, setID, api.getMap(mapID).getOrNull() ?: return@sets)
+                set.load(setID, api.getMap(mapID).getOrNull() ?: return@sets)
 
             }
         }

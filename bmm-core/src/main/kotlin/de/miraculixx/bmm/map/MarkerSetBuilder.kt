@@ -28,9 +28,7 @@ class MarkerSetBuilder(
         return MarkerType.MARKER_SET
     }
 
-    override fun getArgs(): Map<MarkerArg, Box<Any>> {
-        return args
-    }
+    override fun getArgs() = args
 
     override fun setArg(arg: MarkerArg, value: Box<Any>) {
         args[arg] = value

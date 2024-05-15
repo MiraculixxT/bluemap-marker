@@ -15,13 +15,14 @@ import kotlin.jvm.optionals.getOrNull
 
 
 class MarkerBuilder(
-    private val type: MarkerType,
+    val type: MarkerType,
     private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf(),
     private val blueMapMarker: Marker = type.getEmptyMarker()
 ) : Builder {
     override var page = 0
+    private var missingImportant = false
 
-    fun apply(): Marker {
+    fun apply(): Pair<Marker, Boolean> {
         return when (val marker = blueMapMarker) {
             is POIMarker -> marker.apply {
                 applyBasics()
@@ -32,7 +33,7 @@ class MarkerBuilder(
             is LineMarker -> marker.apply {
                 applyBasics()
 
-                args[MarkerArg.ADD_POSITION]?.getVector3dList()?.let { line = Line(it) }
+                args[MarkerArg.ADD_POSITION]?.getVector3dList()?.let { line = Line(it) } ?: importantArgument()
                 args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
                 args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
                 args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
@@ -41,7 +42,7 @@ class MarkerBuilder(
             is ShapeMarker -> marker.apply {
                 applyBasics()
 
-                args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let { setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f) }
+                args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let { setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f) } ?: importantArgument()
                 args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
                 args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
                 args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
@@ -57,9 +58,11 @@ class MarkerBuilder(
                     if (position != null && x != null) {
                         val shape = Shape.createEllipse(position.x, position.z, x, args[MarkerArg.Z_RADIUS]?.getDouble() ?: x, args[MarkerArg.POINTS]?.getInt() ?: 50)
                         setShape(shape, position.y.toFloat(), args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: (position.y.toFloat() + 1f))
-                    }
+                    } else importantArgument()
                 } else {
-                    args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let { setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f, args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: 51f) }
+                    args[MarkerArg.ADD_EDGE]?.getVector2dList()?.let {
+                        setShape(Shape(it), args[MarkerArg.HEIGHT]?.getFloat() ?: 50f, args[MarkerArg.MAX_HEIGHT]?.getFloat() ?: 51f)
+                    } ?: importantArgument()
                 }
 
                 args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
@@ -69,11 +72,11 @@ class MarkerBuilder(
             }
 
             else -> blueMapMarker
-        }
+        } to missingImportant
     }
 
     private fun Marker.applyBasics() {
-        label = args[MarkerArg.LABEL]?.getString()
+        args[MarkerArg.LABEL]?.getString()?.let { label = it } ?: importantArgument()
         args[MarkerArg.POSITION]?.getVector3d()?.let { position = it }
         args[MarkerArg.LISTED]?.getBoolean()?.let { isListed = it }
 
@@ -107,6 +110,10 @@ class MarkerBuilder(
         }.getOrElse { Vector2i.ZERO }
     }
 
+    private fun importantArgument() {
+        missingImportant = true
+    }
+
     override fun getType() = type
 
     override fun getArgs() = args
@@ -121,7 +128,7 @@ class MarkerBuilder(
         }
 
         fun createMarker(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): Marker {
-            return MarkerBuilder(type, attributes).apply()
+            return MarkerBuilder(type, attributes).apply().first
         }
 
         fun createBuilder(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): MarkerBuilder {

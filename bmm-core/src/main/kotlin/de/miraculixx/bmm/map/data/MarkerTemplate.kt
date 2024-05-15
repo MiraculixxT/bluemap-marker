@@ -2,6 +2,7 @@ package de.miraculixx.bmm.map.data
 
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.BlueMapAPI
+import de.bluecolored.bluemap.api.BlueMapMap
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
@@ -22,8 +23,8 @@ import kotlin.jvm.optionals.getOrNull
 @Serializable
 data class MarkerTemplate(
     val name: String,
-    val maxMarkerPerPlayer: Int = -1,
-    val neededPermission: String? = null,
+    var maxMarkerPerPlayer: Int = -1,
+    var neededPermission: String? = null,
     val maps: MutableSet<String> = mutableSetOf(),
     val markerSetID: String,
     val templateSet: BMarkerSet = BMarkerSet(UUID(0, 0)),
@@ -39,7 +40,7 @@ data class MarkerTemplate(
             maps.mapNotNull { mapID ->
                 api.getMap(mapID).getOrNull()?.let { map ->
                     // Get already loaded set or copy template-set and load it
-                    MarkerManager.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet ?: templateSet.copy().load(api, markerSetID, map)
+                    MarkerManager.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet ?: templateSet.copy().load(markerSetID, map)
                 }?.let { mapID to it }
             }.toMap()
         )
@@ -65,6 +66,20 @@ data class MarkerTemplate(
 
         MarkerManager.templateSets[name] = this // only needed if the set is new, otherwise this will do nothing
     }
+
+    fun removeMap(mapID: String, map: BlueMapMap?) {
+        map?.markerSets?.remove(markerSetID)
+        blueMapSets.remove(mapID)
+        maps.remove(mapID)
+        playerMarkers.forEach { (_, data) -> data.placedMaps.remove(mapID) }
+    }
+
+    fun remove() {
+        MarkerManager.templateSets.remove(name)
+        maps.forEach { map ->
+            MarkerManager.blueMapMaps[map]?.remove(markerSetID)
+        }
+    }
 }
 
 @Serializable
@@ -74,5 +89,5 @@ data class MarkerTemplateEntry(
     val playerName: String,
     val id: String,
     val position: @Serializable(with = Vec3dSerializer::class) Vector3d,
-    val placedMaps: Set<String> = emptySet()
+    val placedMaps: MutableSet<String> = mutableSetOf()
 )

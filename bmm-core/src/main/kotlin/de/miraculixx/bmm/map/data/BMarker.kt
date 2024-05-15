@@ -30,6 +30,10 @@ data class BMarker(
         return blueMapMarker
     }
 
+    fun getEditor(): MarkerBuilder? {
+        return blueMapMarker?.let { MarkerBuilder(type, attributes, it) }
+    }
+
     fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
         if (blueMapMarker == null) {
             MarkerManager.sendError("Failed to update marker (not loaded). Did BlueMap boot up correctly?")

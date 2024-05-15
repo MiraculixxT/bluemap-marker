@@ -50,6 +50,9 @@ command:
   canceledSetup: "<grey>Canceled current marker<input-1> setup!" #m #v1
   notValidPlayer: "<red>Could not found given player!" #m
   changedVisibility: "<grey><color:#6e94ff><input-1></color> is now <input-2> on your BlueMap" #m #v2
+  setNotFound: "<red>Could not find the marker-set with the ID <u><input-1></u>! (/<input-2> set-create)" #m #v1
+  mapNotFound: "<red>Could not find the map with the name <u><input-1></u>!" #m #v1
+  missingImportant: "<red>Missing one or more important values! Please fill in all red marked values" #m
 
 
 #-----------------------------------------#

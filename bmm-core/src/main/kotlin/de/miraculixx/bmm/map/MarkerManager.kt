@@ -50,11 +50,14 @@ object MarkerManager {
             contextual(ColorSerializer)
         }
     }
+    var blueMapAPI: BlueMapAPI? = null
 
 
     fun load(api: BlueMapAPI) {
+        blueMapAPI = api
         val invalidUUID = UUID(0,0)
 
+        api.maps.forEach { map -> blueMapMaps[map.id] = mutableMapOf() }
         // Load normal sets
         folderSets.listFiles()?.forEach { file -> // List all world folders
             if (!file.isDirectory) return@forEach
@@ -111,6 +114,18 @@ object MarkerManager {
             val file = File(folderTemplateSets, "$templateName.json")
             file.saveConfig(template, markerJson)
         }
+    }
+
+    /**
+     * Save remove a set from the manager.
+     * This also will remove all templates associated with it.
+     * @return true if the set was removed, false if it was not found.
+     */
+    fun removeSet(mapID: String, setID: String): Boolean {
+        templateSets.filter { it.value.markerSetID == setID }.forEach { (_, data) ->
+            data.removeMap(mapID, blueMapAPI!!.getMap(mapID).getOrNull())
+        }
+        return blueMapMaps[mapID]?.remove(setID) != null
     }
 
 

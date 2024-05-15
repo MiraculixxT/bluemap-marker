@@ -2,10 +2,13 @@ package de.miraculixx.bmm.map.data
 
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.BlueMapMap
+import de.bluecolored.bluemap.api.markers.Marker
 import de.bluecolored.bluemap.api.markers.MarkerSet
+import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
+import de.miraculixx.bmm.utils.enums.MarkerType
 import de.miraculixx.mcommons.serializer.UUIDSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -23,7 +26,7 @@ data class BMarkerSet(
     var blueMapMarkerSet: MarkerSet? = null
         private set
 
-    fun load(api: BlueMapAPI, setID: String, map: BlueMapMap): MarkerSet? {
+    fun load(setID: String, map: BlueMapMap): MarkerSet {
         // Load set
         val set = MarkerSetBuilder.createSet(attributes)
         blueMapMarkerSet = set
@@ -35,13 +38,7 @@ data class BMarkerSet(
 
         // Place set
         MarkerManager.blueMapMaps[map.id]?.put(setID, this) // only needed if the set is new, otherwise this will do nothing
-        val sets = api.getMap(map.id).getOrNull()?.markerSets
-        if (sets == null) {
-            MarkerManager.sendError("Failed to load BlueMap map '${map.name}'! Required by marker set '$setID'.")
-            MarkerManager.sendError(" - Available Maps: ${api.maps.map { it.name }}")
-            return null
-        }
-        sets[setID] = set
+        map.markerSets[setID] = set
         return set
     }
 
@@ -51,5 +48,16 @@ data class BMarkerSet(
             return
         }
         MarkerSetBuilder.editSet(blueMapMarkerSet!!, changedArgs)
+    }
+
+    fun addMarker(owner: UUID, builder: MarkerBuilder, markerID: String) {
+        val bMarker = BMarker(owner, builder.type, builder.getArgs())
+        markers[markerID] = bMarker
+        blueMapMarkerSet?.let { bMarker.load(markerID, it) }
+    }
+
+    fun removeMarker(markerID: String): Boolean {
+        blueMapMarkerSet?.markers?.remove(markerID)
+        return markers.remove(markerID) != null
     }
 }

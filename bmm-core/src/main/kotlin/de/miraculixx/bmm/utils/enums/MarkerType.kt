@@ -15,7 +15,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.POSITION,
             MarkerArg.ANCHOR,
             MarkerArg.ICON,
@@ -28,7 +27,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.ADD_POSITION,
             MarkerArg.DETAIL,
             MarkerArg.LINK,
@@ -45,7 +43,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
             MarkerArg.DETAIL,
@@ -63,7 +60,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
     EXTRUDE(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MARKER_SET,
             MarkerArg.LABEL,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
@@ -83,7 +79,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
     ELLIPSE(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MARKER_SET,
             MarkerArg.LABEL,
             MarkerArg.POSITION,
             MarkerArg.MAX_HEIGHT,
@@ -106,7 +101,6 @@ enum class MarkerType(val args: List<MarkerArg>) {
     MARKER_SET(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MAP,
             MarkerArg.LABEL,
             MarkerArg.TOGGLEABLE,
             MarkerArg.DEFAULT_HIDDEN,

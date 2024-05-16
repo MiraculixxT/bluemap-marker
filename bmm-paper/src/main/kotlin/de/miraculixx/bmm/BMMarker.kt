@@ -1,9 +1,7 @@
 package de.miraculixx.bmm
 
-import de.miraculixx.bmm.utils.message.cmp
-import de.miraculixx.bmm.utils.message.consoleAudience
-import de.miraculixx.bmm.utils.message.plus
-import de.miraculixx.bmm.utils.message.prefix
+import de.miraculixx.bmm.map.MarkerManager
+import de.miraculixx.mcommons.text.*
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
 import org.bukkit.plugin.java.JavaPlugin
@@ -19,6 +17,7 @@ class BMMarker : JavaPlugin() {
     override fun onLoad() {
         INSTANCE = this
         consoleAudience = server.consoleSender
+        prefix = cmp("BMMarker", cHighlight) + _prefixSeparator
 
         // Load Content
         CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
@@ -29,14 +28,14 @@ class BMMarker : JavaPlugin() {
     }
 
     override fun onEnable() {
-        server.pluginManager.registerEvents(GlobalListener, this)
         CommandAPI.onEnable()
     }
 
     override fun onDisable() {
         blueMapInstance.disable()
-        MarkerManager.saveAllMarker(dataFolder)
-        consoleAudience.sendMessage(prefix + cmp("Successfully saved all data! Good Bye :)"))
+        if (MarkerManager.blueMapAPI?.let { MarkerManager.save(it) } != null)
+            consoleAudience.sendMessage(prefix + cmp("Successfully saved all data! Good Bye :)"))
+        else consoleAudience.sendMessage(prefix + cmp("Failed to save data!", cError))
         CommandAPI.onDisable()
     }
 }

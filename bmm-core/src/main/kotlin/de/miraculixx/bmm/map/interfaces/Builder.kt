@@ -8,6 +8,6 @@ interface Builder {
     var page: Int
 
     fun getType(): MarkerType
-    fun getArgs(): Map<MarkerArg, Box<Any>>
-    fun setArg(arg: MarkerArg, value: Box<Any>)
+    fun getArgs(): Map<MarkerArg, Box>
+    fun setArg(arg: MarkerArg, value: Box)
 }

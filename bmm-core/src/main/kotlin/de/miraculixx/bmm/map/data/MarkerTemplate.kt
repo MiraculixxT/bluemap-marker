@@ -53,8 +53,8 @@ data class MarkerTemplate(
                 return@playerMarker
             }
             val markerArgs = templateMarker.attributes.toMutableMap().apply {
-                this[MarkerArg.LABEL] = Box(data.displayName.replace("%PLAYER%", data.playerName))
-                this[MarkerArg.DETAIL]?.let { this[MarkerArg.DETAIL] = Box(it.getString().replace("%PLAYER%", data.playerName)) }
+                this[MarkerArg.LABEL] = Box.BoxString(data.displayName.replace("%PLAYER%", data.playerName))
+                this[MarkerArg.DETAIL]?.let { this[MarkerArg.DETAIL] = Box.BoxString(it.getString()?.replace("%PLAYER%", data.playerName) ?: "Unknown") }
             }
             val finalMarker = MarkerBuilder.createMarker(markerArgs, templateMarker.type)
 

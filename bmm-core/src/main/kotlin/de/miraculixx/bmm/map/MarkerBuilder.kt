@@ -15,9 +15,10 @@ import kotlin.jvm.optionals.getOrNull
 
 
 class MarkerBuilder(
-    val type: MarkerType,
-    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf(),
-    private val blueMapMarker: Marker = type.getEmptyMarker()
+    private val type: MarkerType,
+    private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
+    private val blueMapMarker: Marker = type.getEmptyMarker(),
+    val isEdit: Boolean = false
 ) : Builder {
     override var page = 0
     private var missingImportant = false
@@ -91,7 +92,7 @@ class MarkerBuilder(
         }
     }
 
-    private fun getAnchor(box: Box<Any>?, iconPath: String): Vector2i {
+    private fun getAnchor(box: Box?, iconPath: String): Vector2i {
         box?.getVector2i()?.let { return it } // Anchor was manually set
 
         // Anchor was not set, trying to get it from the image
@@ -118,21 +119,17 @@ class MarkerBuilder(
 
     override fun getArgs() = args
 
-    override fun setArg(arg: MarkerArg, value: Box<Any>) {
+    override fun setArg(arg: MarkerArg, value: Box) {
         args[arg] = value
     }
 
     companion object {
-        fun editMarker(marker: Marker, changedArgs: MutableMap<MarkerArg, Box<Any>>, type: MarkerType) {
+        fun editMarker(marker: Marker, changedArgs: MutableMap<MarkerArg, Box>, type: MarkerType) {
             MarkerBuilder(type, changedArgs, marker).apply()
         }
 
-        fun createMarker(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): Marker {
+        fun createMarker(attributes: MutableMap<MarkerArg, Box>, type: MarkerType): Marker {
             return MarkerBuilder(type, attributes).apply().first
-        }
-
-        fun createBuilder(attributes: MutableMap<MarkerArg, Box<Any>>, type: MarkerType): MarkerBuilder {
-            return MarkerBuilder(type, attributes)
         }
     }
 }

@@ -49,14 +49,16 @@ tasks {
 }
 
 bukkit {
-    main = "$group.${projectName.lowercase()}.${projectName}"
+    main = "$group.bmm.BMMarker"
     apiVersion = "1.16"
     foliaSupported = foliaSupport
     name = projectName
-    println(name + projectName)
+    website = "https://mutils.net"
+    version = properties["version"] as String
+    description = properties["description"] as String
 
     // Optionals
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    depend = listOf()
+    depend = listOf("BlueMap")
     softDepend = listOf()
 }

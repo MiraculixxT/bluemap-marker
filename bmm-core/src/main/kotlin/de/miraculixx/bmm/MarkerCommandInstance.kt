@@ -18,6 +18,7 @@ import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 interface MarkerCommandInstance {
     val builder: MutableMap<String, MarkerBuilder>
@@ -42,61 +43,68 @@ interface MarkerCommandInstance {
      * Create a new marker setup
      * @param id user/console id
      */
-    fun create(sender: Audience, id: String, type: String?) {
+    fun create(sender: Audience, id: String, stringType: String?, mapID: String?, setID: String?, worlds: List<String>?) {
+        val type = enumOf<MarkerType>(stringType?.uppercase())
+        if (type == null) {
+            sender.sendMessage(prefix + locale.msg("command.notValidMarker", listOf(stringType ?: "Unknown")))
+            return
+        }
+        if (mapID == null) {
+            sendMapSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix create $stringType")
+            return
+        }
+        if (setID == null) {
+            sendSetSelection(sender, mapID, "$mainCommandPrefix create $stringType $mapID")
+            return
+        }
         if (builder.contains(id)) {
             sender.sendMessage(alreadyStarted)
-        } else {
-            val markerType = enumOf<MarkerType>(type?.uppercase())
-            if (markerType == null) {
-                sender.sendMessage(prefix + locale.msg("command.notValidMarker", listOf(type ?: "Unknown")))
-                return
-            }
-            builder[id] = MarkerBuilder(markerType)
-            sender.sendMessage(
-                prefix +
-                        locale.msg("command.createMarker", listOf("")) +
-                        cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("${locale.msgUse()} /$setupCommandPrefix <arg> <value>")) +
-                        locale.msg("command.createMarker2") +
-                        cmp("/$setupCommandPrefix build", cMark, underlined = true).addCommand("/$setupCommandPrefix build")
-            )
-            sendStatusInfo(sender, id)
+            return
         }
+
+        builder[id] = MarkerBuilder(type, mutableMapOf(MarkerArg.MAP to Box.BoxString(mapID), MarkerArg.MARKER_SET to Box.BoxString(setID)))
+        sender.sendMessage(
+            prefix +
+                    locale.msg("command.createMarker", listOf("")) +
+                    cmp("/$setupCommandPrefix", cMark, underlined = true).addSuggest("/$setupCommandPrefix ").addHover(cmp("${locale.msgUse()} /$setupCommandPrefix <arg> <value>")) +
+                    locale.msg("command.createMarker2") +
+                    cmp("/$setupCommandPrefix build", cMark, underlined = true).addCommand("/$setupCommandPrefix build")
+        )
+        sendStatusInfo(sender, id)
     }
 
     /**
      * Create a new marker set setup
      * @param id user/console id
      */
-    fun createSet(sender: Audience, id: String) {
-        if (builderSet.contains(id)) {
-            sender.sendMessage(
-                prefix +
-                        locale.msg("command.alreadyStarted") +
-                        cmp(locale.msgCancel(), cError, underlined = true).addCommand("/$setupSetCommandPrefix cancel") +
-                        cmp(" ${locale.msgOr()} ", cError) +
-                        cmp(locale.msgBuild(), cError, underlined = true).addCommand("/$setupSetCommandPrefix build") +
-                        locale.msg("command.alreadyStarted")
-            )
-        } else {
-            builderSet[id] = MarkerSetBuilder()
-            sender.sendMessage(
-                prefix +
-                        locale.msg("command.createMarker", listOf("-Set")) +
-                        cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("${locale.msgUse()} /$setupSetCommandPrefix <arg> <value>")) +
-                        locale.msg("command.createMarker2") +
-                        cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addCommand("/$setupSetCommandPrefix build")
-            )
-            sendStatusInfo(sender, id, true)
+    fun createSet(sender: Audience, id: String, mapID: String?, worlds: List<String>?) {
+        if (mapID == null) {
+            sendMapSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix set-create")
+            return
         }
+        if (builderSet.contains(id)) {
+            sender.sendMessage(alreadyStarted)
+            return
+        }
+
+        builderSet[id] = MarkerSetBuilder(mutableMapOf(MarkerArg.MAP to Box.BoxString(mapID)))
+        sender.sendMessage(
+            prefix +
+                    locale.msg("command.createMarker", listOf("-Set")) +
+                    cmp("/$setupSetCommandPrefix", cMark, underlined = true).addSuggest("/$setupSetCommandPrefix ").addHover(cmp("${locale.msgUse()} /$setupSetCommandPrefix <arg> <value>")) +
+                    locale.msg("command.createMarker2") +
+                    cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addCommand("/$setupSetCommandPrefix build")
+        )
+        sendStatusInfo(sender, id, true)
     }
 
     /**
      * Delete a marker
      * @param mapID The map id, not name
      */
-    fun delete(sender: Audience, mapID: String, setID: String?, markerID: String?) {
-        if (setID == null || markerID == null) {
-            invalidData(sender, setID, markerID)
+    fun delete(sender: Audience, mapID: String?, setID: String?, markerID: String?, worlds: List<String>?) {
+        if (markerID == null) {
+            manageMarkerSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix delete", mapID, setID)
             return
         }
 
@@ -105,16 +113,20 @@ interface MarkerCommandInstance {
         } else sender.sendMessage(prefix + locale.msg("command.notValidMarker", listOf(markerID)))
     }
 
-    fun deleteSet(sender: Audience, confirm: Boolean, setID: String?, mapID: String?) {
+    fun deleteSet(sender: Audience, confirm: Boolean, setID: String?, mapID: String?, worlds: List<String>?) {
+        if (mapID == null) {
+            sendMapSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix set-delete")
+            return
+        }
+        if (setID == null) {
+            sendSetSelection(sender, mapID, "$mainCommandPrefix set-delete $mapID")
+            return
+        }
         if (!confirm) {
             sender.sendMessage(
-                prefix + locale.msg("command.confirmDelete", listOf(setID ?: "Unknown", mapID ?: "Unknown")) +
+                prefix + locale.msg("command.confirmDelete", listOf(setID, mapID)) +
                         cmp("/$mainCommandPrefix set-delete $mapID $setID true", cError, underlined = true)
             )
-        }
-        if (setID == null || mapID == null) {
-            sender.sendMessage(prefix + locale.msg("command.notValidSet", listOf(setID ?: "Unknown", mapID ?: "Unknown")))
-            return
         }
         if (MarkerManager.removeSet(mapID, setID)) {
             sender.sendMessage(prefix + locale.msg("command.deleteSet", listOf(setID)))
@@ -126,9 +138,8 @@ interface MarkerCommandInstance {
         else {
             val build = builder[id]
             val args = build?.getArgs()
-            val markerSetFull = args?.get(MarkerArg.MARKER_SET)?.getString()?.split('.')
-            val mapID = markerSetFull?.getOrNull(0)
-            val setID = markerSetFull?.getOrNull(1)
+            val mapID = args?.get(MarkerArg.MAP)?.getString()
+            val setID = args?.get(MarkerArg.MARKER_SET)?.getString()
             val markerID = build?.getArgs()?.get(MarkerArg.ID)?.getString()
             if (mapID == null || setID == null || markerID == null) {
                 sender.sendMessage(prefix + locale.msg("command.mustProvideID"))
@@ -143,7 +154,7 @@ interface MarkerCommandInstance {
                 sender.sendMessage(prefix + locale.msg("command.setNotFound", listOf("$mapID/$setID", mainCommandPrefix)))
                 return
             }
-            if (set.markers.containsKey(markerID)) {
+            if (set.markers.containsKey(markerID) && !build.isEdit) {
                 sender.sendMessage(prefix + locale.msg("command.idAlreadyExist", listOf(id)))
                 return
             }
@@ -154,7 +165,7 @@ interface MarkerCommandInstance {
                 return
             }
 
-            set.addMarker(id.toUUID() ?: UUID(0,0), build, markerID)
+            if (!build.isEdit) set.addMarker(id.toUUID() ?: UUID(0, 0), build, markerID)
             builder.remove(id)
             sender.sendMessage(prefix + locale.msg("command.createdMarker"))
         }
@@ -185,7 +196,7 @@ interface MarkerCommandInstance {
                 return
             }
 
-            val bMarkerSet = BMarkerSet(id.toUUID() ?: UUID(0,0), build.getArgs(), mutableMapOf())
+            val bMarkerSet = BMarkerSet(id.toUUID() ?: UUID(0, 0), build.getArgs(), mutableMapOf())
             bMarkerSet.load(setID, blueMapMap)
             builderSet.remove(id)
 
@@ -202,25 +213,18 @@ interface MarkerCommandInstance {
         else sender.sendMessage(prefix + locale.msg("command.canceledSetup", listOf(if (isSet) "-set" else "")))
     }
 
-    fun edit(sender: Audience, id: String, mapID: String?, setID: String?, markerID: String?) {
+    fun edit(sender: Audience, id: String, mapID: String?, setID: String?, markerID: String?, worlds: List<String>?) {
         if (builder.contains(id)) {
             sender.sendMessage(alreadyStarted)
             return
         }
-        if (setID == null || markerID == null || mapID == null) {
-            invalidData(sender, setID, markerID)
+        if (markerID == null) {
+            manageMarkerSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix edit", mapID, setID)
             return
         }
         val marker = MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.get(markerID)
         if (marker == null) {
-            sender.sendMessage(
-                prefix +
-                        cmp("Could not find any marker in set ", cError) +
-                        cmp(setID, cError, underlined = true) +
-                        cmp(" with ID ", cError) +
-                        cmp(markerID, cError, underlined = true) +
-                        cmp("!", cError)
-            )
+            sender.sendMessage(prefix + locale.msg("command.mustProvideID"))
             return
         }
 
@@ -292,11 +296,12 @@ interface MarkerCommandInstance {
         val currentPage = pages.getOrElse(builder.page) { pages.first() }
 
         // Send header (no worries, I can't read that either)
-        sender.sendMessage(cmp(" \n") + cmp("                       ", cHighlight, strikethrough = true) + cmp("[", cHighlight) +
-            (if (builder.page > 0) cmp(" ← ", cSuccess).addCommand("/$cmd page-prev").addHover(cmp("Previous Page")) else cmp(" ← ", cError)) +
-            cmp("${builder.page + 1}", cHighlight, true) + cmp("/") + cmp("${pages.size}", cHighlight, true) +
-            (if (builder.page < pages.size - 1) cmp(" → ", cSuccess).addCommand("/$cmd page-next").addHover(cmp("Next Page")) else cmp(" → ", cError)) +
-            cmp("]", cHighlight) + cmp("                       ", cHighlight, strikethrough = true)
+        sender.sendMessage(
+            cmp(" \n") + cmp("                       ", cHighlight, strikethrough = true) + cmp("[", cHighlight) +
+                    (if (builder.page > 0) cmp(" ← ", cSuccess).addCommand("/$cmd page-prev").addHover(cmp("Previous Page")) else cmp(" ← ", cError)) +
+                    cmp("${builder.page + 1}", cHighlight, true) + cmp("/") + cmp("${pages.size}", cHighlight, true) +
+                    (if (builder.page < pages.size - 1) cmp(" → ", cSuccess).addCommand("/$cmd page-next").addHover(cmp("Next Page")) else cmp(" → ", cError)) +
+                    cmp("]", cHighlight) + cmp("                       ", cHighlight, strikethrough = true)
         )
 
         // Send visible arguments
@@ -314,16 +319,19 @@ interface MarkerCommandInstance {
                 // - ARG >> Not Set
                 val inputText = if (isSet) {
                     cmp("[${list.size} Values]", cMark) +
-                    cmp(" [+]", cSuccess).addSuggest("$cmd ${arg.name.lowercase()} ").addHover(hoverAddition) +
-                    cmp(" [-]", cError).addCommand("$cmd ${arg.name.lowercase()} remove-last").addHover(cmp("Remove last value"))
+                            cmp(" [+]", cSuccess).addSuggest("$cmd ${arg.name.lowercase()} ").addHover(hoverAddition) +
+                            cmp(" [-]", cError).addCommand("$cmd ${arg.name.lowercase()} remove-last").addHover(cmp("Remove last value"))
                 } else nothingSet.addSuggest("$cmd ${arg.name.lowercase()} ").addHover(hoverAddition)
                 sender.sendMessage(dash + cmp(locale.msgString("arg.${arg.name}"), color) + midDash + inputText)
                 return@forEach
             }
 
-            val value = appliedArgs[arg]
-            val color = if (value == null) { if (arg.isRequired) cError else NamedTextColor.GRAY } else cSuccess
-            sender.sendMessage(dash +
+            val value = appliedArgs[arg]?.getString()
+            val color = if (value == null) {
+                if (arg.isRequired) cError else NamedTextColor.GRAY
+            } else cSuccess
+            sender.sendMessage(
+                dash +
                         (cmp(locale.msgString("arg.${arg.name}"), color) + midDash +
                                 if (value != null) cmp("$value", cMark) else nothingSet)
                             .addSuggest("$cmd ${arg.name.lowercase()} ")
@@ -334,10 +342,10 @@ interface MarkerCommandInstance {
         // Send footer
         sender.sendMessage(
             cmp("                 ", cHighlight, strikethrough = true) + cmp("[ ", cHighlight) +
-            cmp(locale.msgBuild().uppercase(), cSuccess, true, strikethrough = false).addCommand("$cmd build").addHover(cmp(locale.msgString("event.buildHover"))) +
-            cmp(" | ") +
-            cmp(locale.msgCancel().uppercase(), cError, bold = true, strikethrough = false).addCommand("$cmd cancel").addHover(cmp(locale.msgString("event.cancelHover"))) +
-            cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
+                    cmp(locale.msgBuild().uppercase(), cSuccess, true, strikethrough = false).addCommand("$cmd build").addHover(cmp(locale.msgString("event.buildHover"))) +
+                    cmp(" | ") +
+                    cmp(locale.msgCancel().uppercase(), cError, bold = true, strikethrough = false).addCommand("$cmd cancel").addHover(cmp(locale.msgString("event.cancelHover"))) +
+                    cmp(" ]", cHighlight) + cmp("                 ", cHighlight, strikethrough = true)
         )
     }
 
@@ -348,18 +356,23 @@ interface MarkerCommandInstance {
     }
 
     fun validateID(id: String): Boolean {
-        return id.matches(Regex("[A-Za-z0-9]*")) && !id.contains(' ')
+        return id.matches(Regex("[A-Za-z0-9_-]*")) && !id.contains(' ')
     }
 
-    fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, value: Any?, message: String, isSet: Boolean = false) {
-        if (value == null) {
-            sender.playSound(Sound.sound(Key.key("entity.enderman.teleport"), Sound.Source.MASTER, 1f, 1f))
-            sender.sendMessage(prefix + cmp("Please enter any value!", cError))
-            return
-        }
+    fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, box: Box, message: String, isSet: Boolean = false) {
         val builder = getBuilder(sender, id, isSet) ?: return
-        builder.setArg(type, Box(value))
+        builder.setArg(type, box)
         sendAppliedSuccess(sender, id, message, isSet)
+    }
+
+    fun getMarkerArgument(sender: Audience, id: String, type: MarkerArg, isSet: Boolean = false): Box? {
+        val builder = getBuilder(sender, id, isSet) ?: return null
+        val value = builder.getArgs()[type]
+        if (value == null) {
+            sender.sendMessage(prefix + cmp("No value set for this argument!", cError))
+            return null
+        }
+        return value
     }
 
     fun changeLanguage(sender: Audience, language: Locale) {
@@ -371,7 +384,51 @@ interface MarkerCommandInstance {
 
     fun getLanguageKeys() = localization?.getLoadedKeys() ?: emptyList()
 
-    private fun invalidData(sender: Audience, setID: String?, markerID: String?) {
-        sender.sendMessage(prefix + cmp("Invalid set-ID or marker-ID! ($setID - $markerID)", cError))
+    private fun manageMarkerSelection(sender: Audience, worlds: List<String>?, command: String, mapID: String?, setID: String?) {
+        if (mapID == null) {
+            sendMapSelection(sender, worlds ?: emptyList(), command)
+            return
+        }
+        if (setID == null) {
+            sendSetSelection(sender, mapID, "$command $mapID", true)
+            return
+        }
+        sender.sendMessage(prefix + locale.msg("command.mustProvideID"))
+    }
+
+    private fun sendMapSelection(sender: Audience, worlds: List<String>, command: String) {
+        sender.sendMessage(cmp("\n\n") + locale.msg("command.selectMap"))
+        val api = MarkerManager.blueMapAPI
+        if (api == null) {
+            sender.sendMessage(prefix + cmp("Failed to connect to BlueMap!", cError))
+            return
+        }
+        worlds.forEach { world ->
+            val bWorld = api.getWorld(world)?.getOrNull() ?: return@forEach
+            sender.sendMessage(cmp("→ ") + cmp(world[0].uppercase() + world.substring(1).replace('_',' '), cHighlight, true))
+            bWorld.maps.forEach { map ->
+                sender.sendMessage(
+                    (cmp("  ▪ ") + cmp(map.name, cMark) + cmp(" (click)"))
+                        .addHover(cmp("Click to select this map in $world"))
+                        .addCommand("/$command ${map.id}")
+                )
+            }
+            sender.sendMessage(emptyComponent())
+        }
+    }
+
+    private fun sendSetSelection(sender: Audience, mapID: String, command: String, suggest: Boolean = false) {
+        val sets = MarkerManager.blueMapMaps[mapID]
+        if (sets.isNullOrEmpty()) {
+            sender.sendMessage(prefix + locale.msg("command.noSets", listOf(mapID, mainCommandPrefix)))
+            return
+        }
+        sender.sendMessage(cmp("\n\n") + prefix + locale.msg("command.selectSet"))
+        sets.forEach { (setID, data) ->
+            var message = (cmp("▪ ") + cmp((data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown") + " (${data.markers.size})", cMark) + cmp(" (click)"))
+                .addHover(cmp("Click to select this marker-set"))
+            message = if (suggest) message.addSuggest("/$command $setID ") else message.addCommand("/$command $setID")
+            sender.sendMessage(message)
+        }
     }
 }

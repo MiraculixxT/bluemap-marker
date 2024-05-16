@@ -7,7 +7,7 @@ import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 
 class MarkerSetBuilder(
-    private val args: MutableMap<MarkerArg, Box<Any>> = mutableMapOf(),
+    private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
     private val blueMapSet: MarkerSet = MarkerSet("<unset>")
 ) : Builder {
     override var page = 0
@@ -30,16 +30,16 @@ class MarkerSetBuilder(
 
     override fun getArgs() = args
 
-    override fun setArg(arg: MarkerArg, value: Box<Any>) {
+    override fun setArg(arg: MarkerArg, value: Box) {
         args[arg] = value
     }
 
     companion object {
-        fun createSet(args: MutableMap<MarkerArg, Box<Any>>): MarkerSet {
+        fun createSet(args: MutableMap<MarkerArg, Box>): MarkerSet {
             return MarkerSetBuilder(args).apply()
         }
 
-        fun editSet(set: MarkerSet, changedArgs: MutableMap<MarkerArg, Box<Any>>) {
+        fun editSet(set: MarkerSet, changedArgs: MutableMap<MarkerArg, Box>) {
             MarkerSetBuilder(changedArgs, set).apply()
         }
     }

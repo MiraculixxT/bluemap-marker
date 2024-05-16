@@ -1,25 +1,20 @@
 package de.miraculixx.bmm.map.data
 
-import de.bluecolored.bluemap.api.BlueMapAPI
 import de.bluecolored.bluemap.api.BlueMapMap
-import de.bluecolored.bluemap.api.markers.Marker
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg
-import de.miraculixx.bmm.utils.enums.MarkerType
-import de.miraculixx.mcommons.serializer.UUIDSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 @Serializable
 data class BMarkerSet(
-    val owner: @Serializable(with = UUIDSerializer::class) UUID,
-    val attributes: MutableMap<MarkerArg, Box<@Contextual Any>> = mutableMapOf(),
+    val owner: @Contextual UUID,
+    val attributes: MutableMap<MarkerArg, Box> = mutableMapOf(),
     var markers: MutableMap<String, BMarker> = mutableMapOf(),
 ) {
     @Transient
@@ -42,16 +37,8 @@ data class BMarkerSet(
         return set
     }
 
-    fun update(changedArgs: MutableMap<MarkerArg, Box<Any>>) {
-        if (blueMapMarkerSet == null) {
-            MarkerManager.sendError("Failed to update marker set (not loaded). Did BlueMap boot up correctly?")
-            return
-        }
-        MarkerSetBuilder.editSet(blueMapMarkerSet!!, changedArgs)
-    }
-
     fun addMarker(owner: UUID, builder: MarkerBuilder, markerID: String) {
-        val bMarker = BMarker(owner, builder.type, builder.getArgs())
+        val bMarker = BMarker(owner, builder.getType(), builder.getArgs())
         markers[markerID] = bMarker
         blueMapMarkerSet?.let { bMarker.load(markerID, it) }
     }

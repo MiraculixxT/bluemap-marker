@@ -22,11 +22,11 @@ class BMMarker : JavaPlugin() {
         consoleAudience = server.consoleSender
 
         // Load Content
-        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true).useMojangMappings(true))
+        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
         MarkerCommand()
 
         // BlueMap Management
-        blueMapInstance = BlueMap(dataFolder, description.version.toIntOrNull() ?: 0)
+        blueMapInstance = BlueMap(dataFolder, pluginMeta.version.toIntOrNull() ?: 0)
     }
 
     override fun onEnable() {

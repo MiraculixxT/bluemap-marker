@@ -15,6 +15,7 @@ repositories {
     }
 
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
@@ -22,8 +23,8 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 dependencies {
     paperweight.paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")
     implementation("com.github.BlueMap-Minecraft:BlueMapAPI:v2.7.0")
-    implementation("dev.jorel:commandapi-bukkit-shade-mojang-mapped:9.4.0")
-    compileOnly("dev.jorel:commandapi-bukkit-kotlin:9.4.0")
+    implementation("dev.jorel:commandapi-bukkit-shade-mojang-mapped:9.5.0-SNAPSHOT")
+    compileOnly("dev.jorel:commandapi-bukkit-kotlin:9.5.0-SNAPSHOT")
 }
 
 tasks {

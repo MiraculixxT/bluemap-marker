@@ -1,0 +1,11 @@
+name: BlueMap-Marker
+version: '164'
+main: de.miraculixx.bmm.BMMarker
+description: A BlueMap addition plugin. Give your players the option to place markers on the map
+api-version: '1.20'
+bootstrapper: de.miraculixx.bmm.BMMPluginBootstrap
+loader: de.miraculixx.bmm.BMMPluginLoader
+dependencies:
+  server:
+    BlueMap:
+      load: BEFORE

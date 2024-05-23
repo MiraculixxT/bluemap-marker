@@ -68,7 +68,9 @@ command:
     create: "<green>Template created! Use <u>/<input-1> edit <...></u> to add new template markers, rules and more" #m #v1
     delete: "<red>Template <input-1> deleted with all associated markers and sets!" #m #v1
     setArg: "<green>Applied new value <color:#6e94ff><input-1></color>" #m #v1
+    addTemplateMarker: "<green>Added template marker <input-1> to the template! You can now quick place or automate it.\n" #m #v1
     removeMarkerTemplate: "<gray>Removed template <color:#6e94ff><input-1></color> and all placed markers to it." #m #v1
+    updateMarker: "<green>Updated template marker <input-1> and all placed markers!" #m #v1
     noValidTemplate: "<red><input-1> is not a valid template in this set!" #m #v1
     invalidWorld: "<red>The set is not available in your current world!" #m
     place: "<green>New <input-1> marker placed!" #m #v1

@@ -2,6 +2,7 @@ package de.miraculixx.bmm.map
 
 import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.miraculixx.bmm.map.data.Box
+import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
@@ -11,7 +12,8 @@ import net.kyori.adventure.text.Component
 class MarkerSetBuilder(
     private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
     private val blueMapSet: MarkerSet = MarkerSet("<unset>"),
-    override val isEdit: Boolean = false
+    override val isEdit: Boolean = false,
+    override val templateSet: TemplateSet? = null
 ) : Builder {
     override var page = 0
     override var lastEditMessage: Component = emptyComponent()

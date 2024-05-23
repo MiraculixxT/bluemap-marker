@@ -1,6 +1,7 @@
 package de.miraculixx.bmm.map.interfaces
 
 import de.miraculixx.bmm.map.data.Box
+import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 import de.miraculixx.mcommons.text.cmp
@@ -11,6 +12,7 @@ interface Builder {
     var page: Int
     val isEdit: Boolean
     var lastEditMessage: Component
+    val templateSet: TemplateSet?
 
     fun getType(): MarkerType
     fun getArgs(): Map<MarkerArg, Box>

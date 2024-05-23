@@ -9,7 +9,6 @@ import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
 import de.miraculixx.bmm.utils.settings
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
@@ -45,7 +44,7 @@ data class TemplateSet(
         playerMarkers.forEach playerMarker@{ (_, data) ->
             val templateMarker = templateMarker[data.templateName]
             if (templateMarker == null) {
-                MarkerManager.sendError("Template marker '${data.displayName}' in template '${name}' is invalid! Skipping it...")
+                MarkerManager.sendError("Template marker '${data.id}' in template '${name}' is invalid! Skipping it...")
                 return@playerMarker
             }
             placeMarker(data, templateMarker)
@@ -56,8 +55,9 @@ data class TemplateSet(
 
     fun placeMarker(entry: MarkerTemplateEntry, templateMarker: BMarker) {
         val markerArgs = templateMarker.attributes.toMutableMap().apply {
-            this[MarkerArg.LABEL] = Box.BoxString(entry.displayName.replace("%NAME%", entry.playerName))
+            this[MarkerArg.LABEL]?.let { this[MarkerArg.LABEL] = Box.BoxString(it.getString()?.replace("%NAME%", entry.playerName) ?: "Unknown") }
             this[MarkerArg.DETAIL]?.let { this[MarkerArg.DETAIL] = Box.BoxString(it.getString()?.replace("%NAME%", entry.playerName) ?: "Unknown") }
+            this[MarkerArg.POSITION] = Box.BoxVector3d(entry.position)
         }
         val finalMarker = MarkerBuilder.createMarker(markerArgs, templateMarker.type)
 
@@ -67,11 +67,17 @@ data class TemplateSet(
         }
     }
 
+    fun unplaceMarker(entry: MarkerTemplateEntry) {
+        entry.placedMaps.forEach { map ->
+            blueMapSets[map]?.remove(entry.id)
+        }
+    }
+
     fun addMap(mapID: String, map: BlueMapMap) {
         maps.add(mapID)
         // Get already loaded set or copy template-set and load it
         blueMapSets[mapID] = MarkerManager.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet
-                             ?: BMarkerSet(UUID(0,0), templateSet).load(markerSetID, map)
+            ?: BMarkerSet(UUID(0, 0), templateSet).load(markerSetID, map)
     }
 
     fun removeMap(mapID: String, map: BlueMapMap?) {
@@ -96,9 +102,12 @@ data class TemplateSet(
 @Serializable
 data class MarkerTemplateEntry(
     val templateName: String,
-    val displayName: String,
     val playerName: String,
     val id: String,
     val position: @Serializable(with = Vec3dSerializer::class) Vector3d,
     val placedMaps: MutableSet<String> = mutableSetOf()
 )
+
+interface TemplateSetLoader {
+    fun loadTemplate(templateSet: TemplateSet)
+}

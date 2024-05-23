@@ -1,7 +1,7 @@
 package de.miraculixx.bmm.commands
 
-import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerSetBuilder
+import de.miraculixx.bmm.map.MarkerManager.builder
+import de.miraculixx.bmm.map.MarkerManager.builderSet
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.data.mainCommandPrefix
 import de.miraculixx.bmm.utils.data.setupCommandPrefix
@@ -17,8 +17,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 interface MarkerBuilderInstance {
-    val builder: MutableMap<String, MarkerBuilder>
-    val builderSet: MutableMap<String, MarkerSetBuilder>
 
     fun sendStatusInfo(sender: Audience, id: String, isMarkerSet: Boolean = false, updateMessage: Component? = null) {
         val builder = getBuilder(sender, id, isMarkerSet) ?: return
@@ -31,7 +29,7 @@ interface MarkerBuilderInstance {
         val hoverAddition = cmp("\n\n" + locale.msgString("event.clickToAdd"), cMark)
         if (updateMessage != null) builder.lastEditMessage = updateMessage
 
-        val pages = type.args.chunked(7)
+        val pages = type.args.filter { builder.templateSet == null || !it.excludeTemplate }.chunked(7)
         val currentPage = pages.getOrElse(builder.page) { pages.first() }
 
         // Send header

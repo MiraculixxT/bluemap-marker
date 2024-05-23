@@ -17,6 +17,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.ID,
             MarkerArg.LABEL,
             MarkerArg.POSITION,
+            MarkerArg.DETAIL,
             MarkerArg.ANCHOR,
             MarkerArg.ICON,
             MarkerArg.MIN_DISTANCE,

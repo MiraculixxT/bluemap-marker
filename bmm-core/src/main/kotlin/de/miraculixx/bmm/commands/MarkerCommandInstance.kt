@@ -3,6 +3,8 @@ package de.miraculixx.bmm.commands
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
+import de.miraculixx.bmm.map.MarkerManager.builder
+import de.miraculixx.bmm.map.MarkerManager.builderSet
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.map.data.BMarker
 import de.miraculixx.bmm.map.data.BMarkerSet
@@ -183,18 +185,41 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             return
         }
 
+        val args = build.getArgs()
+        val markerID = args[MarkerArg.ID]?.getString()
+
+
         // Apply template data if template
         build.templateSet?.let {
-            val args = build.getArgs()
-            val markerID = args[MarkerArg.ID]?.getString() ?: UUID.randomUUID().toString()
-            it.templateMarker[markerID] = BMarker(UUID(0, 0), build.getType(), args)
+            if (markerID == null || !validateID(markerID)) {
+                sender.sendMessage(prefix + locale.msg("command.mustAlphanumeric"))
+                return
+            }
+            if (build.isEdit) {
+                // Remove all placed marker -> update template -> place all markers again
+                it.playerMarkers.forEach { (_, entry) ->
+                    if (entry.templateName != markerID) return@forEach
+                    it.unplaceMarker(entry)
+                    val newMarker = BMarker(UUID(0, 0), build.getType(), args)
+                    it.templateMarker[markerID] = newMarker
+                    it.placeMarker(entry, newMarker)
+                }
+                sender.sendMessage(cmp("\n") + prefix + locale.msg("command.template.updateMarker", listOf(markerID)))
+            } else {
+                if (it.templateMarker.containsKey(markerID)) {
+                    sender.sendMessage(prefix + locale.msg("command.idAlreadyExist", listOf(markerID)))
+                    return
+                }
+                it.templateMarker[markerID] = BMarker(UUID(0, 0), build.getType(), args)
+                sender.sendMessage(cmp("\n") + prefix + locale.msg("command.template.addTemplateMarker", listOf(markerID)))
+            }
+            builder.remove(id)
+            return
         }
 
         // Check if builder is valid
-        val args = build.getArgs()
         val mapID = args[MarkerArg.MAP]?.getString()
         val setID = args[MarkerArg.MARKER_SET]?.getString()
-        val markerID = args[MarkerArg.ID]?.getString()
         if (mapID == null || setID == null || markerID == null) {
             sender.sendMessage(prefix + locale.msg("command.mustProvideID"))
             return

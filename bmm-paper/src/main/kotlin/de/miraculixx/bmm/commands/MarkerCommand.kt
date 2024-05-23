@@ -6,9 +6,7 @@ import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.math.Color
-import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
-import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.utils.data.*
 import de.miraculixx.bmm.utils.enums.MarkerArg
@@ -31,8 +29,6 @@ import kotlin.jvm.optionals.getOrNull
 
 @Suppress("unused")
 class MarkerCommand : MarkerCommandInstance {
-    override val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
-    override val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
 
     val mainCommand = commandTree(mainCommandPrefix) {
         withPermission("bmarker.command.main")
@@ -549,6 +545,7 @@ class MarkerCommand : MarkerCommandInstance {
             val allowOthers = info.sender.hasPermission(manageOthersSets)
             set?.forEach { (setID, data) ->
                 if (data.owner != uuid && !allowOthers) return@forEach
+                if (setID.startsWith("template_")) return@forEach // Exclude template sets from indexing
                 val mapName = api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown"
                 builder.suggest(setID, AdventureComponent(cmp("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown"}", cMark)))
             }
@@ -574,5 +571,6 @@ class MarkerCommand : MarkerCommandInstance {
         val player = this as? Player
         return PlayerData(player?.uniqueId, name, hasPermission(manageOthersMarkers), hasPermission(manageOthersSets))
     }
+
     private fun CommandSender.getUUID() = (this as? Player)?.uniqueId
 }

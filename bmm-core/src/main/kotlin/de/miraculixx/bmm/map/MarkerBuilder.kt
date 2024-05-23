@@ -22,7 +22,7 @@ class MarkerBuilder(
     private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
     private val blueMapMarker: Marker = type.getEmptyMarker(),
     override val isEdit: Boolean = false,
-    val templateSet: TemplateSet? = null
+    override val templateSet: TemplateSet? = null
 ) : Builder {
     override var page = 0
     override var lastEditMessage: Component = emptyComponent()
@@ -86,14 +86,13 @@ class MarkerBuilder(
         args[MarkerArg.POSITION]?.getVector3d()?.let { position = it }
         args[MarkerArg.LISTED]?.getBoolean()?.let { isListed = it }
 
+        if (this is DetailMarker) args[MarkerArg.DETAIL]?.getString()?.let { detail = it }
         if (this is DistanceRangedMarker) {
             args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance = it }
             args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance = it }
         }
-
         if (this is ObjectMarker) {
             args[MarkerArg.LINK]?.getString()?.let { setLink(it, args[MarkerArg.NEW_TAB]?.getBoolean() ?: true) }
-            args[MarkerArg.DETAIL]?.getString()?.let { detail = it }
         }
     }
 

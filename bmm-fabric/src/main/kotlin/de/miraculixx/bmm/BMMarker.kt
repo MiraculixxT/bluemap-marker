@@ -23,7 +23,7 @@ class BMMarker : ModInitializer {
             config = File("config/bm-marker")
             if (!config.exists()) config.mkdirs()
             val container = FabricLoader.getInstance().getModContainer("bm-marker").get()
-            blueMapInstance = BlueMap(config, container.metadata.version.friendlyString.toIntOrNull() ?: 0)
+            blueMapInstance = BlueMap(container.metadata.version.friendlyString.toIntOrNull() ?: 0)
             GlobalListener
         })
 

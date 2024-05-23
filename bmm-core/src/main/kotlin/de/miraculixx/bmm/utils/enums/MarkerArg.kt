@@ -1,9 +1,9 @@
 package de.miraculixx.bmm.utils.enums
 
-enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false) {
+enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false, val excludeTemplate: Boolean = false) {
     ID(true),
     MARKER_SET(true),
-    POSITION(true),
+    POSITION(true, excludeTemplate = true),
     LABEL(true),
     ICON(false),
     ANCHOR(false),
@@ -29,6 +29,6 @@ enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false) {
     MAP(true),
     TOGGLEABLE(false),
     DEFAULT_HIDDEN(false),
-    LISTING_POSITION(false),
+    LISTING_POSITION(false, excludeTemplate = true),
     ;
 }

@@ -2,6 +2,7 @@ package de.miraculixx.bmm.commands
 
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
+import de.miraculixx.bmm.map.MarkerManager.builder
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.data.MarkerTemplateEntry
 import de.miraculixx.bmm.map.data.TemplateSet
@@ -32,6 +33,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
 
         val maps = MarkerManager.blueMapAPI?.maps?.map { it.id }?.toMutableSet() ?: mutableSetOf()
         val set = TemplateSet(name, needPermission = needsPermission, maps = maps)
+        MarkerManager.blueMapAPI?.let { set.load(it) }
         MarkerManager.templateSets[name] = set
         sendMessage(prefix + locale.msg("command.template.create", listOf(name)))
         return set
@@ -83,7 +85,17 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
             return
         }
 
-        builder[id] = MarkerBuilder(type, templateSet = set) // TODO move away from other interface
+        builder[id] = MarkerBuilder(type, templateSet = set)
+        sendStatusInfo(this, id)
+    }
+
+    fun Audience.editMarkerTemplate(id: String, templateID: String, set: TemplateSet) {
+        val bMarker = set.templateMarker[templateID]
+        if (bMarker == null) {
+            sendMessage(prefix + locale.msg("command.notValidMarker", listOf(templateID)))
+            return
+        }
+        builder[id] = MarkerBuilder(bMarker.type, bMarker.attributes, isEdit = true, templateSet = set)
         sendStatusInfo(this, id)
     }
 
@@ -179,10 +191,8 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         }
 
         // Clean up
-        set.playerMarkers.remove(markerID)
-        entry.placedMaps.forEach { map ->
-            set.blueMapSets[map]?.remove(markerID)
-        }
+        set.unplaceMarker(entry)
+        set.playerMarkers.remove(entry.id)
         soundDisable()
         sendMessage(prefix + locale.msg("command.template.unplace", listOf(entry.templateName)))
     }

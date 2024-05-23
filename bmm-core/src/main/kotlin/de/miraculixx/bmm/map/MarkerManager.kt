@@ -3,6 +3,7 @@ package de.miraculixx.bmm.map
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.miraculixx.bmm.map.data.BMarkerSet
 import de.miraculixx.bmm.map.data.TemplateSet
+import de.miraculixx.bmm.map.data.TemplateSetLoader
 import de.miraculixx.bmm.utils.serializer.ColorSerializer
 import de.miraculixx.bmm.utils.serializer.Vec2dSerializer
 import de.miraculixx.bmm.utils.serializer.Vec2iSerializer
@@ -37,8 +38,16 @@ object MarkerManager {
     private val folderTemplateSets = File(sourceFolder, "templates")
     private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
 
+    // Data Maps
     val templateSets: MutableMap<String, TemplateSet> = mutableMapOf() // <templateName -> template>
     val blueMapMaps: MutableMap<String, MutableMap<String, BMarkerSet>> = mutableMapOf() // <mapID -> <setID -> set>>
+
+    // Marker (set) Builders
+    val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
+    val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
+
+    // Data Loader
+    var templateLoader: TemplateSetLoader? = null
 
     private val markerJson = Json {
         ignoreUnknownKeys = true
@@ -92,6 +101,7 @@ object MarkerManager {
                 return@forEach
             }
             template.load(api)
+            templateLoader?.loadTemplate(template)
             if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loaded template '${template.name}'!"))
         }
     }

@@ -2,31 +2,30 @@ package de.miraculixx.bmm.commands
 
 import com.flowpowered.math.vector.Vector3d
 import de.miraculixx.bmm.anyExecutorAsync
-import de.miraculixx.bmm.map.MarkerBuilder
-import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.data.MarkerTemplateEntry
 import de.miraculixx.bmm.map.data.TemplateSet
+import de.miraculixx.bmm.map.data.TemplateSetLoader
 import de.miraculixx.bmm.playerExecutorAsync
-import de.miraculixx.bmm.utils.enums.MarkerArg
-import de.miraculixx.bmm.utils.locale
 import de.miraculixx.bmm.utils.data.manageTemplates
 import de.miraculixx.bmm.utils.data.templateCommandPrefix
-import de.miraculixx.mcommons.text.msg
-import de.miraculixx.mcommons.text.plus
-import de.miraculixx.mcommons.text.prefix
+import de.miraculixx.bmm.utils.enums.MarkerArg
+import de.miraculixx.bmm.utils.locale
+import de.miraculixx.mcommons.text.*
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.kotlindsl.*
+import io.papermc.paper.adventure.AdventureComponent
+import java.util.concurrent.CompletableFuture
 import kotlin.jvm.optionals.getOrDefault
 
-class TemplateCommand: TemplateCommandInterface {
-    // Unneeded Overrides
-    override val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
-    override val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
-
+class TemplateCommand : TemplateCommandInterface, TemplateSetLoader {
     private val templateCommands: MutableMap<String, TemplateCommandImplementation> = mutableMapOf()
+
+    override fun loadTemplate(templateSet: TemplateSet) {
+        templateCommands[templateSet.name] = TemplateCommandImplementation(templateSet)
+    }
 
     @Suppress("unused")
     private val templateCommand = commandTree(templateCommandPrefix) {
@@ -39,7 +38,7 @@ class TemplateCommand: TemplateCommandInterface {
         }
 
         literalArgument("create") {
-            literalArgument("name") {
+            stringArgument("name") {
                 booleanArgument("needsPermission", true) {
                     anyExecutorAsync { sender, args ->
                         val setID = args[0] as String
@@ -51,7 +50,8 @@ class TemplateCommand: TemplateCommandInterface {
         }
 
         literalArgument("delete") {
-            literalArgument("name") {
+            stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.stringCollection { templateCommands.keys })
                 booleanArgument("confirm", true) {
                     anyExecutorAsync { sender, args ->
                         val confirm = args.getOptional(0).getOrDefault(false) as Boolean
@@ -65,9 +65,7 @@ class TemplateCommand: TemplateCommandInterface {
 
     private class TemplateCommandImplementation(
         private val templateSet: TemplateSet
-    ): TemplateCommandInterface {
-        override val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
-        override val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
+    ) : TemplateCommandInterface {
         private val managePermission = "bmarker.template.${templateSet.name}-manage"
 
         @Suppress("unused")
@@ -77,7 +75,7 @@ class TemplateCommand: TemplateCommandInterface {
                 withPermission(managePermission)
                 literalArgument("set") {
                     literalArgument("label") {
-                        textArgument("label") {
+                        greedyStringArgument("label") {
                             anyExecutorAsync { sender, args ->
                                 sender.setSetArg(templateSet, MarkerArg.LABEL, Box.BoxString(args[0] as String))
                             }
@@ -100,6 +98,12 @@ class TemplateCommand: TemplateCommandInterface {
                         textArgument("id") {
                             replaceSuggestions(ArgumentSuggestions.stringCollection { templateSet.templateMarker.keys })
                             anyExecutorAsync { sender, args -> sender.removeMarkerTemplate(templateSet, args[0] as String) }
+                        }
+                    }
+                    literalArgument("edit-template") {
+                        textArgument("id") {
+                            replaceSuggestions(ArgumentSuggestions.stringCollection { templateSet.templateMarker.keys })
+                            anyExecutorAsync { sender, args -> sender.editMarkerTemplate(sender.name, args[0] as String, templateSet) }
                         }
                     }
                 }
@@ -133,7 +137,7 @@ class TemplateCommand: TemplateCommandInterface {
                             val templateName = args[0] as String
                             val markerName = args[1] as String
                             val position = player.location.let { Vector3d(it.x, it.y, it.z) }
-                            val entry = MarkerTemplateEntry(templateName, markerName, player.name, markerName.replace(' ', '_'), position)
+                            val entry = MarkerTemplateEntry(templateName, player.name, markerName.replace(' ', '_'), position)
                             player.placeMarker(entry, templateSet, player.hasPermission(managePermission), player.world)
                         }
                     }
@@ -142,6 +146,14 @@ class TemplateCommand: TemplateCommandInterface {
 
             literalArgument("unmark") {
                 textArgument("name") {
+                    replaceSuggestions { info, builder ->
+                        CompletableFuture.supplyAsync {
+                            templateSet.playerMarkers.filter { it.value.playerName == info.sender.name }.forEach { (key, data) ->
+                                builder.suggest(key, AdventureComponent(cmp("Template: ") + cmp(data.templateName, cMark)))
+                            }
+                            builder.build()
+                        }
+                    }
                     playerExecutorAsync { player, args ->
                         player.unplaceMarker(templateSet, args[0] as String, player.hasPermission(managePermission), player.name)
                     }

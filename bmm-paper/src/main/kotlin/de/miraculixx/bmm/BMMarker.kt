@@ -4,6 +4,7 @@ import de.miraculixx.bmm.commands.MarkerCommand
 import de.miraculixx.bmm.commands.SettingsCommand
 import de.miraculixx.bmm.commands.TemplateCommand
 import de.miraculixx.bmm.map.MarkerManager
+import de.miraculixx.bmm.utils.sourceFolder
 import de.miraculixx.mcommons.debug
 import de.miraculixx.mcommons.text.*
 import dev.jorel.commandapi.CommandAPI
@@ -23,15 +24,16 @@ class BMMarker : JavaPlugin() {
         consoleAudience = server.consoleSender
         prefix = cmp("BMMarker", cHighlight) + _prefixSeparator
         debug = true
+        sourceFolder = dataFolder
 
         // Load Content
         CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
         MarkerCommand()
         SettingsCommand()
-        TemplateCommand()
+        MarkerManager.templateLoader = TemplateCommand()
 
         // BlueMap Management
-        blueMapInstance = BlueMap(dataFolder, description.version.toIntOrNull() ?: 0)
+        blueMapInstance = BlueMap(description.version.toIntOrNull() ?: 0)
     }
 
     override fun onEnable() {

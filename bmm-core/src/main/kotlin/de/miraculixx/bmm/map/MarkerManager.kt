@@ -2,12 +2,13 @@ package de.miraculixx.bmm.map
 
 import de.bluecolored.bluemap.api.BlueMapAPI
 import de.miraculixx.bmm.map.data.BMarkerSet
-import de.miraculixx.bmm.map.data.MarkerTemplate
+import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.utils.serializer.ColorSerializer
 import de.miraculixx.bmm.utils.serializer.Vec2dSerializer
 import de.miraculixx.bmm.utils.serializer.Vec2iSerializer
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
 import de.miraculixx.bmm.utils.sourceFolder
+import de.miraculixx.mcommons.debug
 import de.miraculixx.mcommons.extensions.loadConfig
 import de.miraculixx.mcommons.extensions.saveConfig
 import de.miraculixx.mcommons.serializer.UUIDSerializer
@@ -36,7 +37,7 @@ object MarkerManager {
     private val folderTemplateSets = File(sourceFolder, "templates")
     private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
 
-    val templateSets: MutableMap<String, MarkerTemplate> = mutableMapOf() // <templateName -> template>
+    val templateSets: MutableMap<String, TemplateSet> = mutableMapOf() // <templateName -> template>
     val blueMapMaps: MutableMap<String, MutableMap<String, BMarkerSet>> = mutableMapOf() // <mapID -> <setID -> set>>
 
     private val markerJson = Json {
@@ -55,37 +56,43 @@ object MarkerManager {
 
     fun load(api: BlueMapAPI) {
         blueMapAPI = api
-        val invalidUUID = UUID(0,0)
+        val invalidUUID = UUID(1,0)
 
         api.maps.forEach { map -> blueMapMaps[map.id] = mutableMapOf() }
+        if (debug) consoleAudience.sendMessage(prefix + cmp("Loading marker data for maps ${blueMapMaps.keys}..."))
         // Load normal sets
         folderSets.listFiles()?.forEach { file -> // List all world folders
             if (!file.isDirectory) return@forEach
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load map '${file.name}'..."))
             val mapID = file.name
             file.listFiles()?.forEach sets@{ setFile ->
 
                 // Load set
-                if (file.extension != "json") return@sets
+                if (setFile.extension != "json") return@sets
                 val setID = setFile.nameWithoutExtension
-                val set = file.loadConfig(BMarkerSet(invalidUUID), markerJson).takeUnless { it.owner == invalidUUID }
+                if (debug) consoleAudience.sendMessage(prefix + cmp("   - Load set '$setID'..."))
+                val set = setFile.loadConfig(BMarkerSet(invalidUUID), markerJson).takeUnless { it.owner == invalidUUID }
                 if (set == null) {
                     sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
                     return@forEach
                 }
                 set.load(setID, api.getMap(mapID).getOrNull() ?: return@sets)
-
+                if (debug) consoleAudience.sendMessage(prefix + cmp("   - Loaded set '$setID'!"))
             }
         }
 
         // Load template sets
+        if (debug) consoleAudience.sendMessage(prefix + cmp("Loading template data..."))
         folderTemplateSets.listFiles()?.forEach { file ->
             if (file.extension != "json") return
-            val template = file.loadConfig(MarkerTemplate("", markerSetID = ""), markerJson)
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load template '${file.nameWithoutExtension}'..."))
+            val template = file.loadConfig(TemplateSet("", markerSetID = ""), markerJson)
             if (template.name.isEmpty()) {
                 sendError("Template file '${file.name}' is invalid! Skipping it...")
                 return@forEach
             }
             template.load(api)
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loaded template '${template.name}'!"))
         }
     }
 

@@ -1,5 +1,6 @@
 package de.miraculixx.bmm.utils.enums
 
+import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.ExtrudeMarker
 import de.bluecolored.bluemap.api.markers.LineMarker
@@ -20,7 +21,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.ICON,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     LINE(
@@ -36,7 +38,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     SHAPE(
@@ -54,7 +57,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     EXTRUDE(
@@ -73,7 +77,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     ELLIPSE(
@@ -94,7 +99,8 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
 
@@ -113,9 +119,9 @@ enum class MarkerType(val args: List<MarkerArg>) {
         val unset = "<unset>"
         return when (this) {
             POI -> POIMarker(unset, Vector3d())
-            LINE -> LineMarker(unset, Line())
-            SHAPE -> ShapeMarker(unset, Shape(), 0f)
-            EXTRUDE, ELLIPSE -> ExtrudeMarker(unset, Shape(), 0f, 0f)
+            LINE -> LineMarker(unset, Line(Vector3d(), Vector3d()))
+            SHAPE -> ShapeMarker(unset, Shape(Vector2d(), Vector2d(), Vector2d()), 0f)
+            EXTRUDE, ELLIPSE -> ExtrudeMarker(unset, Shape(Vector2d(), Vector2d(), Vector2d()), 0f, 0f)
             MARKER_SET -> throw IllegalArgumentException("MarkerSet is not a marker type")
         }
     }

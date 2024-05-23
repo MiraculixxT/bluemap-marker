@@ -55,6 +55,28 @@ command:
   selectMap: "<gray>Select a BlueMap-Map:" #m
   selectSet: "<gray>Select a Marker-Set:" #m
   noSets: "<red>There are no marker-sets in map <input-1>! (/<input-2> set-create)" #m #v1
+  notYourSet: "<red>You are not the owner of this marker-set!" #m
+  notYourMarker: "<red>You are not the owner of this marker!" #m
+  maxMarkers: "<red>You reached your maximum amount of markers in this set! (<input-1>)" #m #v1
+  maxSets: "<red>You reached your maximum amount of marker-sets in this map! (<input-1>)" #m #v1
+  settings:
+    current: "<gray>Current value: <color:#6e94ff><input-1></color>" #m #v1
+    changed: "<gray>Changed value to: <color:#6e94ff><input-1></color>" #m #v1
+  template:
+    help: "<gray>Templates are a powerful tool to create markers faster or automated. They can be a bit complicated to setup first, so feel free to <click:open_url:'https://discord.gg/zmkyJa3'><u>ask me</u></click> for help :)\n\n- Templates have their own custom command <blue>(/id)</blue>\n- Templates need their own set <blue>(/id edit set)</blue>\n- Can contain multiple \"template\" marker <blue>(/id edit marker)</blue>\n- Can be automated by certain events <blue>(/id edit automate)</blue>"
+    help-marker: "<gray>Template markers are just like normal markers, but they do not appear on the map. They can be put on the map by a single command <blue>(/id mark <marker-id>)</blue>.\n\n- Markers will copy the position of target\n- Label & detail supports placeholder <blue>(%NAME%)</blue>"
+    create: "<green>Template created! Use <u>/<input-1> edit <...></u> to add new template markers, rules and more" #m #v1
+    delete: "<red>Template <input-1> deleted with all associated markers and sets!" #m #v1
+    setArg: "<green>Applied new value <color:#6e94ff><input-1></color>" #m #v1
+    removeMarkerTemplate: "<gray>Removed template <color:#6e94ff><input-1></color> and all placed markers to it." #m #v1
+    noValidTemplate: "<red><input-1> is not a valid template in this set!" #m #v1
+    invalidWorld: "<red>The set is not available in your current world!" #m
+    place: "<green>New <input-1> marker placed!" #m #v1
+    unplace: "<red>Removed your <input-1> marker!" #m #v1
+    mapAlreadyAdded: "<red>The map <input-1> is already added to the template!" #m #v1
+    mapNotAdded: "<red>The map <input-1> is not added to the template!" #m #v1
+    addMap: "<green>Added map <input-1> to the template! <grey>(This action didn't cloned existing markers)" #m #v1
+    confirmRemoval: "<grey>Are you sure you want to <red>delete</red> this template set? This will also delete <red>all markers inside</red>!\n\nConfirm with <red><u><input-1>"
 
 
 #-----------------------------------------#
@@ -100,6 +122,7 @@ arg:
   MAP: "MAP"
   TOGGLEABLE: "TOGGLEABLE"
   DEFAULT_HIDDEN: "DEFAULT HIDDEN"
+  LISTED: "LISTED"
   LISTING_POSITION: "LISTING POSITION"
 
 arg-desc:
@@ -128,4 +151,5 @@ arg-desc:
   MAP: "Target BlueMap Map\nThis is not world exclusive!"
   TOGGLEABLE: "If this is true, the marker-set\ncan be enabled or disabled in the menu"
   DEFAULT_HIDDEN: "If this is true, the marker-set\nwill be hidden by default and can be\nenabled by the user. If 'TOGGELABLE' is\nfalse, this is the forced state"
-  LISTING_POSITION: "Position of the marker(-set) in the BlueMap menu. Lower values are higher in the list compared to others"
+  LISTED: "If this is false, the marker will\nnot be listed in the BlueMap set menu"
+  LISTING_POSITION: "Position of the marker(-set) in the BlueMap menu.\n Higher values are higher in the list compared to others"

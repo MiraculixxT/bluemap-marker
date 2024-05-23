@@ -5,6 +5,7 @@ import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import com.mojang.brigadier.arguments.*
 import de.bluecolored.bluemap.api.math.Color
+import de.miraculixx.bmm.commands.MarkerCommandInstance
 import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.utils.enums.MarkerArg

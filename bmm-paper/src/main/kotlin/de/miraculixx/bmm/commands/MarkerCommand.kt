@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package de.miraculixx.bmm
+package de.miraculixx.bmm.commands
 
 import com.flowpowered.math.vector.Vector2d
 import com.flowpowered.math.vector.Vector2i
@@ -10,6 +10,7 @@ import de.miraculixx.bmm.map.MarkerBuilder
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.MarkerSetBuilder
 import de.miraculixx.bmm.map.data.Box
+import de.miraculixx.bmm.utils.data.*
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.kpaper.extensions.worlds
 import de.miraculixx.mcommons.extensions.round
@@ -23,6 +24,7 @@ import dev.jorel.commandapi.kotlindsl.*
 import dev.jorel.commandapi.wrappers.Location2D
 import io.papermc.paper.adventure.AdventureComponent
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
 import kotlin.jvm.optionals.getOrNull
@@ -41,17 +43,17 @@ class MarkerCommand : MarkerCommandInstance {
             textArgument("type") {
                 replaceSuggestions(ArgumentSuggestions.strings(listOf("poi", "line", "shape", "extrude", "ellipse")))
                 anyExecutor { sender, args ->
-                    create(sender, sender.name, args[0].toString(), null, null, worlds.map { it.name })
+                    create(sender, sender.name, args[0].toString(), null, null, worlds.map { it.name }, null)
                 }
                 textArgument("map") {
                     suggestMapIDs()
                     anyExecutor { sender, args ->
-                        create(sender, sender.name, args[0].toString(), args[1].toString(), null, null)
+                        create(sender, sender.name, args[0].toString(), args[1].toString(), null, null, sender.getData())
                     }
                     textArgument("marker-set") {
-                        suggestSetIDs()
+                        suggestSetIDs(1)
                         anyExecutor { sender, args ->
-                            create(sender, sender.name, args[0].toString(), args[1].toString(), args[2].toString(), null)
+                            create(sender, sender.name, args[0].toString(), args[1].toString(), args[2].toString(), null, sender.getData())
                         }
                     }
                 }
@@ -62,22 +64,22 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("delete") {
             withPermission("bmarker.command.delete")
             anyExecutor { sender, _ ->
-                delete(sender, null, null, null, worlds.map { it.name })
+                delete(sender, null, null, null, worlds.map { it.name }, null)
             }
             textArgument("map") {
                 suggestMapIDs()
                 anyExecutor { sender, args ->
-                    delete(sender, args[0].toString(), null, null, null)
+                    delete(sender, args[0].toString(), null, null, null, sender.getData())
                 }
                 textArgument("marker-set") {
-                    suggestSetIDs()
+                    suggestSetIDs(0)
                     anyExecutor { sender, args ->
-                        delete(sender, args[0].toString(), args[1].toString(), null, null)
+                        delete(sender, args[0].toString(), args[1].toString(), null, null, sender.getData())
                     }
                     textArgument("marker") {
                         suggestMarkerIDs()
                         anyExecutor { sender, args ->
-                            delete(sender, args[0].toString(), args[1].toString(), args[2].toString(), null)
+                            delete(sender, args[0].toString(), args[1].toString(), args[2].toString(), null, sender.getData())
                         }
                     }
                 }
@@ -88,22 +90,22 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("edit") {
             withPermission("bmarker.command.edit")
             anyExecutor { sender, _ ->
-                edit(sender, sender.name, null, null, null, worlds.map { it.name })
+                edit(sender, sender.name, null, null, null, worlds.map { it.name }, null)
             }
             textArgument("map") {
                 suggestMapIDs()
                 anyExecutor { sender, args ->
-                    edit(sender, sender.name, args[0].toString(), null, null, null)
+                    edit(sender, sender.name, args[0].toString(), null, null, null, sender.getData())
                 }
                 textArgument("marker-set") {
-                    suggestSetIDs()
+                    suggestSetIDs(0)
                     anyExecutor { sender, args ->
-                        edit(sender, sender.name, args[0].toString(), args[1].toString(), null, null)
+                        edit(sender, sender.name, args[0].toString(), args[1].toString(), null, null, sender.getData())
                     }
                     textArgument("marker") {
                         suggestMarkerIDs()
                         anyExecutor { sender, args ->
-                            edit(sender, sender.name, args[0].toString(), args[1].toString(), args[2].toString(), null)
+                            edit(sender, sender.name, args[0].toString(), args[1].toString(), args[2].toString(), null, sender.getData())
                         }
                     }
                 }
@@ -114,13 +116,13 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("set-create") {
             withPermission("bmarker.command.set-create")
             anyExecutor { sender, _ ->
-                createSet(sender, sender.name, null, worlds.map { it.name })
+                createSet(sender, sender.name, null, worlds.map { it.name }, null)
             }
             textArgument("map") {
                 suggestMapIDs()
                 anyExecutor { sender, args ->
                     val value = args[0].toString()
-                    createSet(sender, sender.name, value, null)
+                    createSet(sender, sender.name, value, null, sender.getData())
                 }
             }
         }
@@ -129,41 +131,50 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("set-delete") {
             withPermission("bmarker.command.set-delete")
             anyExecutor { sender, _ ->
-                deleteSet(sender, false, null, null, worlds.map { it.name })
+                deleteSet(sender, false, null, null, worlds.map { it.name }, null)
             }
             textArgument("map") {
                 suggestMapIDs()
                 anyExecutor { sender, args ->
-                    deleteSet(sender, false, null, args[0].toString(), null)
+                    deleteSet(sender, false, null, args[0].toString(), null, sender.getData())
                 }
                 textArgument("set-id") {
-                    suggestSetIDs()
+                    suggestSetIDs(0)
                     anyExecutor { sender, args ->
-                        deleteSet(sender, false, args[1].toString(), args[0].toString(), null)
+                        deleteSet(sender, false, args[1].toString(), args[0].toString(), null, null)
                     }
                     booleanArgument("confirm") {
                         anyExecutor { sender, args ->
-                            deleteSet(sender, args[2] == true, args[1].toString(), args[0].toString(), null)
+                            deleteSet(sender, args[2] == true, args[1].toString(), args[0].toString(), null, sender.getData())
                         }
                     }
                 }
             }
         }
 
-        // /marker language TODO
-//        literalArgument("language") {
-//            withPermission("bmarker.command.language")
-//            stringArgument("key") {
-//                replaceSuggestions(ArgumentSuggestions.stringCollection { getLanguageKeys() })
-//                anyExecutor { sender, args ->
-//                    changeLanguage(sender, args[0] as String)
-//                }
-//            }
-//        }
+        // /marker set-edit [<map>] [<set-id>]
+        literalArgument("set-edit") {
+            withPermission("bmarker.command.set-edit")
+            anyExecutor { sender, _ ->
+                editSet(sender, sender.name, null, null, worlds.map { it.name }, null)
+            }
+            textArgument("map") {
+                suggestMapIDs()
+                anyExecutor { sender, args ->
+                    editSet(sender, sender.name, args[0].toString(), null, null, sender.getData())
+                }
+                textArgument("set-id") {
+                    suggestSetIDs(0)
+                    anyExecutor { sender, args ->
+                        editSet(sender, sender.name, args[0].toString(), args[1].toString(), null, sender.getData())
+                    }
+                }
+            }
+        }
     }
 
     val setupMarkerCommand = commandTree(setupCommandPrefix) {
-        withPermission("bmarker.command.create")
+        withPermission(manageOwnMarkers)
 
         anyExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name)
@@ -172,7 +183,7 @@ class MarkerCommand : MarkerCommandInstance {
         // SETUP COMMANDS
         literalArgument("build") {
             anyExecutor { sender, _ ->
-                build(sender, sender.name)
+                build(sender, sender.name, (sender as? Player)?.uniqueId)
             }
         }
         literalArgument("cancel") {
@@ -180,6 +191,7 @@ class MarkerCommand : MarkerCommandInstance {
                 cancel(sender, sender.name)
             }
         }
+        pageLogic(false)
 
         // Single String / URL
         literalArgument("icon") {
@@ -233,8 +245,8 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("add_position") {
             literalArgument("remove-last") {
                 anyExecutor { sender, _ ->
-                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION) as? Box.BoxVector3dList ?: return@anyExecutor
-                    box.value.dropLast(1)
+                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION) as? Box.BoxVector3dList ?: Box.BoxVector3dList(mutableListOf())
+                    box.value.removeLast()
                     setMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION, box, "removed last position")
                 }
             }
@@ -242,7 +254,7 @@ class MarkerCommand : MarkerCommandInstance {
                 anyExecutor { sender, args ->
                     val newDirection = args[0] as Location
                     val value = Vector3d(newDirection.x.round(2), newDirection.y.round(2), newDirection.z.round(2))
-                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION) as? Box.BoxVector3dList ?: return@anyExecutor
+                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION) as? Box.BoxVector3dList ?: Box.BoxVector3dList(mutableListOf())
                     box.value.add(value)
                     setMarkerArgument(sender, sender.name, MarkerArg.ADD_POSITION, box, "new direction $value")
                 }
@@ -251,8 +263,8 @@ class MarkerCommand : MarkerCommandInstance {
         literalArgument("add_edge") {
             literalArgument("remove-last") {
                 anyExecutor { sender, _ ->
-                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE) as? Box.BoxVector2dList ?: return@anyExecutor
-                    box.value.dropLast(1)
+                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE) as? Box.BoxVector2dList ?: Box.BoxVector2dList(mutableListOf())
+                    box.value.removeLast()
                     setMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE, box, "removed last edge")
                 }
             }
@@ -260,7 +272,7 @@ class MarkerCommand : MarkerCommandInstance {
                 anyExecutor { sender, args ->
                     val edge = args[0] as Location2D
                     val value = Vector2d(edge.x.round(2), edge.z.round(2))
-                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE) as? Box.BoxVector2dList ?: return@anyExecutor
+                    val box = getMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE) as? Box.BoxVector2dList ?: Box.BoxVector2dList(mutableListOf())
                     box.value.add(value)
                     setMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE, box, "new edge $value")
                 }
@@ -318,6 +330,7 @@ class MarkerCommand : MarkerCommandInstance {
                 }
             }
         }
+        listingLogic(false)
 
         // Floats
         literalArgument("height") {
@@ -373,7 +386,7 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val setupSetCommand = commandTree(setupSetCommandPrefix) {
-        withPermission("bmarker.command.set-create")
+        withPermission(manageOwnSets)
 
         anyExecutor { sender, _ ->
             sendStatusInfo(sender, sender.name, true)
@@ -382,7 +395,7 @@ class MarkerCommand : MarkerCommandInstance {
         // SETUP COMMANDS
         literalArgument("build") {
             anyExecutor { sender, _ ->
-                buildSet(sender, sender.name)
+                buildSet(sender, sender.name, (sender as? Player)?.uniqueId)
             }
         }
         literalArgument("cancel") {
@@ -390,6 +403,7 @@ class MarkerCommand : MarkerCommandInstance {
                 cancel(sender, sender.name, true)
             }
         }
+        pageLogic(true)
 
         // Booleans
         literalArgument("toggleable") {
@@ -410,14 +424,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
 
         // Integers
-        literalArgument("listing_position") {
-            integerArgument("position", 0) {
-                anyExecutor { sender, args ->
-                    val value = args[0] as Int
-                    setMarkerArgument(sender, sender.name, MarkerArg.LISTING_POSITION, Box.BoxInt(value), "listing position $value", true)
-                }
-            }
-        }
+        listingLogic(true)
 
         // String / Multi Strings
         labelLogic(true)
@@ -425,7 +432,7 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     val visibilityCommand = commandTree(visibilityCommandPrefix) {
-        withPermission("bmarker.command.visibility")
+        withPermission(changeVisibility)
 
         literalArgument("hide") {
             visibility(false)
@@ -482,12 +489,40 @@ class MarkerCommand : MarkerCommandInstance {
         }
     }
 
+    private fun CommandTree.listingLogic(isSet: Boolean) {
+        literalArgument("listing_position") {
+            integerArgument("listing-position", Int.MIN_VALUE) {
+                anyExecutor { sender, args ->
+                    val value = args[0] as Int
+                    setMarkerArgument(sender, sender.name, MarkerArg.LISTING_POSITION, Box.BoxInt(value), "listing position $value", isSet)
+                }
+            }
+        }
+    }
+
+    private fun CommandTree.pageLogic(isSet: Boolean) {
+        literalArgument("page") {
+            literalArgument("next") {
+                anyExecutor { sender, _ ->
+                    getBuilder(sender, sender.name, isSet)?.let { it.page++ }
+                    sendStatusInfo(sender, sender.name, isSet)
+                }
+            }
+            literalArgument("previous") {
+                anyExecutor { sender, _ ->
+                    getBuilder(sender, sender.name, isSet)?.let { it.page-- }
+                    sendStatusInfo(sender, sender.name, isSet)
+                }
+            }
+        }
+    }
+
     private fun Argument<*>.visibility(visible: Boolean) {
         playerExecutor { player, _ ->
             setPlayerVisibility(player, listOf(player.uniqueId to player.name), visible)
         }
         entitySelectorArgumentManyPlayers("target") {
-            withPermission("bmarker.command.visibility-other")
+            withPermission(changeVisibilityOthers)
             anyExecutor { sender, args ->
                 val profiles = (args[0] as Collection<Player>).map { it.uniqueId to it.name }
                 setPlayerVisibility(sender, profiles, visible)
@@ -505,15 +540,17 @@ class MarkerCommand : MarkerCommandInstance {
         }
     }
 
-
-    private fun <T> Argument<T>.suggestSetIDs() = replaceSuggestions { info, builder ->
+    private fun <T> Argument<T>.suggestSetIDs(mapIDIndex: Int) = replaceSuggestions { info, builder ->
         CompletableFuture.supplyAsync {
             val api = MarkerManager.blueMapAPI
-            val mapID = info.previousArgs[0].toString()
+            val mapID = info.previousArgs[mapIDIndex].toString()
             val set = MarkerManager.blueMapMaps[mapID]
+            val uuid = info.sender.getUUID()
+            val allowOthers = info.sender.hasPermission(manageOthersSets)
             set?.forEach { (setID, data) ->
+                if (data.owner != uuid && !allowOthers) return@forEach
                 val mapName = api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown"
-                builder.suggest("$setID.$setID", AdventureComponent(cmp("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL] ?: "Unknown"}", cMark)))
+                builder.suggest(setID, AdventureComponent(cmp("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown"}", cMark)))
             }
             builder.build()
         }
@@ -523,10 +560,19 @@ class MarkerCommand : MarkerCommandInstance {
         CompletableFuture.supplyAsync {
             val mapID = info.previousArgs[0].toString()
             val setID = info.previousArgs[1].toString()
+            val uuid = info.sender.getUUID()
+            val allowOthers = info.sender.hasPermission(manageOthersMarkers)
             MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.forEach { (id, data) ->
+                if (data.owner != uuid && !allowOthers) return@forEach
                 builder.suggest(id, AdventureComponent(cmp(data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown", cMark)))
             }
             builder.build()
         }
     }
+
+    private fun CommandSender.getData(): PlayerData {
+        val player = this as? Player
+        return PlayerData(player?.uniqueId, name, hasPermission(manageOthersMarkers), hasPermission(manageOthersSets))
+    }
+    private fun CommandSender.getUUID() = (this as? Player)?.uniqueId
 }

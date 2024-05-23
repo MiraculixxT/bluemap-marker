@@ -9,10 +9,11 @@ import java.util.*
 @Serializable
 data class Settings(
     var language: @Serializable(with = LocaleSerializer::class) Locale = Locale.ENGLISH,
-    var allowUserMarkers: Boolean = false,
+    var maxUserSets: Int = 1,
+    var maxUserMarker: Int = 5
 )
 
-val settings = Settings()
+var settings = Settings()
 
 lateinit var sourceFolder: File
 

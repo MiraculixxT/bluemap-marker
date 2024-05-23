@@ -37,6 +37,10 @@ data class BMarkerSet(
         return set
     }
 
+    fun getEditor(): MarkerSetBuilder? {
+        return blueMapMarkerSet?.let { MarkerSetBuilder(attributes, it, true) }
+    }
+
     fun addMarker(owner: UUID, builder: MarkerBuilder, markerID: String) {
         val bMarker = BMarker(owner, builder.getType(), builder.getArgs())
         markers[markerID] = bMarker

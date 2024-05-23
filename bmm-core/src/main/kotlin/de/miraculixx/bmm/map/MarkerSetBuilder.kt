@@ -5,12 +5,16 @@ import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
+import de.miraculixx.mcommons.text.emptyComponent
+import net.kyori.adventure.text.Component
 
 class MarkerSetBuilder(
     private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
-    private val blueMapSet: MarkerSet = MarkerSet("<unset>")
+    private val blueMapSet: MarkerSet = MarkerSet("<unset>"),
+    override val isEdit: Boolean = false
 ) : Builder {
     override var page = 0
+    override var lastEditMessage: Component = emptyComponent()
 
     fun apply(): MarkerSet {
         return blueMapSet.apply {
@@ -37,10 +41,6 @@ class MarkerSetBuilder(
     companion object {
         fun createSet(args: MutableMap<MarkerArg, Box>): MarkerSet {
             return MarkerSetBuilder(args).apply()
-        }
-
-        fun editSet(set: MarkerSet, changedArgs: MutableMap<MarkerArg, Box>) {
-            MarkerSetBuilder(changedArgs, set).apply()
         }
     }
 }

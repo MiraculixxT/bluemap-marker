@@ -6,9 +6,12 @@ import de.bluecolored.bluemap.api.markers.*
 import de.bluecolored.bluemap.api.math.Line
 import de.bluecolored.bluemap.api.math.Shape
 import de.miraculixx.bmm.map.data.Box
+import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
+import de.miraculixx.mcommons.text.emptyComponent
+import net.kyori.adventure.text.Component
 import java.net.URI
 import javax.imageio.ImageIO
 import kotlin.jvm.optionals.getOrNull
@@ -18,9 +21,11 @@ class MarkerBuilder(
     private val type: MarkerType,
     private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
     private val blueMapMarker: Marker = type.getEmptyMarker(),
-    val isEdit: Boolean = false
+    override val isEdit: Boolean = false,
+    val templateSet: TemplateSet? = null
 ) : Builder {
     override var page = 0
+    override var lastEditMessage: Component = emptyComponent()
     private var missingImportant = false
 
     fun apply(): Pair<Marker, Boolean> {

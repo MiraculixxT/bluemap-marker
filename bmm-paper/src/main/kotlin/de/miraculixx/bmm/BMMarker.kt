@@ -22,7 +22,7 @@ class BMMarker : JavaPlugin() {
     override fun onLoad() {
         INSTANCE = this
         consoleAudience = server.consoleSender
-        prefix = cmp("BMMarker", cHighlight) + _prefixSeparator
+        prefix = cmp("BMarker", cHighlight) + _prefixSeparator
         debug = true
         sourceFolder = dataFolder
 

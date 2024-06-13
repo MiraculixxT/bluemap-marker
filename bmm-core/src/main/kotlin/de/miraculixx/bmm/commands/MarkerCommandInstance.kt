@@ -16,6 +16,7 @@ import de.miraculixx.bmm.utils.data.setupCommandPrefix
 import de.miraculixx.bmm.utils.data.setupSetCommandPrefix
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
+import de.miraculixx.mcommons.extensions.enumOf
 import de.miraculixx.mcommons.text.*
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key

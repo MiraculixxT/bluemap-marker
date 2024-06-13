@@ -7,10 +7,10 @@ import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.data.MarkerTemplateEntry
 import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.utils.data.templateCommandPrefix
-import de.miraculixx.bmm.utils.enumOf
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
 import de.miraculixx.bmm.utils.locale
+import de.miraculixx.mcommons.extensions.enumOf
 import de.miraculixx.mcommons.extensions.soundDisable
 import de.miraculixx.mcommons.extensions.soundEnable
 import de.miraculixx.mcommons.text.msg

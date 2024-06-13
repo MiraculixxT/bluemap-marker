@@ -39,7 +39,7 @@ class MarkerBuilder(
             is LineMarker -> marker.apply {
                 applyBasics()
 
-                args[MarkerArg.ADD_POSITION]?.getVector3dList()?.let { line = Line(it) } ?: importantArgument()
+                args[MarkerArg.ADD_POSITION]?.getVector3dList()?.let { line = Line(it); centerPosition() } ?: importantArgument()
                 args[MarkerArg.DEPTH_TEST]?.getBoolean()?.let { isDepthTestEnabled = it }
                 args[MarkerArg.LINE_WIDTH]?.getInt()?.let { lineWidth = it }
                 args[MarkerArg.LINE_COLOR]?.getColor()?.let { lineColor = it }
@@ -85,6 +85,7 @@ class MarkerBuilder(
         args[MarkerArg.LABEL]?.getString()?.let { label = it } ?: importantArgument()
         args[MarkerArg.POSITION]?.getVector3d()?.let { position = it }
         args[MarkerArg.LISTED]?.getBoolean()?.let { isListed = it }
+        args[MarkerArg.LISTING_POSITION]?.getInt()?.let { sorting = it }
 
         if (this is DetailMarker) args[MarkerArg.DETAIL]?.getString()?.let { detail = it }
         if (this is DistanceRangedMarker) {

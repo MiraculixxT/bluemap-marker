@@ -27,7 +27,7 @@ sourceSets {
 }
 
 modrinth {
-    this.versionName = "BMM Paper - ${(version as String).removeSuffix("-fabric")}"
+    this.versionName = "BMM Fabric - ${(version as String).removeSuffix("-fabric")}"
     uploadFile.set(tasks.remapJar)
     outlet.mcVersionRange = properties["fabricSupportedVersions"] as String
     outlet.allowedReleaseTypes = setOf(ReleaseType.RELEASE)

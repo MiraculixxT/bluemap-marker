@@ -28,6 +28,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
     modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.13.0")!!)
 
     //
     // Kotlin libraries

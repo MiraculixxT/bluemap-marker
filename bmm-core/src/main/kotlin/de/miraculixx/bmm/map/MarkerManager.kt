@@ -146,6 +146,7 @@ object MarkerManager {
         templateSets.filter { it.value.markerSetID == setID }.forEach { (_, data) ->
             data.removeMap(mapID, blueMapAPI!!.getMap(mapID).getOrNull())
         }
+        blueMapAPI?.getMap(mapID)?.getOrNull()?.markerSets?.remove(setID)
         return blueMapMaps[mapID]?.remove(setID) != null
     }
 

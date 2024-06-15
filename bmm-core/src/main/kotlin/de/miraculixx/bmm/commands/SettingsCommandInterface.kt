@@ -117,7 +117,8 @@ interface SettingsCommandInterface {
 
         // Load Markers
         set.markers.forEach { (id, marker) ->
-            val bMarker = BMarker(UUID(0, 0), enumOf<MarkerType>(marker.type) ?: MarkerType.POI, marker.getArgs(id))
+            println(marker.type.uppercase())
+            val bMarker = BMarker(UUID(0, 0), enumOf<MarkerType>(marker.type.uppercase()) ?: MarkerType.POI, marker.getArgs(id))
             bSet.markers[id] = bMarker
             bMarker.load(id, finalSet)
         }
@@ -142,26 +143,26 @@ interface SettingsCommandInterface {
             put(MarkerArg.LISTED, Box.BoxBoolean(isListed))
             put(MarkerArg.LISTING_POSITION, Box.BoxInt(sorting))
 
-            if (this is DetailMarker) put(MarkerArg.DETAIL, Box.BoxString(detail))
-            if (this is DistanceRangedMarker) {
+            if (this@getArgs is DetailMarker) put(MarkerArg.DETAIL, Box.BoxString(detail))
+            if (this@getArgs is DistanceRangedMarker) {
                 put(MarkerArg.MAX_DISTANCE, Box.BoxDouble(maxDistance))
                 put(MarkerArg.MIN_DISTANCE, Box.BoxDouble(minDistance))
             }
-            if (this is ObjectMarker) {
+            if (this@getArgs is ObjectMarker) {
                 link.getOrNull()?.let { put(MarkerArg.LINK, Box.BoxString(it)) }
                 put(MarkerArg.NEW_TAB, Box.BoxBoolean(isNewTab))
             }
-            if (this is POIMarker) {
+            if (this@getArgs is POIMarker) {
                 put(MarkerArg.ICON, Box.BoxString(iconAddress))
                 put(MarkerArg.ANCHOR, Box.BoxVector2i(anchor))
             }
-            if (this is LineMarker) {
+            if (this@getArgs is LineMarker) {
                 put(MarkerArg.ADD_POSITION, Box.BoxVector3dList(line.points.toMutableList()))
                 put(MarkerArg.DEPTH_TEST, Box.BoxBoolean(isDepthTestEnabled))
                 put(MarkerArg.LINE_WIDTH, Box.BoxInt(lineWidth))
                 put(MarkerArg.LINE_COLOR, Box.BoxColor(lineColor))
             }
-            if (this is ShapeMarker) {
+            if (this@getArgs is ShapeMarker) {
                 put(MarkerArg.ADD_EDGE, Box.BoxVector2dList(shape.points.toMutableList()))
                 put(MarkerArg.HEIGHT, Box.BoxFloat(shapeY))
                 put(MarkerArg.DEPTH_TEST, Box.BoxBoolean(isDepthTestEnabled))
@@ -169,7 +170,7 @@ interface SettingsCommandInterface {
                 put(MarkerArg.LINE_COLOR, Box.BoxColor(lineColor))
                 put(MarkerArg.FILL_COLOR, Box.BoxColor(fillColor))
             }
-            if (this is ExtrudeMarker) {
+            if (this@getArgs is ExtrudeMarker) {
                 put(MarkerArg.ADD_EDGE, Box.BoxVector2dList(shape.points.toMutableList()))
                 put(MarkerArg.HEIGHT, Box.BoxFloat(shapeMinY))
                 put(MarkerArg.MAX_HEIGHT, Box.BoxFloat(shapeMaxY))

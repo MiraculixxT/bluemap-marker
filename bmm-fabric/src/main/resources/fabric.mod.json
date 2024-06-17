@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "bm-marker",
-  "version": "163",
+  "id": "bmmarker",
+  "version": "2.1.2",
 
   "name": "BlueMap Marker Manager",
   "description": "A BlueMap addition plugin. Give your players the option to place markers on the map",
   "authors": ["Miraculixx"],
   "contact": {
-    "homepage": "https://mutils.de/",
+    "homepage": "https://mutils.net/",
     "sources": "https://github.com/MiraculixxT/bluemap-marker"
   },
 

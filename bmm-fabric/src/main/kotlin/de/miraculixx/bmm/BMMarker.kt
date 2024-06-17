@@ -5,6 +5,7 @@ import de.miraculixx.bmm.commands.SettingsCommand
 import de.miraculixx.bmm.commands.TemplateCommand
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.sourceFolder
+import de.miraculixx.mcommons.debug
 import de.miraculixx.mcommons.text.*
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -15,21 +16,23 @@ import java.io.File
 
 class BMMarker : ModInitializer {
     private lateinit var blueMapInstance: BlueMap
-    private lateinit var config: File
 
     override fun onInitialize() {
+        prefix = cmp("BMarker", cHighlight) + _prefixSeparator
+        debug = true
+        sourceFolder = File("config/BMMarker")
+        if (!sourceFolder.exists()) sourceFolder.mkdirs()
+
+        MarkerManager
+        MarkerCommand()
+        SettingsCommand()
+        MarkerManager.templateLoader = TemplateCommand()
+
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server: MinecraftServer? ->
             val adventure = FabricServerAudiences.of(server!!)
             consoleAudience = adventure.console()
-            config = File("config/bm-marker")
-            if (!config.exists()) config.mkdirs()
-            sourceFolder = config
 
-            MarkerCommand()
-            SettingsCommand()
-            MarkerManager.templateLoader = TemplateCommand()
-
-            val container = FabricLoader.getInstance().getModContainer("bm-marker").get()
+            val container = FabricLoader.getInstance().getModContainer("bmmarker").get()
             blueMapInstance = BlueMap(container.metadata.version.friendlyString.toIntOrNull() ?: 0)
         })
 

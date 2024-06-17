@@ -4,7 +4,6 @@ plugins {
     `core-script`
     `fabric-script`
     `adventure-script`
-    `shadow-script`
     `publish-script`
     id("io.github.dexman545.outlet")
 }

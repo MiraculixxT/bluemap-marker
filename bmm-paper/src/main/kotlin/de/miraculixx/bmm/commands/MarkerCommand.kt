@@ -31,11 +31,10 @@ import kotlin.jvm.optionals.getOrNull
 class MarkerCommand : MarkerCommandInstance {
 
     val mainCommand = commandTree(mainCommandPrefix) {
-        withPermission("bmarker.command.main")
+        withPermission( manageOwnMarkers)
 
         // /marker create <type> [<map>] [<marker-set>]
         literalArgument("create") {
-            withPermission("bmarker.command.create")
             textArgument("type") {
                 replaceSuggestions(ArgumentSuggestions.strings(listOf("poi", "line", "shape", "extrude", "ellipse")))
                 anyExecutor { sender, args ->
@@ -58,7 +57,6 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker delete [<map>] [<set-id>] [<marker-id>]
         literalArgument("delete") {
-            withPermission("bmarker.command.delete")
             anyExecutor { sender, _ ->
                 delete(sender, null, null, null, worlds.map { it.name }, null)
             }
@@ -84,7 +82,6 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker edit [<map>] [<set-id>] [<marker-id>]
         literalArgument("edit") {
-            withPermission("bmarker.command.edit")
             anyExecutor { sender, _ ->
                 edit(sender, sender.name, null, null, null, worlds.map { it.name }, null)
             }
@@ -110,7 +107,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-create [<map-id>]
         literalArgument("set-create") {
-            withPermission("bmarker.command.set-create")
+            withPermission(manageOwnSets)
             anyExecutor { sender, _ ->
                 createSet(sender, sender.name, null, worlds.map { it.name }, null)
             }
@@ -125,7 +122,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-delete [<map>] [<id>] [true]
         literalArgument("set-delete") {
-            withPermission("bmarker.command.set-delete")
+            withPermission(manageOwnSets)
             anyExecutor { sender, _ ->
                 deleteSet(sender, false, null, null, worlds.map { it.name }, null)
             }
@@ -150,7 +147,7 @@ class MarkerCommand : MarkerCommandInstance {
 
         // /marker set-edit [<map>] [<set-id>]
         literalArgument("set-edit") {
-            withPermission("bmarker.command.set-edit")
+            withPermission(manageOwnSets)
             anyExecutor { sender, _ ->
                 editSet(sender, sender.name, null, null, worlds.map { it.name }, null)
             }
@@ -264,7 +261,7 @@ class MarkerCommand : MarkerCommandInstance {
                     setMarkerArgument(sender, sender.name, MarkerArg.ADD_EDGE, box, "removed last edge")
                 }
             }
-            location2DArgument("anchor", LocationType.PRECISE_POSITION) {
+            location2DArgument("add-edge", LocationType.PRECISE_POSITION) {
                 anyExecutor { sender, args ->
                     val edge = args[0] as Location2D
                     val value = Vector2d(edge.x.round(2), edge.z.round(2))

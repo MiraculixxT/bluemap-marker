@@ -44,7 +44,7 @@ dependencies {
 
 tasks {
     assemble {
-        dependsOn(tasks.shadowJar)
+        dependsOn(reobfJar)
     }
 }
 

@@ -131,7 +131,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
 
         // Check permissions
         val set = MarkerManager.blueMapMaps[mapID]?.get(setID)
-        if (pData?.permMarkerOther != null && pData.uuid != set?.owner) {
+        if (pData?.permMarkerOther != true && pData?.uuid != set?.owner) {
             sender.sendMessage(prefix + locale.msg("command.notYourMarker"))
             return
         }

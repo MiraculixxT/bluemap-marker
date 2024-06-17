@@ -1,11 +1,9 @@
 import dex.plugins.outlet.v2.util.ReleaseType
 
 plugins {
-    `kotlin-script`
     `core-script`
     `fabric-script`
     `adventure-script`
-    `shadow-script`
     `publish-script`
     id("io.github.dexman545.outlet")
 }
@@ -28,7 +26,7 @@ sourceSets {
 }
 
 modrinth {
-    this.versionName = "BMM Paper - ${(version as String).removeSuffix("-fabric")}"
+    this.versionName = "BMM Fabric - ${(version as String).removeSuffix("-fabric")}"
     uploadFile.set(tasks.remapJar)
     outlet.mcVersionRange = properties["fabricSupportedVersions"] as String
     outlet.allowedReleaseTypes = setOf(ReleaseType.RELEASE)

@@ -1,24 +1,35 @@
 package de.miraculixx.bmm.utils.enums
 
+import com.flowpowered.math.vector.Vector2d
+import com.flowpowered.math.vector.Vector3d
+import de.bluecolored.bluemap.api.markers.ExtrudeMarker
+import de.bluecolored.bluemap.api.markers.LineMarker
+import de.bluecolored.bluemap.api.markers.Marker
+import de.bluecolored.bluemap.api.markers.MarkerSet
+import de.bluecolored.bluemap.api.markers.POIMarker
+import de.bluecolored.bluemap.api.markers.ShapeMarker
+import de.bluecolored.bluemap.api.math.Line
+import de.bluecolored.bluemap.api.math.Shape
+
 enum class MarkerType(val args: List<MarkerArg>) {
     POI(
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.POSITION,
+            MarkerArg.DETAIL,
             MarkerArg.ANCHOR,
             MarkerArg.ICON,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     LINE(
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.ADD_POSITION,
             MarkerArg.DETAIL,
             MarkerArg.LINK,
@@ -28,14 +39,14 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.LINE_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     SHAPE(
         listOf(
             MarkerArg.ID,
             MarkerArg.LABEL,
-            MarkerArg.MARKER_SET,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
             MarkerArg.DETAIL,
@@ -47,13 +58,13 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     EXTRUDE(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MARKER_SET,
             MarkerArg.LABEL,
             MarkerArg.ADD_EDGE,
             MarkerArg.HEIGHT,
@@ -67,13 +78,13 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
     ELLIPSE(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MARKER_SET,
             MarkerArg.LABEL,
             MarkerArg.POSITION,
             MarkerArg.MAX_HEIGHT,
@@ -89,17 +100,30 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.FILL_COLOR,
             MarkerArg.MIN_DISTANCE,
             MarkerArg.MAX_DISTANCE,
-            MarkerArg.LISTED
+            MarkerArg.LISTED,
+            MarkerArg.LISTING_POSITION,
         )
     ),
 
     MARKER_SET(
         listOf(
             MarkerArg.ID,
-            MarkerArg.MAP,
             MarkerArg.LABEL,
             MarkerArg.TOGGLEABLE,
-            MarkerArg.DEFAULT_HIDDEN
+            MarkerArg.DEFAULT_HIDDEN,
+            MarkerArg.LISTING_POSITION,
         )
     )
+    ;
+
+    fun getEmptyMarker(): Marker {
+        val unset = "<unset>"
+        return when (this) {
+            POI -> POIMarker(unset, Vector3d())
+            LINE -> LineMarker(unset, Line(Vector3d(), Vector3d()))
+            SHAPE -> ShapeMarker(unset, Shape(Vector2d(), Vector2d(), Vector2d()), 0f)
+            EXTRUDE, ELLIPSE -> ExtrudeMarker(unset, Shape(Vector2d(), Vector2d(), Vector2d()), 0f, 0f)
+            MARKER_SET -> throw IllegalArgumentException("MarkerSet is not a marker type")
+        }
+    }
 }

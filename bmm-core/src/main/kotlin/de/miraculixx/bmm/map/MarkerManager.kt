@@ -1,197 +1,181 @@
 package de.miraculixx.bmm.map
 
-import com.google.gson.JsonSyntaxException
 import de.bluecolored.bluemap.api.BlueMapAPI
-import de.bluecolored.bluemap.api.gson.MarkerGson
-import de.bluecolored.bluemap.api.markers.Marker
-import de.bluecolored.bluemap.api.markers.MarkerSet
-import de.miraculixx.bmm.utils.message.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import de.miraculixx.bmm.map.data.BMarkerSet
+import de.miraculixx.bmm.map.data.TemplateSet
+import de.miraculixx.bmm.map.data.TemplateSetLoader
+import de.miraculixx.bmm.utils.serializer.ColorSerializer
+import de.miraculixx.bmm.utils.serializer.Vec2dSerializer
+import de.miraculixx.bmm.utils.serializer.Vec2iSerializer
+import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
+import de.miraculixx.bmm.utils.sourceFolder
+import de.miraculixx.mcommons.debug
+import de.miraculixx.mcommons.extensions.loadConfig
+import de.miraculixx.mcommons.extensions.saveConfig
+import de.miraculixx.mcommons.serializer.UUIDSerializer
+import de.miraculixx.mcommons.text.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import java.io.File
+import java.util.UUID
+import kotlin.jvm.optionals.getOrNull
 
+
+/**
+ * Marker Concept
+ *
+ * - Creating Sets like normal based on bluemap maps
+ * - Creating Markers like normal based on sets
+ *
+ * - Creating Template Sets based on bluemap maps.
+ * Those sets will have a unique name that will be the new command name.
+ * Template sets can be populated by template markers.
+ * Players then can enter `/<set-template> place <marker-template> <name>` to place a marker.
+ */
 object MarkerManager {
-    private val markerSets: MutableMap<String, MarkerSet> = mutableMapOf()
+    // Storage Files
+    private val folderTemplateSets = File(sourceFolder, "templates")
+    private val folderSets = File(sourceFolder, "data") // data/<world>/<set-id>.json
+    private val backupFolder = File(sourceFolder, "backup") // All old converted data will be saved here
 
-    /**
-     * @param setID id_mapName
-     * @param markerID Marker ID (unique)
-     * @param marker Marker that should be added
-     */
-    fun addMarker(setID: String, marker: Marker, markerID: String): Boolean {
-        val markerSet = markerSets[setID]
-        if (markerSet == null) {
-            consoleAudience.sendMessage(prefix + cmp("Failed to apply marker to set '$setID'! This marker-set does not exist", cError))
-            return false
-        }
+    // Data Maps
+    val templateSets: MutableMap<String, TemplateSet> = mutableMapOf() // <templateName -> template>
+    val blueMapMaps: MutableMap<String, MutableMap<String, BMarkerSet>> = mutableMapOf() // <mapID -> <setID -> set>>
 
-        markerSet.markers[markerID] = marker
-        return true
-    }
+    // Marker (set) Builders
+    val builder: MutableMap<String, MarkerBuilder> = mutableMapOf()
+    val builderSet: MutableMap<String, MarkerSetBuilder> = mutableMapOf()
 
-    /**
-     * @param setID id_mapName
-     * @param markerID Marker ID (unique)
-     * @return A matching loaded marker or null if no one could be found
-     */
-    fun getMarker(setID: String, markerID: String): Marker? {
-        val markerSet = markerSets[setID]
-        if (markerSet == null) {
-            consoleAudience.sendMessage(prefix + cmp("Failed to get marker-set from ID '$setID'! This marker-set does not exist", cError))
-            return null
-        }
-        return if (markerSet.markers.contains(markerID)) {
-            markerSet.markers[markerID]
-        } else {
-            consoleAudience.sendMessage(prefix + cmp("Failed to get marker ($markerID) from set '$setID'"))
-            null
+    // Data Loader
+    var templateLoader: TemplateSetLoader? = null
+
+    private val markerJson = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = true
+        serializersModule = SerializersModule {
+            contextual(UUIDSerializer)
+            contextual(Vec3dSerializer)
+            contextual(Vec2iSerializer)
+            contextual(Vec2dSerializer)
+            contextual(ColorSerializer)
         }
     }
+    var blueMapAPI: BlueMapAPI? = null
 
-    /**
-     * @param setID id_mapName
-     * @param markerID Maker ID (unique)
-     * @return true if successfully removed
-     */
-    fun removeMarker(setID: String, markerID: String): Boolean {
-        val markerSet = markerSets[setID] ?: return false
-        return markerSet.markers.remove(markerID) != null
-    }
 
-    /**
-     * @param setID id_mapName
-     */
-    fun getAllMarkers(setID: String): Map<String, Marker> {
-        return markerSets[setID]?.markers ?: emptyMap()
-    }
+    fun load(api: BlueMapAPI) {
+        blueMapAPI = api
+        val invalidUUID = UUID(1,0)
 
-    /**
-     * @param mapName World name
-     * @return A list of all sets targeting the map with name [mapName]
-     */
-    fun getAllSetIDs(mapName: String): List<String> {
-        return markerSets.keys.filter { it.contains("_$mapName") }.map { it.removeSuffix("_$mapName") }
-    }
+        api.maps.forEach { map -> blueMapMaps[map.id] = mutableMapOf() }
+        if (debug) consoleAudience.sendMessage(prefix + cmp("Loading marker data for maps ${blueMapMaps.keys}..."))
+        // Load normal sets
+        folderSets.listFiles()?.forEach { file -> // List all world folders
+            if (!file.isDirectory) return@forEach
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load map '${file.name}'..."))
+            val mapID = file.name
+            val map = api.getMap(mapID).getOrNull()
 
-    /**
-     * @return A list of all marker-sets
-     */
-    fun getAllSetIDs(): List<String> {
-        return markerSets.keys.toList()
-    }
+            file.listFiles()?.forEach sets@{ setFile ->
 
-    /**
-     * @param rawID Raw set ID
-     * @param mapName Target map name
-     * @param set Set that should be added
-     * @return Returns only true if the set was successfully added. Fails could appear through BlueMap is not loaded, world name does not exist or something else is broke
-     */
-    fun addSet(rawID: String, mapName: String, set: MarkerSet): Boolean {
-        val setID = "${rawID}_$mapName"
-        val api = getAPI() ?: return false
-        val map = api.maps?.firstOrNull { it.name == mapName.replace('.', ' ') }
-        if (map == null) {
-            consoleAudience.sendMessage(prefix + cmp("Failed to access Map $mapName for set $rawID! Check if BlueMap loaded correctly and if you enter a valid map name!", cError))
-            return false
-        }
-
-        markerSets[setID] = set
-        map.markerSets[setID] = set
-        return true
-    }
-
-    /**
-     * @param rawID Raw set ID
-     * @param mapName Target map name
-     * @return Returns only true if the set was successfully removed. Fails could appear through BlueMap is not loaded, world name does not exist or set does not exist anymore
-     */
-    fun removeSet(rawID: String, mapName: String): Boolean {
-        val setID = "${rawID}_$mapName"
-        val api = getAPI() ?: return false
-        val map = api.maps.firstOrNull { it.name == mapName.replace('.', ' ') } ?: return false
-
-        map.markerSets.remove(setID)
-        markerSets.remove(setID)
-        return true
-    }
-
-    /**
-     * @return Returns a list of all loaded BlueMap maps in string name formation
-     */
-    fun getAllMaps(): List<String> {
-        val api = getAPI() ?: return emptyList()
-        return api.maps.map { it.name.replace(' ', '.') }
-    }
-
-    fun loadAllMarker(api: BlueMapAPI, sourceFolder: File) {
-        val gson = MarkerGson.INSTANCE
-        val folder = prepareConfigFolder(sourceFolder)
-        val file = File("${folder.path}/marker-sets.json")
-        if (!file.exists()) file.writeText("[]")
-
-        val setIDs = Json.decodeFromString<List<String>>(file.readText())
-        setIDs.forEach { setID ->
-            val data = setID.split("_", limit = 2)
-            val mapName = data.getOrNull(1) ?: return@forEach
-            val rawID = data.getOrNull(0) ?: return@forEach
-            val markerFile = File("${folder.path}/${setID}.json")
-            val set = if (markerFile.exists()) {
-                consoleAudience.sendMessage(prefix + cmp("Found markers for marker-set '$mapName'/'$rawID' - Loading ${markerFile.length() / 1000.0} kb"))
-                try {
-                    gson.fromJson(markerFile.readText(), MarkerSet::class.java)
-                } catch (e: JsonSyntaxException) {
-                    consoleAudience.sendMessage(prefix + cmp("Marker file for set '$setID' is invalid! Skipping it...", cError))
+                // Load set
+                if (setFile.extension != "json") return@sets
+                val setID = setFile.nameWithoutExtension
+                if (map == null) { // Recover sets that were saved by name instead by ID
+                    sendError("   - Cannot find map '$mapID'! Trying to fix '$setID'...")
+                    recoverSetByName(mapID, setID, setFile, api)
+                    return@sets
+                }
+                if (debug) consoleAudience.sendMessage(prefix + cmp("   - Load set '$setID'..."))
+                val set = setFile.loadConfig(BMarkerSet(invalidUUID), markerJson).takeUnless { it.owner == invalidUUID }
+                if (set == null) {
+                    sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
                     return@forEach
                 }
-            } else {
-                MarkerSet.builder()
-                    .defaultHidden(false)
-                    .toggleable(true)
-                    .label("Custom Marker")
-                    .build()
+                set.load(setID, map)
+                if (debug) consoleAudience.sendMessage(prefix + cmp("   - Loaded set '$setID'!"))
             }
+            if (map == null) file.deleteRecursively()
+        }
 
-            markerSets[setID] = set
-            val map = api.maps.firstOrNull { it.name == mapName.replace('.', ' ') }
-            if (map == null) {
-                consoleAudience.sendMessage(
-                    prefix + cmp(
-                        "Cannot find map '$mapName' for marker-set '$rawID'! If you rename your map in BlueMap, edit the marker-set before!",
-                        cError
-                    )
-                )
+        // Load template sets
+        if (debug) consoleAudience.sendMessage(prefix + cmp("Loading template data..."))
+        folderTemplateSets.listFiles()?.forEach { file ->
+            if (file.extension != "json") return
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load template '${file.nameWithoutExtension}'..."))
+            val template = file.loadConfig(TemplateSet("", markerSetID = ""), markerJson)
+            if (template.name.isEmpty()) {
+                sendError("Template file '${file.name}' is invalid! Skipping it...")
                 return@forEach
             }
-            map.markerSets[setID] = set
+            template.load(api)
+            templateLoader?.loadTemplate(template)
+            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loaded template '${template.name}'!"))
         }
     }
 
-    fun saveAllMarker(sourceFolder: File) {
-        if (markerSets.isEmpty()) return
+    fun save(api: BlueMapAPI) {
+        // Prepare workspace
+        folderSets.mkdirs()
+        folderTemplateSets.mkdirs()
 
-        val folder = prepareConfigFolder(sourceFolder)
-        val sets = File("${folder.path}/marker-sets.json")
-        sets.writeText(json.encodeToString(markerSets.keys))
-        markerSets.forEach { (id, set) ->
-            val file = File("${folder.path}/$id.json")
-            file.writeText(gson.toJson(set))
+        // Save normal sets
+        blueMapMaps.forEach { (mapID, sets) ->
+            val worldFolder = File(folderSets, mapID)
+            if (!worldFolder.exists()) worldFolder.mkdir()
+            sets.forEach { (setID, set) ->
+                val file = File(worldFolder, "$setID.json")
+                file.saveConfig(set, markerJson)
+            }
         }
-        markerSets.clear()
+
+        // Save template sets
+        templateSets.forEach { (templateName, template) ->
+            val file = File(folderTemplateSets, "$templateName.json")
+            file.saveConfig(template, markerJson)
+        }
     }
 
-    private fun prepareConfigFolder(sourceFolder: File): File {
-        if (!sourceFolder.exists()) sourceFolder.mkdir()
-        val markerFolder = File("${sourceFolder.path}/marker")
-        if (!markerFolder.exists()) markerFolder.mkdir()
-        return markerFolder
+    /**
+     * Save remove a set from the manager.
+     * This also will remove all templates associated with it.
+     * @return true if the set was removed, false if it was not found.
+     */
+    fun removeSet(mapID: String, setID: String): Boolean {
+        templateSets.filter { it.value.markerSetID == setID }.forEach { (_, data) ->
+            data.removeMap(mapID, blueMapAPI!!.getMap(mapID).getOrNull())
+        }
+        blueMapAPI?.getMap(mapID)?.getOrNull()?.markerSets?.remove(setID)
+        return blueMapMaps[mapID]?.remove(setID) != null
     }
 
-    private fun getAPI(): BlueMapAPI? {
-        val instance = BlueMapAPI.getInstance()
-        return if (!instance.isPresent) {
-//            consoleAudience.sendMessage(prefix + cmp("Failed to access BlueMap API! Try /bluemap reload and look for errors or contact support", cError))
-            null
-        } else instance.get()
+
+    //
+    // Error Handling Messages
+    //
+    fun sendError(info: String) {
+        consoleAudience.sendMessage(prefix + cmp(info, cError))
+    }
+
+    /**
+     * Tries to recover sets that were potentially saved by name instead by ID.
+     */
+    private fun recoverSetByName(mapName: String, setID: String, sourceFile: File, api: BlueMapAPI) {
+        val map = api.maps.firstOrNull { it.name == mapName }
+        if (map == null) {
+            sendError("   - Failed to recover set '$setID' in '$mapName'! Delete to remove this message.")
+            return
+        }
+        sourceFile.copyTo(File(backupFolder, "${sourceFile.parentFile.name}/${sourceFile.name}"), true) // Backup
+        val targetFix = File(folderSets, "${map.id}/$setID.json")
+        if (targetFix.exists()) {
+            sendError("   - Set '$setID' already exists in '$mapName'! Moving invalid to backup...")
+            sourceFile.delete()
+            return
+        }
+        sourceFile.copyTo(targetFix)
+        consoleAudience.sendMessage(prefix + cmp("   - Successfully recovered set '$setID' in '$mapName'! (Restart to finalize)"))
+        sourceFile.delete()
     }
 }

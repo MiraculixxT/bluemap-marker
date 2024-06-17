@@ -1,0 +1,125 @@
+#----------------------- Translation ------------------------#
+#       Content of all messages in BlueMap-Marker.           #
+#------------------------------------------------------------#
+# Some messages support MiniMessage styling (marked with #m) #
+#          and extra variables (marked with #v).             #
+# Syntax: <input-i> ->                                       #
+#         i is a number from 0 to the message max            #
+#------------------------------------------------------------#
+
+creator: Miraculixx
+version: 1.0.0
+
+#-----------------------------------------#
+#           Common Translations           #
+# Translation keys that persist in every  #
+#        project for simple values        #
+#-----------------------------------------#
+common:
+  cancel: "Abbrechen"
+  build: "Erstellen"
+  or: "oder"
+  notSet: "Nicht gesetzt"
+  use: "Nutze"
+
+
+#-----------------------------------------#
+#            Command Responses            #
+# Translation keys that fires on command  #
+#           executions and help           #
+#-----------------------------------------#
+command:
+  alreadyStarted: "<red>Du hast bereits angefangen einen Marker zu erstellen!" #m
+  alreadyStarted2: "<red> vor dem neuerstellen!" #m (Cancel or build ...)
+  notValidMarker: "<red>Dies ist kein valider Marker! (<input-1>)" #m #v1
+  notValidSet: "<red>Ungültige set-ID oder Map Name! (<input-1> - <input-2>)" #m #v2
+  mustProvideID: "<red>Bitte gebe eine Marker ID und ein Markerset an!" #m
+  mustProvideIDSet: "<red>Bitte gebe eine marker-set ID und eine Zielwelt an!" #m
+  mustAlphanumeric: "<red>IDs müssen alphanumerisch sein (nur Buchstaben und Zahlen)" #m
+  switchLang: "<green>Die Sprache wurde zu Deutsch gewechselt!" #m
+  switchLangFailed: "<red>Deine angegebene Sprache existiert nicht!" #m
+  createMarker: "<gray>Marker<input-1> setup gestartet! Änderer Werte mit  " #m #v1 (using <command> ...)
+  createMarker2: "<gray> und bestätige dein setup mit " #m (<command> ... <command>)
+  createdMarker: "<green>Marker erstellt! Es sollte in ein paar Sekunden auf deiner BlueMap erscheinen" #m
+  createdSet: "<green>Marker-Set erstellt! Nutze es um neue Marker drin zu erstellen mit "
+  deleteMarker: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
+  deleteSet: "<gray>Erfolgreich <color:#6e94ff><input-1></color> marker-set gelöscht! Es sollte in ein paar Sekunden auf deiner BlueMap verschwinden" #m #v1
+  confirmDelete: "<red>Bist du dir wirklich sicher das '<input-1>' set auf der Map '<input-2>' zu löschen? Bitte bestätige es mit " #m #v2
+  idAlreadyExist: "<red>Die ID <u><input-1></u> existiert bereits in dem set/der Welt!" #m #v1
+  markerReplaced: "<grey>Der alte Marker wird ersetzt mit dem neuen..." #m
+  canceledSetup: "<grey>Aktuelles Marker<input-1> setup abgebrochen!" #m #v1
+  notValidPlayer: "<red>Konnte den angegebenen Spieler nicht finden!" #m
+  changedVisibility: "<grey><color:#6e94ff><input-1></color> ist jetzt <input-2> auf deiner BlueMap" #m #v2
+
+
+
+#-----------------------------------------#
+#            Creator Messages             #
+#  Translation keys that are used while   #
+#          creating markers(set)          #
+#-----------------------------------------#
+event:
+  currentSetup: "Der aktuelle Erstellungsstatus (<input-1>)" #v1
+  buildHover: "Erstelle neuen Marker mit den\neingestellten Einstellungen. Rote Werte\nsind Pflicht!"
+  cancelHover: "Breche das aktuelle Erstellen ab.\nDies löscht alle gesetzten Werte!"
+  clickToAdd: "Klicke um einen Wert hinzuzufügen"
+
+
+#-----------------------------------------#
+#                Arguments                #
+#   Translation keys for all modifiers    #
+#          to create markers(set)         #
+#-----------------------------------------#
+arg:
+  ID: "ID"
+  MARKER_SET: "MARKER SET"
+  POSITION: "POSITION"
+  LABEL: "NAME"
+  ICON: "BILD"
+  ANCHOR: "ANKER"
+  MAX_DISTANCE: "MAX DISTANZ"
+  MIN_DISTANCE: "MIN DISTANZ"
+  ADD_POSITION: "NEUE POSITION"
+  ADD_EDGE: "NEUE ECKE"
+  DETAIL: "BESCHREIBUNG"
+  LINK: "LINK"
+  NEW_TAB: "NEUER TAB"
+  DEPTH_TEST: "TIEFEN TEST"
+  LINE_WIDTH: "LINIEN DICKE"
+  LINE_COLOR: "LINIEN FARBE"
+  FILL_COLOR: "FÜLLFARBE"
+  HEIGHT: "HÖHE"
+  MAX_HEIGHT: "MAX HÖHE"
+  POINTS: "PUNKTE"
+  X_RADIUS: "RADIUS X"
+  Z_RADIUS: "RADIUS Z"
+  MAP: "MAP"
+  TOGGLEABLE: "ÄNDERBAR"
+  DEFAULT_HIDDEN: "DEFAULT VERSTECKT"
+
+arg-desc:
+  ID: "Interne ID für den Zugriff auf den Marker(-set)"
+  MARKER_SET: "Markerset, in dem die Markierung\ngespeichert werden soll (Welt)"
+  POSITION: "Position wo der Marker gesetzt\nwird. (NICHT die Welt)"
+  LABEL: "Angezeigter Name in der Marker Liste/Menü"
+  ICON: "Bild URL für ein angezeigtes Bild\nbei der gegebenen Position (POI exklusiv)"
+  ANCHOR: "Verschiebung für das angezeigte \nBild/Html Code (in Pixel)"
+  MAX_DISTANCE: "Max Distanz zu der Kamera\nbei welcher der Marker sichtbar ist"
+  MIN_DISTANCE: "Min Distanz zu der Kamera\nbei welcher der Marker sichtbar ist"
+  ADD_POSITION: "Füge neue Positionen zum Marker\nhinzu um die Linie zu bilden (Line exklusiv)"
+  ADD_EDGE: "Füge neue Ecken zu dem Marker\nhinzu um die Form zu bilden"
+  DETAIL: "Beschreibung welche sichtbar ist\nbeim anklicken"
+  LINK: "Eine Verlinkung beim anklicken"
+  NEW_TAB: "Ob der angeklickte Link in einem\nneuen Tab geöffnet werden soll oder im selben"
+  DEPTH_TEST: "Wenn false, wird der Marker immer über allem\nangezeigt. Andernfalls respektiert er blockierende Ebenen."
+  LINE_WIDTH: "Die Dicke der Umrandung/Linie (in Pixel)"
+  LINE_COLOR: "Farbe der Umrandung/Linie (RGBA)\n- https://htmlcolorcodes.com -"
+  FILL_COLOR: "Farbe des inneres Feldes (RGBA)\n- https://htmlcolorcodes.com -"
+  HEIGHT: "Die minimale Höhe des Markierungsfeldes.\nDefinitionshöhe für Form Marker"
+  MAX_HEIGHT: "Die maximale Höhe des Markerfelds.\nFür eine flache Form auf dieselbe Y-Höhe/Position eingestellt."
+  POINTS: "Die Anzahl der Punkte, die zum Rendern des\nKreises/der Ellipse verwendet werden. Mehr Punkte\nerzeugen sauberere Ränder, aber zu viele\nPunkte beeinträchtigen die Leistung!"
+  X_RADIUS: "Der Ellipsen Radius in der +-x Richtung"
+  Z_RADIUS: "Der Ellipsen Radius in der +-z Richtung"
+  MAP: "Ziel BlueMap Map\nDies ist nicht die Welt!"
+  TOGGLEABLE: "Wenn true kann das Marker-Set im\nMenü aktiviert oder deaktiviert werden"
+  DEFAULT_HIDDEN: "Wenn true ist das Marker-Set standardmäßig\nausgeblendet und kann vom Benutzer aktiviert werden.\nWenn 'ÄNDERBAR' false ist, ist dies der erzwungene Zustand"

@@ -4,8 +4,9 @@ plugins {
 }
 
 dependencies {
-    implementation("net.kyori:adventure-api:4.12.0")
-    implementation("net.kyori:adventure-text-minimessage:4.12.0")
-    implementation("net.kyori:adventure-text-serializer-plain:4.12.0")
-    implementation("net.kyori:adventure-text-serializer-gson:4.12.0")
+    val adventureVersion = "4.17.0"
+    implementation("net.kyori:adventure-api:$adventureVersion")
+    implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-plain:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
 }

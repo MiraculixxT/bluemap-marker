@@ -1,6 +1,6 @@
 
 plugins {
-    `kotlin-script`
+    `core-script`
     `paper-script`
     `shadow-script`
 }

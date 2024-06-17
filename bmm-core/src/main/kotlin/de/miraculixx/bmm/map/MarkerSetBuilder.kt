@@ -1,22 +1,30 @@
 package de.miraculixx.bmm.map
 
-import com.flowpowered.math.vector.Vector2d
-import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.MarkerSet
-import de.miraculixx.bmm.map.data.ArgumentValue
+import de.miraculixx.bmm.map.data.Box
+import de.miraculixx.bmm.map.data.TemplateSet
 import de.miraculixx.bmm.map.interfaces.Builder
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.bmm.utils.enums.MarkerType
+import de.miraculixx.mcommons.text.emptyComponent
+import net.kyori.adventure.text.Component
 
-class MarkerSetBuilder: Builder {
-    private val args: MutableMap<MarkerArg, ArgumentValue> = mutableMapOf()
+class MarkerSetBuilder(
+    private val args: MutableMap<MarkerArg, Box> = mutableMapOf(),
+    private val blueMapSet: MarkerSet = MarkerSet("<unset>"),
+    override val isEdit: Boolean = false,
+    override val templateSet: TemplateSet? = null
+) : Builder {
+    override var page = 0
+    override var lastEditMessage: Component = emptyComponent()
 
-    fun buildMarkerSet(): MarkerSet? {
-        return MarkerSet.builder().apply {
-            label(args[MarkerArg.LABEL]?.getString() ?: return null)
-            toggleable(args[MarkerArg.TOGGLEABLE]?.getBoolean() ?: true)
-            defaultHidden(args[MarkerArg.DEFAULT_HIDDEN]?.getBoolean() ?: false)
-        }.build()
+    fun apply(): MarkerSet {
+        return blueMapSet.apply {
+            args[MarkerArg.LABEL]?.getString()?.let { label = it }
+            args[MarkerArg.TOGGLEABLE]?.getBoolean()?.let { isToggleable = it }
+            args[MarkerArg.DEFAULT_HIDDEN]?.getBoolean()?.let { isDefaultHidden = it }
+            args[MarkerArg.LISTING_POSITION]?.getInt()?.let { sorting = it }
+        }
     }
 
     /*
@@ -26,19 +34,15 @@ class MarkerSetBuilder: Builder {
         return MarkerType.MARKER_SET
     }
 
-    override fun getArgs(): Map<MarkerArg, ArgumentValue> {
-        return args
-    }
+    override fun getArgs() = args
 
-    override fun setArg(arg: MarkerArg, value: ArgumentValue) {
+    override fun setArg(arg: MarkerArg, value: Box) {
         args[arg] = value
     }
 
-    override fun getVec3List(): MutableList<Vector3d> {
-        return mutableListOf()
-    }
-
-    override fun getVec2List(): MutableList<Vector2d> {
-        return mutableListOf()
+    companion object {
+        fun createSet(args: MutableMap<MarkerArg, Box>): MarkerSet {
+            return MarkerSetBuilder(args).apply()
+        }
     }
 }

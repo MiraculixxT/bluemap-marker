@@ -117,8 +117,7 @@ interface SettingsCommandInterface {
 
         // Load Markers
         set.markers.forEach { (id, marker) ->
-            println(marker.type.uppercase())
-            val bMarker = BMarker(UUID(0, 0), enumOf<MarkerType>(marker.type.uppercase()) ?: MarkerType.POI, marker.getArgs(id))
+            val bMarker = BMarker(UUID(0, 0), enumOf<MarkerType>(marker.type.uppercase()) ?: MarkerType.POI, marker.getArgs(id, map.id, setID))
             bSet.markers[id] = bMarker
             bMarker.load(id, finalSet)
         }
@@ -126,6 +125,7 @@ interface SettingsCommandInterface {
 
     private fun MarkerSet.getArgs(mapID: String, setID: String): MutableMap<MarkerArg, Box> {
         return buildMap {
+            put(MarkerArg.ID, Box.BoxString(setID))
             put(MarkerArg.MAP, Box.BoxString(mapID))
             put(MarkerArg.MARKER_SET, Box.BoxString(setID))
             put(MarkerArg.LABEL, Box.BoxString(label))
@@ -135,9 +135,11 @@ interface SettingsCommandInterface {
         }.toMutableMap()
     }
 
-    private fun Marker.getArgs(id: String): MutableMap<MarkerArg, Box> {
+    private fun Marker.getArgs(id: String, mapID: String, markerSetID: String): MutableMap<MarkerArg, Box> {
         return buildMap {
             put(MarkerArg.ID, Box.BoxString(id))
+            put(MarkerArg.MAP, Box.BoxString(mapID))
+            put(MarkerArg.MARKER_SET, Box.BoxString(markerSetID))
             put(MarkerArg.LABEL, Box.BoxString(label))
             put(MarkerArg.POSITION, Box.BoxVector3d(position))
             put(MarkerArg.LISTED, Box.BoxBoolean(isListed))

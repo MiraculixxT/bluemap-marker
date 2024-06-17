@@ -175,7 +175,7 @@ class TemplateCommand : TemplateCommandInterface, TemplateSetLoader {
         }
 
         fun unregister() {
-            CommandAPI.unregister(templateSet.name) // TODO
+            // TODO unregister command
             templateSet.remove()
         }
 

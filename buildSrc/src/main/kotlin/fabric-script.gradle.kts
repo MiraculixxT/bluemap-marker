@@ -9,6 +9,7 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://maven.terraformersmc.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 val transitiveInclude: Configuration by configurations.creating {

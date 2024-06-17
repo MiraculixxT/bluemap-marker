@@ -6,6 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://maven.shedaniel.me/")
     maven("https://maven.terraformersmc.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
@@ -29,7 +30,8 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
     modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.13.0")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:5.14.0-SNAPSHOT")!!)
+    transitiveInclude(implementation("de.miraculixx", "mc-commons", "1.0.1"))
 
     //
     // Kotlin libraries

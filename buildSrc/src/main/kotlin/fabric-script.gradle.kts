@@ -30,7 +30,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
     modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
-    modImplementation(include("net.kyori:adventure-platform-fabric:5.14.0-SNAPSHOT")!!)
+    modImplementation(include("net.kyori", "adventure-platform-fabric", properties["adventureVersion"] as String))
     transitiveInclude(implementation("de.miraculixx", "mc-commons", "1.0.1"))
 
     //

@@ -29,7 +29,7 @@ interface SettingsCommandInterface {
 
     fun convertOldMarkers(sender: Audience, configFolder: File) {
         sender.sendMessage(prefix + cmp("Converting markers from version prior 2.0..."))
-        val oldFolder = File(configFolder, "BlueMap-Marker/marker")
+        val oldFolder = File(configFolder, "BlueMap-Marker/marker").takeIf { it.exists() } ?: File(configFolder, "bm-marker/marker")
         if (!oldFolder.exists()) {
             sender.sendMessage(prefix + cmp("No old markers found!", cError))
             return

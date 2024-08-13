@@ -87,7 +87,8 @@ class MarkerBuilder(
         args[MarkerArg.LISTED]?.getBoolean()?.let { isListed = it }
         args[MarkerArg.LISTING_POSITION]?.getInt()?.let { sorting = it }
 
-        if (this is DetailMarker) args[MarkerArg.DETAIL]?.getString()?.let { detail = it }
+        if (this is DetailMarker)
+                (args[MarkerArg.DETAIL] ?: args[MarkerArg.LABEL])?.getString()?.let { detail = it }
         if (this is DistanceRangedMarker) {
             args[MarkerArg.MAX_DISTANCE]?.getDouble()?.let { maxDistance = it }
             args[MarkerArg.MIN_DISTANCE]?.getDouble()?.let { minDistance = it }

@@ -100,6 +100,11 @@ object MarkerManager {
         }
 
         // Load template sets
+        loadTemplates(api)
+    }
+
+    fun loadTemplates(api: BlueMapAPI?) {
+        // Load template sets
         if (debug) consoleAudience.sendMessage(prefix + cmp("Loading template data..."))
         folderTemplateSets.listFiles()?.forEach { file ->
             if (file.extension != "json") return
@@ -109,7 +114,7 @@ object MarkerManager {
                 sendError("Template file '${file.name}' is invalid! Skipping it...")
                 return@forEach
             }
-            template.load(api)
+            api?.let { template.load(it) } ?: if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loading pre api...")) else Unit
             templateLoader?.loadTemplate(template)
             if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loaded template '${template.name}'!"))
         }

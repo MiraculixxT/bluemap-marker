@@ -4,7 +4,6 @@ import com.flowpowered.math.vector.Vector3d
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.map.data.MarkerTemplateEntry
 import de.miraculixx.bmm.map.data.TemplateSet
@@ -162,7 +161,7 @@ class TemplateCommand : TemplateCommandInterface, TemplateSetLoader {
                     suggestListWithTooltipsSuspending { info ->
                         buildList {
                             templateSet.playerMarkers.filter { it.value.playerName == info.source.textName }.forEach { (key, data) ->
-                                add(key to literalText("Template: ").append(literalText(data.templateName) { color = 0x6e94ff }))
+                                add(key to literalText("Template: ").append(literalText("${data.templateName} (${data.position.x.toInt()}, ${data.position.y.toInt()}, ${data.position.z.toInt()})") { color = 0x6e94ff }))
                             }
                         }
                     }

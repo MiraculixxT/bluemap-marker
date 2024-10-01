@@ -27,6 +27,9 @@ class BMMarker : ModInitializer {
         MarkerCommand()
         SettingsCommand()
         MarkerManager.templateLoader = TemplateCommand()
+        // fabric only vvv
+        MarkerManager.loadTemplates(null)
+
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server: MinecraftServer? ->
             val adventure = FabricServerAudiences.of(server!!)

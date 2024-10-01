@@ -149,7 +149,9 @@ class TemplateCommand : TemplateCommandInterface, TemplateSetLoader {
                     replaceSuggestions { info, builder ->
                         CompletableFuture.supplyAsync {
                             templateSet.playerMarkers.filter { it.value.playerName == info.sender.name }.forEach { (key, data) ->
-                                builder.suggest(key, AdventureComponent(cmp("Template: ") + cmp(data.templateName, cMark)))
+                                builder.suggest(key, AdventureComponent(
+                                    cmp("Template: ") + cmp("${data.templateName} (${data.position.x.toInt()}, ${data.position.y.toInt()}, ${data.position.z.toInt()})", cMark)
+                                ))
                             }
                             builder.build()
                         }

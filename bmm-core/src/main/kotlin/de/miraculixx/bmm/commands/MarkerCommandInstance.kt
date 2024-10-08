@@ -26,6 +26,7 @@ import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 interface MarkerCommandInstance: MarkerBuilderInstance {
+
     private val alreadyStarted: Component
         get() = prefix + locale.msg("command.alreadyStarted") +
                 cmp(locale.msgCancel(), cError, underlined = true).addCommand("/$setupCommandPrefix cancel") +
@@ -79,7 +80,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
                     locale.msg("command.createMarker2") +
                     cmp("/$setupCommandPrefix build", cMark, underlined = true).addCommand("/$setupCommandPrefix build")
         )
-        sendStatusInfo(sender, id)
+        sendStatusInfo(sender, id, isConsole = pData?.uuid == null)
     }
 
     /**
@@ -115,7 +116,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
                     locale.msg("command.createMarker2") +
                     cmp("/$setupSetCommandPrefix build", cMark, underlined = true).addCommand("/$setupSetCommandPrefix build")
         )
-        sendStatusInfo(sender, id, true)
+        sendStatusInfo(sender, id, true, isConsole = pData?.uuid == null)
     }
 
     /**
@@ -346,7 +347,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             return
         }
         builder[id] = build
-        sendStatusInfo(sender, id)
+        sendStatusInfo(sender, id, isConsole = pData.uuid == null)
     }
 
     fun editSet(sender: Audience, id: String, mapID: String?, setID: String?, worlds: List<String>?, pData: PlayerData?) {
@@ -382,7 +383,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             return
         }
         builderSet[id] = build
-        sendStatusInfo(sender, id, true)
+        sendStatusInfo(sender, id, true, isConsole = pData.uuid == null)
     }
 
     /**
@@ -410,8 +411,8 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
      * Begin of Utility functions to display or calculate output
      *
      */
-    fun sendAppliedSuccess(sender: Audience, id: String, message: String, isSet: Boolean = false) {
-        sendStatusInfo(sender, id, isSet, prefix + cmp("Marker${if (isSet) "-Set" else ""} $message applied!", cSuccess))
+    fun sendAppliedSuccess(sender: Audience, id: String, message: String, isSet: Boolean = false, isConsole: Boolean) {
+        sendStatusInfo(sender, id, isSet, prefix + cmp("Marker${if (isSet) "-Set" else ""} $message applied!", cSuccess), isConsole)
         sender.playSound(Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 1f, 1.3f))
     }
 
@@ -422,7 +423,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
     fun setMarkerArgument(sender: Audience, id: String, type: MarkerArg, box: Box, message: String, isSet: Boolean = false) {
         val builder = getBuilder(sender, id, isSet) ?: return
         builder.setArg(type, box)
-        sendAppliedSuccess(sender, id, message, isSet)
+        sendAppliedSuccess(sender, id, message, isSet, id == consoleName)
     }
 
     fun getMarkerArgument(sender: Audience, id: String, type: MarkerArg, isSet: Boolean = false): Box? {

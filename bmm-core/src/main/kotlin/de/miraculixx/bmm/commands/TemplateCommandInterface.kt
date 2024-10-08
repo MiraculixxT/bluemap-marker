@@ -86,7 +86,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         }
 
         builder[id] = MarkerBuilder(type, templateSet = set)
-        sendStatusInfo(this, id)
+        sendStatusInfo(this, id, isConsole = id == consoleName)
     }
 
     fun Audience.editMarkerTemplate(id: String, templateID: String, set: TemplateSet) {
@@ -96,7 +96,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
             return
         }
         builder[id] = MarkerBuilder(bMarker.type, bMarker.attributes, isEdit = true, templateSet = set)
-        sendStatusInfo(this, id)
+        sendStatusInfo(this, id, isConsole = id == consoleName)
     }
 
     /**

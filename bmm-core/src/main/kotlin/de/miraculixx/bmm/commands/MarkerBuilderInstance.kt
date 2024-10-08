@@ -17,8 +17,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 interface MarkerBuilderInstance {
+    val consoleName
+        get() = "CONSOLE"
 
-    fun sendStatusInfo(sender: Audience, id: String, isMarkerSet: Boolean = false, updateMessage: Component? = null) {
+    fun sendStatusInfo(sender: Audience, id: String, isMarkerSet: Boolean = false, updateMessage: Component? = null, isConsole: Boolean) {
         val builder = getBuilder(sender, id, isMarkerSet) ?: return
         val type = builder.getType()
         val appliedArgs = builder.getArgs()
@@ -33,8 +35,9 @@ interface MarkerBuilderInstance {
         val currentPage = pages.getOrElse(builder.page) { pages.first() }
 
         // Send header
-        sender.sendMessage(cmp("\n\n\n\n\n\n\n\n\n"))
+        if (!isConsole) sender.sendMessage(cmp("\n\n\n\n\n\n\n\n\n"))
         sender.sendMessage(builder.lastEditMessage)
+        if (isConsole) return
         sender.sendMessage(
             cmp(" \n") + cmp("                       ", cHighlight, strikethrough = true) + cmp("[", cHighlight) +
                     (if (builder.page > 0) cmp(" ← ", cSuccess).addCommand("$cmd page previous").addHover(cmp("Previous Page")) else cmp(" ← ", cError)) +

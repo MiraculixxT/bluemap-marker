@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bmmarker",
-  "version": "2.1.4",
+  "version": "${version}",
   "name": "BlueMap Marker Manager",
   "description": "A BlueMap addition plugin. Give your players the option to place markers on the map",
   "authors": ["Miraculixx"],

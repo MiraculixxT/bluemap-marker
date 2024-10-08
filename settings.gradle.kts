@@ -11,5 +11,3 @@ pluginManagement {
 include("bmm-paper")
 include("bmm-core")
 include("bmm-fabric")
-include("kpaper-light")
-project(":kpaper-light").projectDir.mkdirs()

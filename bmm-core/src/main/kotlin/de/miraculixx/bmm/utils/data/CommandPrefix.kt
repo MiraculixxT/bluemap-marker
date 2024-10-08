@@ -14,3 +14,6 @@ const val templateCommandPrefix = "btemplate"
 
 // Player marker visibility
 const val visibilityCommandPrefix = "bplayer"
+
+// Marker teleportation
+const val teleportCommandPrefix = "btp"

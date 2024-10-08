@@ -5,7 +5,6 @@ import com.flowpowered.math.vector.Vector3d
 import de.bluecolored.bluemap.api.markers.ExtrudeMarker
 import de.bluecolored.bluemap.api.markers.LineMarker
 import de.bluecolored.bluemap.api.markers.Marker
-import de.bluecolored.bluemap.api.markers.MarkerSet
 import de.bluecolored.bluemap.api.markers.POIMarker
 import de.bluecolored.bluemap.api.markers.ShapeMarker
 import de.bluecolored.bluemap.api.math.Line
@@ -24,6 +23,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE,
             MarkerArg.LISTED,
             MarkerArg.LISTING_POSITION,
+            MarkerArg.TELEPORTER,
         )
     ),
     LINE(
@@ -41,6 +41,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE,
             MarkerArg.LISTED,
             MarkerArg.LISTING_POSITION,
+            MarkerArg.TELEPORTER,
         )
     ),
     SHAPE(
@@ -60,6 +61,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE,
             MarkerArg.LISTED,
             MarkerArg.LISTING_POSITION,
+            MarkerArg.TELEPORTER,
         )
     ),
     EXTRUDE(
@@ -80,6 +82,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE,
             MarkerArg.LISTED,
             MarkerArg.LISTING_POSITION,
+            MarkerArg.TELEPORTER,
         )
     ),
     ELLIPSE(
@@ -102,6 +105,7 @@ enum class MarkerType(val args: List<MarkerArg>) {
             MarkerArg.MAX_DISTANCE,
             MarkerArg.LISTED,
             MarkerArg.LISTING_POSITION,
+            MarkerArg.TELEPORTER,
         )
     ),
 

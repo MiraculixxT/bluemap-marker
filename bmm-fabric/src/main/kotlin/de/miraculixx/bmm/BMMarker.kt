@@ -2,6 +2,7 @@ package de.miraculixx.bmm
 
 import de.miraculixx.bmm.commands.MarkerCommand
 import de.miraculixx.bmm.commands.SettingsCommand
+import de.miraculixx.bmm.commands.TeleportCommand
 import de.miraculixx.bmm.commands.TemplateCommand
 import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.utils.sourceFolder
@@ -26,6 +27,7 @@ class BMMarker : ModInitializer {
         MarkerManager
         MarkerCommand()
         SettingsCommand()
+        TeleportCommand()
         MarkerManager.templateLoader = TemplateCommand()
         // fabric only vvv
         MarkerManager.loadTemplates(null)

@@ -5,7 +5,6 @@ import com.flowpowered.math.vector.Vector2i
 import com.flowpowered.math.vector.Vector3d
 import com.mojang.brigadier.arguments.*
 import de.bluecolored.bluemap.api.math.Color
-import de.miraculixx.bmm.map.MarkerManager
 import de.miraculixx.bmm.map.data.Box
 import de.miraculixx.bmm.utils.data.*
 import de.miraculixx.bmm.utils.enums.MarkerArg
@@ -19,8 +18,9 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument
 import net.silkmc.silk.commands.ArgumentCommandBuilder
 import net.silkmc.silk.commands.LiteralCommandBuilder
 import net.silkmc.silk.commands.command
-import net.silkmc.silk.core.text.literalText
-import kotlin.jvm.optionals.getOrNull
+import de.miraculixx.bmm.commands.CommandHelper.suggestMapIDs
+import de.miraculixx.bmm.commands.CommandHelper.suggestMarkerIDs
+import de.miraculixx.bmm.commands.CommandHelper.suggestSetIDs
 
 @Suppress("unused")
 class MarkerCommand : MarkerCommandInstance {
@@ -448,7 +448,7 @@ class MarkerCommand : MarkerCommandInstance {
                     argument<Float>("opacity", FloatArgumentType.floatArg(0f, 1f)) { o ->
                         runs {
                             val value = Color(r(), g(), b(), o())
-                            setMarkerArgument(source, source.textName, arg, Box.BoxColor(value), "color ${value}")
+                            setMarkerArgument(source, source.textName, arg, Box.BoxColor(value), "color $value")
                         }
                     }
                 }
@@ -516,44 +516,6 @@ class MarkerCommand : MarkerCommandInstance {
                 runsAsync {
                     setMarkerArgument(source, source.textName, MarkerArg.LISTING_POSITION, Box.BoxInt(value()), "listing position $value", isSet)
                 }
-            }
-        }
-    }
-
-    private fun <T> ArgumentCommandBuilder<CommandSourceStack, T>.suggestMapIDs() {
-        suggestListWithTooltipsSuspending {
-            val api = MarkerManager.blueMapAPI
-            MarkerManager.blueMapMaps.map { (mapID, _) ->
-                mapID to literalText(api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown") { color = 0x6e94ff }
-            }
-        }
-    }
-
-    private fun <T> ArgumentCommandBuilder<CommandSourceStack, T>.suggestSetIDs(mapIDArgument: String) {
-        suggestListWithTooltipsSuspending { info ->
-            val api = MarkerManager.blueMapAPI
-            val mapID = info.getArgument(mapIDArgument, String::class.java)
-            val set = MarkerManager.blueMapMaps[mapID]
-            val uuid = info.source.player?.uuid
-            val allowOthers = Permissions.require(manageOwnSets, 3).test(info.source)
-            set?.mapNotNull { (setID, data) ->
-                if (data.owner != uuid && !allowOthers) return@mapNotNull null
-                if (setID.startsWith("template_")) return@mapNotNull null // Exclude template sets from indexing
-                val mapName = api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown"
-                setID to literalText("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown"}")
-            }
-        }
-    }
-
-    private fun <T> ArgumentCommandBuilder<CommandSourceStack, T>.suggestMarkerIDs(mapIDArgument: String, setIDArgument: String) {
-        suggestListWithTooltipsSuspending { info ->
-            val mapID = info.getArgument(mapIDArgument, String::class.java)
-            val setID = info.getArgument(setIDArgument, String::class.java)
-            val uuid = info.source.player?.uuid
-            val allowOthers = Permissions.require(manageOwnMarkers, 2).test(info.source)
-            MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.mapNotNull { (id, data) ->
-                if (data.owner != uuid && !allowOthers) return@mapNotNull null
-                id to literalText(data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown")
             }
         }
     }

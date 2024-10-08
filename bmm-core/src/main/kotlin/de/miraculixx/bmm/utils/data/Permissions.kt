@@ -9,6 +9,9 @@ const val manageOthersSets = "$manageOwnSets.others"
 const val changeVisibility = "bmarker.command.visibility"
 const val changeVisibilityOthers = "$changeVisibility.others"
 
+const val teleportCommand = "bmarker.command.teleport"
+const val teleportCommandOthers = "$teleportCommand.others"
+
 const val manageTemplates = "bmarker.command.templates"
 
 const val manageSettings = "bmarker.command.settings"

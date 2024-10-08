@@ -24,6 +24,7 @@ enum class MarkerArg(val isRequired: Boolean, val isList: Boolean = false, val e
     X_RADIUS(true),
     Z_RADIUS(true),
     LISTED(false),
+    TELEPORTER(false),
 
     // Marker-Set exclusives
     MAP(true),

@@ -170,7 +170,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
 
         runs {
-            sendStatusInfo(source, source.textName)
+            sendStatusInfo(source, source.textName, isConsole = !source.isPlayer)
         }
 
         // SETUP COMMANDS
@@ -378,7 +378,7 @@ class MarkerCommand : MarkerCommandInstance {
         }
 
         runs {
-            sendStatusInfo(source, source.textName, true)
+            sendStatusInfo(source, source.textName, true, isConsole = !source.isPlayer)
         }
 
         // SETUP COMMANDS
@@ -498,13 +498,13 @@ class MarkerCommand : MarkerCommandInstance {
             literal("next") {
                 runsAsync {
                     getBuilder(source, source.textName, isSet)?.let { it.page++ }
-                    sendStatusInfo(source, source.textName, isSet)
+                    sendStatusInfo(source, source.textName, isSet, isConsole = !source.isPlayer)
                 }
             }
             literal("previous") {
                 runsAsync {
                     getBuilder(source, source.textName, isSet)?.let { it.page-- }
-                    sendStatusInfo(source, source.textName, isSet)
+                    sendStatusInfo(source, source.textName, isSet, isConsole = !source.isPlayer)
                 }
             }
         }

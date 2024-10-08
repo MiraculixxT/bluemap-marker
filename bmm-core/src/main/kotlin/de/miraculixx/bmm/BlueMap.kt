@@ -14,7 +14,7 @@ import java.util.function.Consumer
 
 var localization: Localization? = null
 
-class BlueMap(version: Int) {
+class BlueMap(version: Int, isFabric: Boolean) {
     private val configFile = File(sourceFolder, "settings.json")
 
     private val onEnable = Consumer<BlueMapAPI> {
@@ -22,7 +22,7 @@ class BlueMap(version: Int) {
         settings = configFile.loadConfig(Settings())
         val languages = listOf(Locale.ENGLISH, Locale.GERMAN).map { key -> key to javaClass.getResourceAsStream("/language/$key.yml") }
         localization = Localization(File(sourceFolder, "language"), settings.language, languages)
-        MarkerManager.load(it)
+        MarkerManager.load(it, isFabric)
         consoleAudience.sendMessage(prefix + cmp("Successfully enabled Marker Command addition!"))
     }
 

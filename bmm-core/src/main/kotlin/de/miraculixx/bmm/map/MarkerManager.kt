@@ -64,7 +64,7 @@ object MarkerManager {
     var blueMapAPI: BlueMapAPI? = null
 
 
-    fun load(api: BlueMapAPI) {
+    fun load(api: BlueMapAPI, isFabric: Boolean) {
         blueMapAPI = api
         val invalidUUID = UUID(1,0)
 
@@ -100,23 +100,24 @@ object MarkerManager {
         }
 
         // Load template sets
-        loadTemplates(api)
+        if (!isFabric) loadTemplates(api)
     }
 
     fun loadTemplates(api: BlueMapAPI?) {
         // Load template sets
-        if (debug) consoleAudience.sendMessage(prefix + cmp("Loading template data..."))
+        if (debug) println("[BMM] Loading template data...")
         folderTemplateSets.listFiles()?.forEach { file ->
             if (file.extension != "json") return
-            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load template '${file.nameWithoutExtension}'..."))
+            if (debug) println("[BMM]   - Load template '${file.nameWithoutExtension}'...")
             val template = file.loadConfig(TemplateSet("", markerSetID = ""), markerJson)
             if (template.name.isEmpty()) {
-                sendError("Template file '${file.name}' is invalid! Skipping it...")
+                if (api == null) println("[BMM-Warn] Template file '${file.name}' is invalid! Skipping it...")
+                else sendError("Template file '${file.name}' is invalid! Skipping it...")
                 return@forEach
             }
-            api?.let { template.load(it) } ?: if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loading pre api...")) else Unit
+            api?.let { template.load(it) } ?: if (debug) println("[BMM]  - Loading pre api...") else Unit
             templateLoader?.loadTemplate(template)
-            if (debug) consoleAudience.sendMessage(prefix + cmp(" - Loaded template '${template.name}'!"))
+            if (debug) println("[BMM]  - Loaded template '${template.name}'!")
         }
     }
 

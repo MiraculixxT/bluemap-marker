@@ -38,7 +38,7 @@ class BMMarker : ModInitializer {
             consoleAudience = adventure.console()
 
             val container = FabricLoader.getInstance().getModContainer("bmmarker").get()
-            blueMapInstance = BlueMap(container.metadata.version.friendlyString.toIntOrNull() ?: 0)
+            blueMapInstance = BlueMap(container.metadata.version.friendlyString.toIntOrNull() ?: 0, true)
         })
 
         ServerLifecycleEvents.SERVER_STOPPED.register(ServerLifecycleEvents.ServerStopped {

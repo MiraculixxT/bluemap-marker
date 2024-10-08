@@ -35,7 +35,7 @@ class BMMarker : JavaPlugin() {
         MarkerManager.templateLoader = TemplateCommand()
 
         // BlueMap Management
-        blueMapInstance = BlueMap(description.version.toIntOrNull() ?: 0)
+        blueMapInstance = BlueMap(description.version.toIntOrNull() ?: 0, false)
     }
 
     override fun onEnable() {

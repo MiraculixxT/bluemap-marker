@@ -60,6 +60,7 @@ command:
   maxMarkers: "<red>You reached your maximum amount of markers in this set! (<input-1>)" #m #v1
   maxSets: "<red>You reached your maximum amount of marker-sets in this map! (<input-1>)" #m #v1
   notTeleportMarker: "<red>This marker is not setup to be teleportable!" #m
+  teleportMarker: "<green>Teleported to the marker <u><input-1></u>!" #m #v1
   settings:
     current: "<gray>Current value: <color:#6e94ff><input-1></color>" #m #v1
     changed: "<gray>Changed value to: <color:#6e94ff><input-1></color>" #m #v1

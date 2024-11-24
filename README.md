@@ -26,8 +26,7 @@ If you have issues with entering colors, please use a generator instead of tryin
 
 ## Localization
 Change the language of BMarker via ``/bmarker langauge <key>``<br>
-Currently english (en_US) and german (de_DE) is provided from installation.
-
+Currently english (en_US), german (de_DE), chinese (zh_CN), and japanese (ja_JP) are provided from installation.
 You can create your own translation by coping an existing language file (``<config-folder>/langauge/<key>.yml``),
 renaming it to your target langauge code and editing all values inside. 
 You are responsible for updating it on BMarker updates, missing keys will be displayed as just the key in red.

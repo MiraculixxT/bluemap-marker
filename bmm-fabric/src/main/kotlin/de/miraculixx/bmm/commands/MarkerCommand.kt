@@ -521,7 +521,8 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     private fun CommandSourceStack.getData(): PlayerData {
-        return PlayerData(player?.uuid, textName, Permissions.require(manageOthersMarkers).test(this), Permissions.require(manageOthersSets).test(this))
+        val isOP = player?.permissionLevel?.let { it >= 3 } == true
+        return PlayerData(player?.uuid, textName, isOP || Permissions.require(manageOthersMarkers).test(this), isOP || Permissions.require(manageOthersSets).test(this))
     }
 
     private fun CommandSourceStack.getWorldKeys(): List<String> {

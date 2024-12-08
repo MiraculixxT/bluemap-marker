@@ -11,7 +11,7 @@ import de.miraculixx.mcommons.text.*
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.loader.api.FabricLoader
-import net.kyori.adventure.platform.fabric.FabricServerAudiences
+import net.kyori.adventure.platform.modcommon.MinecraftServerAudiences
 import net.minecraft.server.MinecraftServer
 import java.io.File
 
@@ -34,7 +34,7 @@ class BMMarker : ModInitializer {
 
 
         ServerLifecycleEvents.SERVER_STARTING.register(ServerLifecycleEvents.ServerStarting { server: MinecraftServer? ->
-            val adventure = FabricServerAudiences.of(server!!)
+            val adventure = MinecraftServerAudiences.of(server!!)
             consoleAudience = adventure.console()
 
             val container = FabricLoader.getInstance().getModContainer("bmmarker").get()

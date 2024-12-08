@@ -46,7 +46,8 @@ dependencies {
     //
     val useSilk = properties["useSilk"] as String == "true"
     if (useSilk) {
-        val silkVersion = outlet.latestModrinthModVersion("silk", outlet.mcVersions())
+//        val silkVersion = outlet.latestModrinthModVersion("silk", outlet.mcVersions())
+        val silkVersion = "1.10.7"
         modImplementation("net.silkmc", "silk-core", silkVersion)
         modImplementation("net.silkmc", "silk-commands", silkVersion) // easy command registration
         modImplementation("net.silkmc", "silk-nbt", silkVersion) // item simplification

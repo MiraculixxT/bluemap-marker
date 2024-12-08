@@ -1,6 +1,6 @@
 plugins {
     `kotlin-dsl`
-    kotlin("plugin.serialization") version "1.9.23"
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 repositories {
@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     fun pluginDep(id: String, version: String) = "${id}:${id}.gradle.plugin:${version}"
-    val kotlinVersion = "1.9.23"
+    val kotlinVersion = "2.1.0"
 
     compileOnly(kotlin("gradle-plugin", kotlinVersion))
     runtimeOnly(kotlin("gradle-plugin", kotlinVersion))
@@ -23,7 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.+")
 
     // Fabric implementation
-    implementation("net.fabricmc:fabric-loom:1.7-SNAPSHOT")
+    implementation("net.fabricmc:fabric-loom:1.9-SNAPSHOT")
 
     // Paper implementation
     implementation(pluginDep("io.papermc.paperweight.userdev", "1.7.1"))

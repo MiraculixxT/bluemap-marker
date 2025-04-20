@@ -128,16 +128,16 @@ class MarkerCommand : MarkerCommandInstance {
             argument<String>("map", StringArgumentType.word()) { map ->
                 suggestMapIDs()
                 runsAsync {
-                    deleteSet(source, false, map(), null, null, source.getData())
+                    deleteSet(source, false, null, map(), null, source.getData())
                 }
                 argument<String>("id", StringArgumentType.word()) { id ->
                     suggestSetIDs("map")
                     runsAsync {
-                        deleteSet(source, false, map(), id(), null, source.getData())
+                        deleteSet(source, false, id(), map(), null, source.getData())
                     }
                     argument<Boolean>("confirm", BoolArgumentType.bool()) { confirm ->
                         runsAsync {
-                            deleteSet(source, confirm(), map(), id(), null, source.getData())
+                            deleteSet(source, confirm(), id(), map(), null, source.getData())
                         }
                     }
                 }

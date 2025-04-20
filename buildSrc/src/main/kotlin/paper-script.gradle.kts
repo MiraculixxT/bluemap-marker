@@ -34,8 +34,8 @@ dependencies {
     // Utility libraries (optional)
     val useBrigadier = properties["useBrigadier"] as String == "true"
     if (useBrigadier) {
-        implementation("dev.jorel:commandapi-bukkit-shade:9.7.0")
-        implementation("dev.jorel:commandapi-bukkit-kotlin:9.7.0")
+        implementation("dev.jorel:commandapi-bukkit-shade:10.0.0")
+        implementation("dev.jorel:commandapi-bukkit-kotlin:10.0.0")
     }
 
     // MC Libraries

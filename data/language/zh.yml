@@ -1,82 +1,155 @@
-#----------------------- Translation ------------------------#
-#       Content of all messages in BlueMap-Marker.           #
-#------------------------------------------------------------#
-# Some messages support MiniMessage styling (marked with #m) #
-#          and extra variables (marked with #v).             #
-# Syntax: <input-i> ->                                       #
-#         i is a number from 0 to the message max            #
-#------------------------------------------------------------#
+#----------------------- 翻译 ------------------------#
+#         BlueMap-Marker 插件的所有消息内容             #
+#------------------------------------------------------#
+# 部分消息支持 MiniMessage 样式（标记为 #m）             #
+#       和额外变量（标记为 #v）                          #
+# 语法: <input-i> ->                                   #
+#        i 是从 0 到消息最大值的数字                     #
+#------------------------------------------------------#
 
-creator: colorcard
+creator: colorcard zzh4141
 version: 1.0.0
 
 #-----------------------------------------#
-#           Common Translations           #
-# Translation keys that persist in every  #
-#        project for simple values        #
+#             通用翻译                     #
+# 所有项目中通用的简单值翻译键               #
 #-----------------------------------------#
 common:
   cancel: "取消"
-  build: "生成"
+  build: "构建"
   or: "或"
   notSet: "未设置"
   use: "使用"
 
+
 #-----------------------------------------#
-#            Command Responses            #
-# Translation keys that fires on command  #
-#           executions and help           #
+#            命令响应                      #
+# 执行命令和帮助时触发的翻译键               #
 #-----------------------------------------#
 command:
   alreadyStarted: "<red>您已开始一个标记设置！" #m
-  alreadyStarted2: "<red> 请先完成或取消它再创建一个新标记" #m (取消或生成 ...)
-  notValidMarker: "<red>这不是一个有效的标记！(<input-1>)" #m #v1
-  notValidSet: "<red>无效的标记集 ID 或地图名称！(<input-1> - <input-2>)" #m #v2
-  mustProvideID: "<red>请提供一个标记 ID！" #m
-  mustProvideIDSet: "<red>请提供一个标记集 ID 和目标世界！" #m
-  mustAlphanumeric: "<red>ID 必须为字母数字组合（仅包含字母和数字）" #m
-  switchLang: "<green>语言已切换至 <u>en_US</u>！" #m
+  alreadyStarted2: "<red>请先完成或取消当前设置" #m （例如：取消或构建...）
+  notValidMarker: "<red>无效的标记！(<input-1>)" #m #v1
+  notValidSet: "<red>无效的集合ID或地图名称！(<input-1> - <input-2>)" #m #v2
+  mustProvideID: "<red>请提供标记ID！" #m
+  mustProvideIDSet: "<red>请提供标记集合ID和目标世界！" #m
+  mustAlphanumeric: "<red>ID必须为字母数字（仅包含字母和数字）" #m
+  switchLang: "<green>语言已切换为 <u>en_US</u>！" #m
   switchLangFailed: "<red>您提供的语言不存在！" #m
-  createMarker: "<gray>标记 <input-1> 设置已开始！请使用 " #m #v1 (通过 <command> ...)
-  createMarker2: "<gray> 并通过以下操作完成设置 " #m (<command> ... <command>)
-  createdMarker: "<green>标记已创建！几秒钟后将在您的 BlueMap 上显示" #m
-  createdSet: "<green>标记集已创建！您可以在此标记集中添加新标记 "
-  deleteMarker: "<gray>成功删除 <color:#6e94ff><input-1></color> 标记！几秒钟后将在您的 BlueMap 上消失" #m #v1
-  deleteSet: "<gray>成功删除 <color:#6e94ff><input-1></color> 标记集！几秒钟后将在您的 BlueMap 上消失" #m #v1
-  confirmDelete: "<red>您确定要删除地图 '<input-2>' 上的标记集 '<input-1>' 吗？请通过输入以下内容确认 " #m #v2
-  idAlreadyExist: "<red>ID <u><input-1></u> 已存在于该集合/世界中！" #m #v1
-  canceledSetup: "<grey>取消了当前标记 <input-1> 设置！" #m #v1
-  notValidPlayer: "<red>无法找到指定的玩家！" #m
-  changedVisibility: "<grey><color:#6e94ff><input-1></color> 现在在 BlueMap 上为 <input-2>" #m #v2
-  setNotFound: "<red>无法找到 ID 为 <u><input-1></u> 的标记集！ (/<input-2> set-create)" #m #v1
-  mapNotFound: "<red>无法找到名称为 <u><input-1></u> 的地图！" #m #v1
-  missingImportant: "<red>缺少一个或多个重要值！请填写所有红色标记的值" #m
-  selectMap: "<gray>选择一个 BlueMap 地图：" #m
-  selectSet: "<gray>选择一个标记集：" #m
-  noSets: "<red>地图 <input-1> 中没有标记集！ (/<input-2> set-create)" #m #v1
-  notYourSet: "<red>您不是该标记集的所有者！" #m
-  notYourMarker: "<red>您不是该标记的所有者！" #m
-  maxMarkers: "<red>您已达到此集合中标记的最大数量！(<input-1>)" #m #v1
-  maxSets: "<red>您已达到此地图中标记集的最大数量！(<input-1>)" #m #v1
-  notTeleportMarker: "<red>此标记未设置为可传送！" #m
-  teleportMarker: "<green>传送到标记 <u><input-1></u>！" #m #v1
+  createMarker: "<gray>标记<input-1>设置已启动！使用 " #m #v1 （例如：使用 <command> ...）
+  createMarker2: "<gray> 并通过 " #m （例如：<command> ... <command> 完成设置）
+  createdMarker: "<green>标记已创建！几秒后将在BlueMap显示" #m
+  createdSet: "<green>标记集合已创建！使用此集合添加新标记："
+  deleteMarker: "<gray>已删除标记 <color:#6e94ff><input-1></color>！几秒后将从BlueMap消失" #m #v1
+  deleteSet: "<gray>已删除标记集合 <color:#6e94ff><input-1></color>！几秒后将从BlueMap消失" #m #v1
+  confirmDelete: "<red>确认删除地图 '<input-2>' 中的集合 '<input-1>'？请输入 " #m #v2
+  idAlreadyExist: "<red>ID <u><input-1></u> 在此集合/世界中已存在！" #m #v1
+  canceledSetup: "<grey>已取消当前标记<input-1>的设置！" #m #v1
+  notValidPlayer: "<red>未找到指定玩家！" #m
+  changedVisibility: "<grey><color:#6e94ff><input-1></color> 在BlueMap中已设为 <input-2>" #m #v2
+  setNotFound: "<red>未找到ID为 <u><input-1></u> 的标记集合！(使用 /<input-2> set-create)" #m #v1
+  mapNotFound: "<red>未找到名称为 <u><input-1></u> 的地图！" #m #v1
+  missingImportant: "<red>缺失关键值！请填写所有标红的值" #m
+  selectMap: "<gray>选择BlueMap地图：" #m
+  selectSet: "<gray>选择标记集合：" #m
+  noSets: "<red>地图 <input-1> 中无标记集合！(使用 /<input-2> set-create)" #m #v1
+  notYourSet: "<red>您不是此标记集合的所有者！" #m
+  notYourMarker: "<red>您不是此标记的所有者！" #m
+  maxMarkers: "<red>您在此集合中的标记数量已达上限！(<input-1>)" #m #v1
+  maxSets: "<red>您在此地图中的集合数量已达上限！(<input-1>)" #m #v1
+  notTeleportMarker: "<red>此标记未启用传送功能！" #m
+  teleportMarker: "<green>已传送至标记 <u><input-1></u>！" #m #v1
   settings:
     current: "<gray>当前值：<color:#6e94ff><input-1></color>" #m #v1
-    changed: "<gray>值已更改为：<color:#6e94ff><input-1></color>" #m #v1
+    changed: "<gray>已修改为：<color:#6e94ff><input-1></color>" #m #v1
   template:
-    help: "<gray>模板是一种强大的工具，可以更快速或自动化地创建标记。初次设置可能会稍显复杂，欢迎随时 <click:open_url:'https://discord.gg/zmkyJa3'><u>向我寻求帮助</u></click> :)\n\n- 模板有自己的自定义命令 <blue>(/id)</blue>\n- 模板需要自己的集合 <blue>(/id edit set)</blue>\n- 可以包含多个“模板”标记 <blue>(/id edit marker)</blue>\n- 可以通过特定事件自动化 <blue>(/id edit automate)</blue>"
-    help-marker: "<gray>模板标记和普通标记相似，但它们不会直接出现在地图上。可通过单一命令 <blue>(/id mark <marker-id>)</blue> 放置在地图上。\n\n- 标记会复制目标位置\n- 标签和详情支持占位符 <blue>(%NAME%)</blue>"
-    create: "<green>模板已创建！使用 <u>/<input-1> edit <...></u> 添加新模板标记、规则等内容" #m #v1
-    delete: "<red>模板 <input-1> 及其所有关联标记和集合已删除！" #m #v1
-    setArg: "<green>应用了新值 <color:#6e94ff><input-1></color>" #m #v1
-    addTemplateMarker: "<green>已将模板标记 <input-1> 添加到模板！您现在可以快速放置或自动化它。\n" #m #v1
-    removeMarkerTemplate: "<gray>已移除模板 <color:#6e94ff><input-1></color> 及所有与其关联的标记。" #m #v1
-    updateMarker: "<green>更新了模板标记 <input-1> 及所有关联标记！" #m #v1
+    help: "<gray>模板是快速或自动化创建标记的强大工具。初次设置可能较复杂，欢迎<click:open_url:'https://discord.gg/zmkyJa3'><u>联系我</u></click>寻求帮助 :)\n\n- 模板有独立命令 <blue>(/id)</blue>\n- 模板需独立集合 <blue>(/id edit set)</blue>\n- 可包含多个“模板”标记 <blue>(/id edit marker)</blue>\n- 可通过事件自动化 <blue>(/id edit automate)</blue>"
+    help-marker: "<gray>模板标记类似普通标记，但不会直接显示。可通过命令 <blue>(/id mark <marker-id>)</blue> 快速放置。\n\n- 标记会复制目标位置\n- 标签和详情支持占位符 <blue>(%NAME%)</blue>"
+    create: "<green>模板已创建！使用 <u>/<input-1> edit <...></u> 添加模板标记和规则" #m #v1
+    delete: "<red>模板 <input-1> 及其关联标记和集合已删除！" #m #v1
+    setArg: "<green>已应用新值 <color:#6e94ff><input-1></color>" #m #v1
+    addTemplateMarker: "<green>已添加模板标记 <input-1>！现在可快速放置或自动化。" #m #v1
+    removeMarkerTemplate: "<gray>已移除模板 <color:#6e94ff><input-1></color> 及其所有标记。" #m #v1
+    updateMarker: "<green>已更新模板标记 <input-1> 及其所有放置的标记！" #m #v1
     noValidTemplate: "<red><input-1> 不是此集合中的有效模板！" #m #v1
-    invalidWorld: "<red>该集合在当前世界中不可用！" #m
-    place: "<green>新标记 <input-1> 已放置！" #m #v1
-    unplace: "<red>已移除您的标记 <input-1>！" #m #v1
-    mapAlreadyAdded: "<red>地图 <input-1> 已添加到模板！" #m #v1
-    mapNotAdded: "<red>地图 <input-1> 未添加到模板！" #m #v1
-    addMap: "<green>将地图 <input-1> 添加到模板！<gray>(此操作未克隆现有标记)" #m #v1
-    confirmRemoval: "<grey>您确定要 <red>删除</red> 此模板集合吗？这将 <red>删除其中的所有标记！</red>\n\n请通过 <red><u><input-1> 确认</u></red>"
+    invalidWorld: "<red>此集合在您当前世界中不可用！" #m
+    place: "<green>已放置 <input-1> 标记！" #m #v1
+    unplace: "<red>已移除您的 <input-1> 标记！" #m #v1
+    mapAlreadyAdded: "<red>地图 <input-1> 已添加至模板！" #m #v1
+    mapNotAdded: "<red>地图 <input-1> 未添加至模板！" #m #v1
+    addMap: "<green>已添加地图 <input-1> 至模板！<grey>（未克隆现有标记）" #m #v1
+    confirmRemoval: "<grey>确认<red>删除</red>此模板集合吗？这将<red>删除所有内部标记</red>！\n\n输入 <red><u><input-1> 以确认"
+
+
+#-----------------------------------------#
+#             事件消息                     #
+# 执行命令时触发的事件相关翻译键             #
+#-----------------------------------------#
+event:
+  currentSetup: "当前设置状态（<input-1>）" #v1
+  buildHover: "应用设置并构建新标记\n红色高亮值为必填项！"
+  cancelHover: "取消当前标记构建\n这将清除所有已填内容！"
+  clickToAdd: "点击添加值"
+
+
+#-----------------------------------------#
+#            创建者消息                    #
+# 创建标记/集合时使用的翻译键               #
+#-----------------------------------------#
+arg:
+  ID: "ID"
+  MARKER_SET: "标记集合"
+  POSITION: "位置"
+  LABEL: "标签"
+  ICON: "图标"
+  ANCHOR: "锚点"
+  MAX_DISTANCE: "最大可见距离"
+  MIN_DISTANCE: "最小可见距离"
+  ADD_POSITION: "添加位置"
+  ADD_EDGE: "添加边线"
+  DETAIL: "详情"
+  LINK: "链接"
+  NEW_TAB: "新标签页打开"
+  DEPTH_TEST: "深度测试"
+  LINE_WIDTH: "线宽"
+  LINE_COLOR: "线条颜色"
+  FILL_COLOR: "填充颜色"
+  HEIGHT: "高度"
+  MAX_HEIGHT: "最大高度"
+  POINTS: "顶点数"
+  X_RADIUS: "X轴半径"
+  Z_RADIUS: "Z轴半径"
+  MAP: "地图"
+  TOGGLEABLE: "可切换"
+  DEFAULT_HIDDEN: "默认隐藏"
+  LISTED: "可列出"
+  LISTING_POSITION: "列表位置"
+
+arg-desc:
+  ID: "标记（或集合）的内部访问ID"
+  MARKER_SET: "目标标记集合（决定所属世界）"
+  POSITION: "标记的放置位置（非所属世界）"
+  LABEL: "在标记菜单中显示的标签"
+  ICON: "标记图标的图片URL（仅限POI）"
+  ANCHOR: "图标/HTML的像素偏移量"
+  MAX_DISTANCE: "标记可见的最大相机距离"
+  MIN_DISTANCE: "标记可见的最小相机距离"
+  ADD_POSITION: "为路径标记添加更多位置（仅限线型）"
+  ADD_EDGE: "为形状标记添加更多边线"
+  DETAIL: "点击标记时显示的描述"
+  LINK: "点击标记时的跳转链接"
+  NEW_TAB: "是否在新标签页打开链接"
+  DEPTH_TEST: "若关闭，标记将始终显示在最上层"
+  LINE_WIDTH: "线条/轮廓的宽度（像素）"
+  LINE_COLOR: "线条/轮廓颜色（RGBA）\n- https://htmlcolorcodes.com -"
+  FILL_COLOR: "填充区域颜色（RGBA）\n- https://htmlcolorcodes.com -"
+  HEIGHT: "标记区域的最小高度\n（形状标记的定义高度）"
+  MAX_HEIGHT: "标记区域的最大高度\n设为相同Y值可创建平面形状"
+  POINTS: "渲染圆/椭圆的顶点数量\n顶点越多边缘越平滑，但影响性能"
+  X_RADIUS: "椭圆在X轴方向的半径"
+  Z_RADIUS: "椭圆在Z轴方向的半径"
+  MAP: "目标BlueMap地图\n（非世界专属）"
+  TOGGLEABLE: "若开启，用户可切换集合的显示状态"
+  DEFAULT_HIDDEN: "若开启，集合默认隐藏\n若TOGGLEABLE关闭，此状态将强制生效"
+  LISTED: "若关闭，标记（集合）不会显示在BlueMap菜单"
+  LISTING_POSITION: "标记（集合）在BlueMap菜单中的位置\n值越大，排序越靠前"

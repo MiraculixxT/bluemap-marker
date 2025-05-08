@@ -11,6 +11,10 @@ tasks {
                 it.moduleGroup == properties["group"] as String || it.moduleGroup == "dev.jorel"
             }
         }
-        relocate("dev.jorel.commandapi", "de.miraculixx.veinminer.commandapi")
+        relocate("dev.jorel", "de.miraculixx.bmm")
+    }
+
+    assemble {
+        dependsOn(shadowJar)
     }
 }

@@ -54,7 +54,7 @@ class TemplateCommand : TemplateCommandInterface, TemplateSetLoader {
                 replaceSuggestions(ArgumentSuggestions.stringCollection { templateCommands.keys })
                 booleanArgument("confirm", true) {
                     anyExecutorAsync { sender, args ->
-                        val confirm = args.getOptional(0).getOrDefault(false) as Boolean
+                        val confirm = args.getOptional(1).getOrDefault(false) as Boolean
                         val id = args[0] as String
                         if (sender.deleteSet(id, confirm)) templateCommands.remove(id)?.unregister()
                     }

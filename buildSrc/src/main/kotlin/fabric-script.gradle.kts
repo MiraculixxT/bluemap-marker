@@ -1,4 +1,3 @@
-
 plugins {
     id("fabric-loom")
     id("io.github.dexman545.outlet")
@@ -10,7 +9,6 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://maven.terraformersmc.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 val transitiveInclude: Configuration by configurations.creating {
@@ -21,17 +19,18 @@ val transitiveInclude: Configuration by configurations.creating {
 
 dependencies {
     val gameVersion: String by properties
-    outlet.mcVersionRange = properties["fabricSupportedVersions"] as String
+    outlet.mcVersionRange = properties["fabricDependencyVersions"] as String
 
     //
     // Fabric configuration
     //
     minecraft("com.mojang", "minecraft", gameVersion)
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
-    modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
-    modImplementation(include("net.kyori", "adventure-platform-fabric", properties["adventureVersion"] as String))
-    transitiveInclude(implementation("de.miraculixx", "mc-commons", "1.0.1"))
+//    println("FabricLoader: " + outlet.loaderVersion() + ", " + outlet.fapiVersion())
+//    modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
+//    modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
+    modImplementation("net.fabricmc", "fabric-loader", "0.16.12")
+    modImplementation("net.fabricmc.fabric-api", "fabric-api", "0.119.9+1.21.5")
 
     //
     // Kotlin libraries
@@ -40,25 +39,26 @@ dependencies {
     modImplementation("net.fabricmc", "fabric-language-kotlin", flkVersion)
     implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.+")
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.+")
+//    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:6.3.0")!!)
 
     //
     // Silk configuration (optional)
     //
-    val useSilk = properties["useSilk"] as String == "true"
-    if (useSilk) {
-//        val silkVersion = outlet.latestModrinthModVersion("silk", outlet.mcVersions())
-        val silkVersion = "1.10.7"
-        modImplementation("net.silkmc", "silk-core", silkVersion)
-        modImplementation("net.silkmc", "silk-commands", silkVersion) // easy command registration
-        modImplementation("net.silkmc", "silk-nbt", silkVersion) // item simplification
-    }
+    val silkVersion = properties["silkVersion"] as String
+    println("Silk: $silkVersion")
+    modImplementation("net.silkmc", "silk-core", silkVersion)
+    modImplementation("net.silkmc", "silk-commands", silkVersion) // easy command registration
+    modImplementation("net.silkmc", "silk-nbt", silkVersion) // item simplification
+    modImplementation("net.silkmc", "silk-network", silkVersion)
+
 
     //
     // Permissions configuration (optional)
     //
     val usePermissions = properties["usePermissions"] as String == "true"
     if (usePermissions) {
-        modImplementation(include("me.lucko", "fabric-permissions-api", "0.2-SNAPSHOT"))
+        modImplementation(include("me.lucko", "fabric-permissions-api", "0.3.3"))
     }
 
     //

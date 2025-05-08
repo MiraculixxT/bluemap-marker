@@ -110,6 +110,20 @@ interface SettingsCommandInterface {
         sender.sendMessage(prefix + cmp("Conversion finished! Reloading BlueMap...", cSuccess))
     }
 
+    fun configSave(sender: Audience) {
+        MarkerManager.blueMapAPI?.let {
+            MarkerManager.save(it)
+            sender.sendMessage(prefix + cmp("Saved config data to disk"))
+        } ?: sender.sendMessage(prefix + cmp("Failed to save config data! BlueMapAPI is null", cError))
+    }
+
+    fun configLoad(sender: Audience, isFabric: Boolean) {
+        MarkerManager.blueMapAPI?.let {
+            MarkerManager.load(it, isFabric)
+            sender.sendMessage(prefix + cmp("Loaded config data from disk"))
+        } ?: sender.sendMessage(prefix + cmp("Failed to load config data! BlueMapAPI is null", cError))
+    }
+
     private fun integrateSet(set: MarkerSet, map: BlueMapMap, setID: String) {
         // Load set
         val bSet = BMarkerSet(UUID(0, 0), set.getArgs(map.id, setID))

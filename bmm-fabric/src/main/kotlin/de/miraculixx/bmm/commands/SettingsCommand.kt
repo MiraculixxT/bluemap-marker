@@ -39,6 +39,19 @@ class SettingsCommand : SettingsCommandInterface {
 
         intSetting("maxUserSets", { settings.maxUserSets }) { settings.maxUserSets = it }
         intSetting("maxUserMarker", { settings.maxUserMarker }) { settings.maxUserMarker = it }
+
+        literal("config") {
+            literal("save") {
+                runsAsync {
+                    configSave(source)
+                }
+            }
+            literal("load") {
+                runsAsync {
+                    configLoad(source, true)
+                }
+            }
+        }
     }
 
     private fun LiteralCommandBuilder<CommandSourceStack>.intSetting(name: String, get: () -> Int, set: (Int) -> Unit) = literal(name) {

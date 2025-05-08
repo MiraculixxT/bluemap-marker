@@ -12,7 +12,7 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.kotlindsl.*
 import java.io.File
 
-class SettingsCommand: SettingsCommandInterface {
+class SettingsCommand : SettingsCommandInterface {
     private val settingsCommand = commandTree(settingsCommandPrefix) {
         withPermission(manageSettings)
 
@@ -36,6 +36,19 @@ class SettingsCommand: SettingsCommandInterface {
 
         intSetting("maxUserSets", { settings.maxUserSets }) { settings.maxUserSets = it }
         intSetting("maxUserMarker", { settings.maxUserMarker }) { settings.maxUserMarker = it }
+
+        literalArgument("config") {
+            literalArgument("save") {
+                anyExecutorAsync { sender, _ ->
+                    configSave(sender)
+                }
+            }
+            literalArgument("load") {
+                anyExecutorAsync { sender, _ ->
+                    configLoad(sender, false)
+                }
+            }
+        }
     }
 
     private fun CommandTree.intSetting(name: String, get: () -> Int, set: (Int) -> Unit) = literalArgument(name) {

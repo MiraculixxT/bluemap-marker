@@ -39,8 +39,7 @@ dependencies {
     modImplementation("net.fabricmc", "fabric-language-kotlin", flkVersion)
     implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.+")
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.+")
-//    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
-    modImplementation(include("net.kyori:adventure-platform-fabric:6.3.0")!!)
+    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
 
     //
     // Silk configuration (optional)

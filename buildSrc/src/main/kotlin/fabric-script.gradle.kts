@@ -61,19 +61,12 @@ dependencies {
     }
 
     //
-    // Ingame configuration (optional)
+    // Configuration
     //
-    val useConfig = properties["useConfig"] as String == "true"
-    if (useConfig) {
-        modApi("com.terraformersmc", "modmenu", "9.+")
-        modApi("me.shedaniel.cloth", "cloth-config-fabric", "13.+") {
-            exclude("net.fabricmc.fabric-api")
-        }
-        transitiveInclude(implementation("org.yaml", "snakeyaml", "2.2"))
-    }
-
+    transitiveInclude(implementation("org.yaml", "snakeyaml", "2.2"))
 
     // Add all non-mod dependencies to the jar
+    include("de.miraculixx:mc-commons:1.0.1")
     transitiveInclude.resolvedConfiguration.resolvedArtifacts.forEach {
         include(it.moduleVersion.id.toString())
     }

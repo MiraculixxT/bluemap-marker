@@ -28,7 +28,13 @@ class BMMarker : JavaPlugin() {
         sourceFolder = dataFolder
 
         // Load Content
-        CommandAPI.onLoad(CommandAPIBukkitConfig(this).silentLogs(true))
+        CommandAPI.onLoad(
+            CommandAPIBukkitConfig(this)
+            .silentLogs(true)
+            .shouldHookPaperReload(true)
+            .beLenientForMinorVersions(true)
+        )
+
         MarkerCommand()
         SettingsCommand()
         TeleportCommand()

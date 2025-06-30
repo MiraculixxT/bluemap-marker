@@ -1,17 +1,16 @@
 
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 tasks {
     shadowJar {
         dependencies {
             include {
-                it.moduleGroup == properties["group"] as String || it.moduleGroup == "dev.jorel"
+                it.moduleGroup == properties["group"] as String
             }
         }
-        relocate("dev.jorel", "de.miraculixx.bmm")
     }
 
     assemble {

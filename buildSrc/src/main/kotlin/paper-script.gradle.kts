@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm")
     id("io.papermc.paperweight.userdev")
     id("xyz.jpenilla.run-paper")
-    id("net.minecrell.plugin-yml.bukkit")
+    id("de.eldoria.plugin-yml.paper")
     id("com.modrinth.minotaur")
 }
 
@@ -21,7 +21,7 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
-//paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 dependencies {
     paperweight.paperDevBundle("${properties["gameVersion"]}-R0.1-SNAPSHOT")
@@ -34,31 +34,34 @@ dependencies {
     // Utility libraries (optional)
     val useBrigadier = properties["useBrigadier"] as String == "true"
     if (useBrigadier) {
-        implementation("dev.jorel:commandapi-bukkit-shade:10.1.0")
-        implementation("dev.jorel:commandapi-bukkit-kotlin:10.1.0")
+        implementation(library("dev.jorel:commandapi-bukkit-shade-mojang-mapped:10.1.0")!!)
+        implementation(library("dev.jorel:commandapi-bukkit-kotlin:10.1.0")!!)
     }
 
     // MC Libraries
-    implementation("de.miraculixx:kpaper-light:1.2.1")
+    library("de.miraculixx:kpaper-light:1.2.1")
 }
 
-tasks {
-    assemble {
-        dependsOn(reobfJar)
-    }
-}
+//tasks {
+//    assemble {
+//        dependsOn(reobfJar)
+//    }
+//}
 
-bukkit {
+paper {
     main = "$group.bmm.BMMarker"
-    apiVersion = "1.16"
-    foliaSupported = foliaSupport
+    bootstrapper = "$group.bmm.BMMBootstrap"
+    loader = "$group.bmm.BMMLoader"
+    generateLibrariesJson = true
+
     name = projectName
     website = "https://mutils.net"
-    version = properties["version"] as String
-    description = properties["description"] as String
 
-    // Optionals
+    foliaSupported = true
+    apiVersion = "1.20"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    depend = listOf("BlueMap")
-    softDepend = listOf()
+
+    serverDependencies {
+        register("BlueMap")
+    }
 }

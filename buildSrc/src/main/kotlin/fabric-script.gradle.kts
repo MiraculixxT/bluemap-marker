@@ -27,9 +27,9 @@ dependencies {
     //
     minecraft("com.mojang:minecraft:$gameVersion")
     mappings(loom.officialMojangMappings())
-//    println("FabricLoader: " + outlet.loaderVersion() + ", " + outlet.fapiVersion())
-//    modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
-//    modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
+//    println("FabricLoader: " + outlet.loaderVersion() + " " + outlet.fapiVersion())
+//    modImplementation("net.fabricmc:fabric-loader:${outlet.loaderVersion()}")
+//    modImplementation("net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion()}")
     modImplementation("net.fabricmc:fabric-loader:0.17.3")
     modImplementation("net.fabricmc.fabric-api:fabric-api:0.136.0+1.21.10")
 
@@ -58,13 +58,13 @@ dependencies {
     //
     val usePermissions = properties["usePermissions"] as String == "true"
     if (usePermissions) {
-        modImplementation("me.lucko:fabric-permissions-api:0.4.0")
+        modImplementation(include("me.lucko:fabric-permissions-api:0.4.0")!!)
     }
 
     //
     // Configuration
     //
-    implementation ("org.yaml:snakeyaml:2.5")
+    transitiveInclude(implementation("org.yaml:snakeyaml:2.5")!!)
 
     // Add all non-mod dependencies to the jar
     include("de.miraculixx:mc-commons:1.0.1")

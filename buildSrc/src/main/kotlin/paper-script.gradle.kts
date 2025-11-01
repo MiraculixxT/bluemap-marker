@@ -39,7 +39,7 @@ dependencies {
     }
 
     // MC Libraries
-    library("de.miraculixx:kpaper-light:1.2.+")
+    library("de.miraculixx:kpaper-light:1.2.1")
 }
 
 //tasks {

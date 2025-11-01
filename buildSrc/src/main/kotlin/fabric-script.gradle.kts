@@ -9,6 +9,7 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://maven.terraformersmc.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.pauli.fyi/releases/")
 }
 
 val transitiveInclude: Configuration by configurations.creating {
@@ -24,21 +25,21 @@ dependencies {
     //
     // Fabric configuration
     //
-    minecraft("com.mojang", "minecraft", gameVersion)
+    minecraft("com.mojang:minecraft:$gameVersion")
     mappings(loom.officialMojangMappings())
-//    println("FabricLoader: " + outlet.loaderVersion() + ", " + outlet.fapiVersion())
-//    modImplementation("net.fabricmc", "fabric-loader", outlet.loaderVersion())
-//    modImplementation("net.fabricmc.fabric-api", "fabric-api", outlet.fapiVersion())
-    modImplementation("net.fabricmc", "fabric-loader", "0.16.12")
-    modImplementation("net.fabricmc.fabric-api", "fabric-api", "0.127.1+1.21.6")
+//    println("FabricLoader: " + outlet.loaderVersion() + " " + outlet.fapiVersion())
+//    modImplementation("net.fabricmc:fabric-loader:${outlet.loaderVersion()}")
+//    modImplementation("net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion()}")
+    modImplementation("net.fabricmc:fabric-loader:0.17.3")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.136.0+1.21.10")
 
     //
     // Kotlin libraries
     //
     val flkVersion = outlet.latestModrinthModVersion("fabric-language-kotlin", outlet.mcVersions())
-    modImplementation("net.fabricmc", "fabric-language-kotlin", flkVersion)
-    implementation("org.jetbrains.kotlinx", "kotlinx-serialization-json", "1.+")
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.+")
+    modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.+")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.+")
     modImplementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
 
     //
@@ -46,10 +47,10 @@ dependencies {
     //
     val silkVersion = properties["silkVersion"] as String
     println("Silk: $silkVersion")
-    modImplementation("net.silkmc", "silk-core", silkVersion)
-    modImplementation("net.silkmc", "silk-commands", silkVersion) // easy command registration
-    modImplementation("net.silkmc", "silk-nbt", silkVersion) // item simplification
-    modImplementation("net.silkmc", "silk-network", silkVersion)
+    modImplementation("net.silkmc:silk-core:$silkVersion")
+    modImplementation("net.silkmc:silk-commands:$silkVersion")
+    modImplementation("net.silkmc:silk-nbt:$silkVersion")
+    modImplementation("net.silkmc:silk-network:$silkVersion")
 
 
     //
@@ -57,13 +58,13 @@ dependencies {
     //
     val usePermissions = properties["usePermissions"] as String == "true"
     if (usePermissions) {
-        modImplementation(include("me.lucko", "fabric-permissions-api", "0.3.3"))
+        modImplementation(include("me.lucko:fabric-permissions-api:0.4.0")!!)
     }
 
     //
     // Configuration
     //
-    transitiveInclude(implementation("org.yaml", "snakeyaml", "2.2"))
+    transitiveInclude(implementation("org.yaml:snakeyaml:2.5")!!)
 
     // Add all non-mod dependencies to the jar
     include("de.miraculixx:mc-commons:1.0.1")

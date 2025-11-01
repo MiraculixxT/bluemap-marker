@@ -10,6 +10,7 @@ import de.miraculixx.mcommons.debug
 import de.miraculixx.mcommons.text.*
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
+import dev.jorel.commandapi.CommandAPIPaperConfig
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("unused")
@@ -29,10 +30,9 @@ class BMMarker : JavaPlugin() {
 
         // Load Content
         CommandAPI.onLoad(
-            CommandAPIBukkitConfig(this)
+            CommandAPIPaperConfig(this)
             .silentLogs(true)
-            .shouldHookPaperReload(true)
-            .beLenientForMinorVersions(true)
+            .fallbackToLatestNMS(true)
         )
 
         MarkerCommand()

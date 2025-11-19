@@ -25,7 +25,7 @@ Note, this is a 3rd party extension and not official by BlueMap in any way!
 If you have issues with entering colors, please use a generator instead of trying to enter the RGB values for your self. There are some hidden rules that has to be followed, otherwise the system will just pick an other color.
 
 ## Localization
-Change the language of BMarker via ``/bmarker langauge <key>``<br>
+Change the language of BMarker via ``/bmarker language <key>``<br>
 Currently english (en_US), german (de_DE), chinese (zh_CN), and japanese (ja_JP) are provided from installation.
 You can create your own translation by coping an existing language file (``<config-folder>/langauge/<key>.yml``),
 renaming it to your target langauge code and editing all values inside. 

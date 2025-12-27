@@ -21,6 +21,8 @@ import net.silkmc.silk.commands.command
 import de.miraculixx.bmm.commands.CommandHelper.suggestMapIDs
 import de.miraculixx.bmm.commands.CommandHelper.suggestMarkerIDs
 import de.miraculixx.bmm.commands.CommandHelper.suggestSetIDs
+import net.minecraft.server.permissions.Permission
+import net.minecraft.server.permissions.PermissionLevel
 
 @Suppress("unused")
 class MarkerCommand : MarkerCommandInstance {
@@ -521,7 +523,7 @@ class MarkerCommand : MarkerCommandInstance {
     }
 
     private fun CommandSourceStack.getData(): PlayerData {
-        val isOP = player?.permissionLevel?.let { it >= 3 } == true
+        val isOP = player?.permissions()?.hasPermission(Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS)) == true
         return PlayerData(player?.uuid, textName, isOP || Permissions.require(manageOthersMarkers).test(this), isOP || Permissions.require(manageOthersSets).test(this))
     }
 

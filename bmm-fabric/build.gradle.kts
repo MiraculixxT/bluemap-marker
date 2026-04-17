@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    implementation(include(project(":bmm-core", configuration = "namedElements"))!!)
+    implementation(include(project(":bmm-core"))!!)
 }
 
 sourceSets {

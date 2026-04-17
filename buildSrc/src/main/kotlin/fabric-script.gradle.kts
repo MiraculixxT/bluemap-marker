@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom")
+    id("net.fabricmc.fabric-loom")
     id("io.github.dexman545.outlet")
 }
 
@@ -26,31 +26,30 @@ dependencies {
     // Fabric configuration
     //
     minecraft("com.mojang:minecraft:$gameVersion")
-    mappings(loom.officialMojangMappings())
 //    println("FabricLoader: " + outlet.loaderVersion() + " " + outlet.fapiVersion())
 //    modImplementation("net.fabricmc:fabric-loader:${outlet.loaderVersion()}")
 //    modImplementation("net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion()}")
-    modImplementation("net.fabricmc:fabric-loader:0.18.4")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.140.2+1.21.11")
+    implementation("net.fabricmc:fabric-loader:0.18.4")
+    implementation("net.fabricmc.fabric-api:fabric-api:0.144.0+26.1")
 
     //
     // Kotlin libraries
     //
     val flkVersion = outlet.latestModrinthModVersion("fabric-language-kotlin", outlet.mcVersions())
-    modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
+    implementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.+")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.+")
-    modImplementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
+    implementation(include("net.kyori:adventure-platform-fabric:${properties["adventureVersion"]}")!!)
 
     //
     // Silk configuration (optional)
     //
     val silkVersion = properties["silkVersion"] as String
     println("Silk: $silkVersion")
-    modImplementation("net.silkmc:silk-core:$silkVersion")
-    modImplementation("net.silkmc:silk-commands:$silkVersion")
-    modImplementation("net.silkmc:silk-nbt:$silkVersion")
-    modImplementation("net.silkmc:silk-network:$silkVersion")
+    implementation("net.silkmc:silk-core:$silkVersion")
+    implementation("net.silkmc:silk-commands:$silkVersion")
+    implementation("net.silkmc:silk-nbt:$silkVersion")
+    implementation("net.silkmc:silk-network:$silkVersion")
 
 
     //
@@ -58,7 +57,7 @@ dependencies {
     //
     val usePermissions = properties["usePermissions"] as String == "true"
     if (usePermissions) {
-        modImplementation(include("me.lucko:fabric-permissions-api:0.6.1")!!)
+        implementation(include("me.lucko:fabric-permissions-api:0.7.0")!!)
     }
 
     //

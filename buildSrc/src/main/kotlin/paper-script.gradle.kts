@@ -24,7 +24,7 @@ repositories {
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 dependencies {
-    paperweight.paperDevBundle("${properties["gameVersion"]}-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("${properties["gameVersion"]}.build.+")
 
     // Kotlin libraries
     library(kotlin("stdlib"))

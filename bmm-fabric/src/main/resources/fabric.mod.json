@@ -35,8 +35,8 @@
     "silk-core": ">=1.10.3",
     "fabric-api": ">=0.91.3+1.20.4",
     "fabric-language-kotlin": ">=1.10.16+kotlin.1.9.21",
-    "minecraft": "~1.21",
-    "java": ">=21",
+    "minecraft": ">=26.1",
+    "java": ">=25",
     "bluemap": "*"
   },
   "suggests": {}

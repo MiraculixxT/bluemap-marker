@@ -32,10 +32,10 @@
 
   "depends": {
     "fabricloader": ">=0.15.2",
-    "silk-core": ">=1.10.3",
-    "fabric-api": ">=0.91.3+1.20.4",
+    "silk-core": ">=1.10.1",
+    "fabric-api": ">=0.83.0+1.20.1",
     "fabric-language-kotlin": ">=1.10.16+kotlin.1.9.21",
-    "minecraft": "~1.21",
+    "minecraft": "~1.20.1",
     "java": ">=21",
     "bluemap": "*"
   },

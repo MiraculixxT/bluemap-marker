@@ -60,7 +60,7 @@ interface SettingsCommandInterface {
             }.onFailure {
                 sender.sendMessage(prefix + cmp(" - Set '$setID' has an invalid json structure! Skipping it...", cError))
                 sender.sendMessage(prefix + cmp(" - Error: ${it.message}", cError))
-            }.getOrNull() ?: return
+            }.getOrNull() ?: return@forEach
 
             integrateSet(set, map, setID)
             sender.sendMessage(prefix + cmp(" - Set '$setID' converted successfully! (${set.markers.size} markers)"))
@@ -135,6 +135,7 @@ interface SettingsCommandInterface {
             bSet.markers[id] = bMarker
             bMarker.load(id, finalSet)
         }
+        MarkerManager.saveSet(map.id, setID)
     }
 
     private fun MarkerSet.getArgs(mapID: String, setID: String): MutableMap<MarkerArg, Box> {

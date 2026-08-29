@@ -10,7 +10,6 @@ import de.miraculixx.bmm.utils.serializer.Vec2iSerializer
 import de.miraculixx.bmm.utils.serializer.Vec3dSerializer
 import de.miraculixx.bmm.utils.sourceFolder
 import de.miraculixx.mcommons.debug
-import de.miraculixx.mcommons.extensions.loadConfig
 import de.miraculixx.mcommons.extensions.saveConfig
 import de.miraculixx.mcommons.serializer.UUIDSerializer
 import de.miraculixx.mcommons.text.*
@@ -18,7 +17,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import java.io.File
-import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -66,7 +64,6 @@ object MarkerManager {
 
     fun load(api: BlueMapAPI, isFabric: Boolean) {
         blueMapAPI = api
-        val invalidUUID = UUID(1,0)
 
         api.maps.forEach { map -> blueMapMaps[map.id] = mutableMapOf() }
         if (debug) consoleAudience.sendMessage(prefix + cmp("Loading marker data for maps ${blueMapMaps.keys}..."))
@@ -88,11 +85,8 @@ object MarkerManager {
                     return@sets
                 }
                 if (debug) consoleAudience.sendMessage(prefix + cmp("   - Load set '$setID'..."))
-                val set = setFile.loadConfig(BMarkerSet(invalidUUID), markerJson).takeUnless { it.owner == invalidUUID }
-                if (set == null) {
-                    sendError("Marker set file for set '$setID' in map '$mapID' is invalid! Skipping it...")
-                    return@forEach
-                }
+                val set = readSafe<BMarkerSet>(setFile) { sendError("Marker set file for set '$setID' in map '$mapID' is invalid ($it)! Skipping it...") }
+                if (set == null) return@sets
                 set.load(setID, map)
                 if (debug) consoleAudience.sendMessage(prefix + cmp("   - Loaded set '$setID'!"))
             }
@@ -107,18 +101,80 @@ object MarkerManager {
         // Load template sets
         if (debug) println("[BMM] Loading template data...")
         folderTemplateSets.listFiles()?.forEach { file ->
-            if (file.extension != "json") return
+            if (file.extension != "json") return@forEach
             if (debug) println("[BMM]   - Load template '${file.nameWithoutExtension}'...")
-            val template = file.loadConfig(TemplateSet("", markerSetID = ""), markerJson)
-            if (template.name.isEmpty()) {
-                if (api == null) println("[BMM-Warn] Template file '${file.name}' is invalid! Skipping it...")
-                else sendError("Template file '${file.name}' is invalid! Skipping it...")
+            val warn: (String) -> Unit = { info ->
+                if (api == null) println("[BMM-Warn] $info")
+                else sendError(info)
+            }
+            val template = readSafe<TemplateSet>(file) { warn("Template file '${file.name}' is invalid ($it)! Skipping it...") }
+            if (template == null || template.name.isEmpty()) {
+                if (template != null) warn("Template file '${file.name}' has no name! Skipping it...")
                 return@forEach
             }
             api?.let { template.load(it) } ?: if (debug) println("[BMM]  - Loading pre api...") else Unit
             templateLoader?.loadTemplate(template)
             if (debug) println("[BMM]  - Loaded template '${template.name}'!")
         }
+    }
+
+    /**
+     * Marker sets owned by a template set. Those are fully managed by their template and must not be
+     * touched by the normal marker commands.
+     */
+    fun isTemplateSet(setID: String) = templateSets.values.any { it.markerSetID == setID }
+
+    /**
+     * Look up a set for the normal marker commands. Template owned sets are treated as non existing.
+     */
+    fun getSet(mapID: String?, setID: String?): BMarkerSet? {
+        if (mapID == null || setID == null || isTemplateSet(setID)) return null
+        return blueMapMaps[mapID]?.get(setID)
+    }
+
+    /**
+     * All sets of a map that the normal marker commands may use.
+     */
+    fun getSets(mapID: String?): Map<String, BMarkerSet> {
+        return blueMapMaps[mapID]?.filterKeys { !isTemplateSet(it) } ?: emptyMap()
+    }
+
+    /**
+     * Read a config file without ever destroying it.
+     * A file that cannot be parsed is copied into the backup folder and skipped.
+     */
+    private inline fun <reified T> readSafe(file: File, onError: (String) -> Unit): T? {
+        return runCatching { markerJson.decodeFromString<T>(file.readText()) }.getOrElse { exception ->
+            runCatching { file.copyTo(File(backupFolder, "${file.parentFile.name}/${file.name}"), true) }
+            onError(exception.message ?: exception.javaClass.simpleName)
+            null
+        }
+    }
+
+    /**
+     * Write a single marker set to disk. Used to persist every change immediately.
+     */
+    fun saveSet(mapID: String, setID: String) {
+        val set = blueMapMaps[mapID]?.get(setID) ?: return
+        File(folderSets, mapID).mkdirs()
+        File(folderSets, "$mapID/$setID.json").saveConfig(set, markerJson)
+    }
+
+    /**
+     * Write a single template set to disk. Used to persist every change immediately.
+     */
+    fun saveTemplate(templateName: String) {
+        val template = templateSets[templateName] ?: return
+        folderTemplateSets.mkdirs()
+        File(folderTemplateSets, "$templateName.json").saveConfig(template, markerJson)
+    }
+
+    fun deleteSetFile(mapID: String, setID: String) {
+        File(folderSets, "$mapID/$setID.json").delete()
+    }
+
+    fun deleteTemplateFile(templateName: String) {
+        File(folderTemplateSets, "$templateName.json").delete()
     }
 
     fun save(api: BlueMapAPI) {
@@ -150,10 +206,13 @@ object MarkerManager {
      */
     fun removeSet(mapID: String, setID: String): Boolean {
         templateSets.filter { it.value.markerSetID == setID }.forEach { (_, data) ->
-            data.removeMap(mapID, blueMapAPI!!.getMap(mapID).getOrNull())
+            data.removeMap(mapID, blueMapAPI?.getMap(mapID)?.getOrNull())
+            saveTemplate(data.name)
         }
         blueMapAPI?.getMap(mapID)?.getOrNull()?.markerSets?.remove(setID)
-        return blueMapMaps[mapID]?.remove(setID) != null
+        val removed = blueMapMaps[mapID]?.remove(setID) != null
+        if (removed) deleteSetFile(mapID, setID)
+        return removed
     }
 
 

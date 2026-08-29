@@ -17,7 +17,7 @@ import kotlin.jvm.optionals.getOrNull
 /**
  * @param name name of the template and command -> `/<name> <subcommand>`
  * @param maxMarkerPerPlayer -1 means unlimited
- * @param neededPermission null means no permission needed to use command
+ * @param needPermission null means no permission needed to use command
  * @param maps all maps where this template is available. Markers will only be placed in maps associated with the world
  */
 @Serializable
@@ -76,14 +76,16 @@ data class TemplateSet(
     fun addMap(mapID: String, map: BlueMapMap) {
         maps.add(mapID)
         // Get already loaded set or copy template-set and load it
-        blueMapSets[mapID] = MarkerManager.blueMapMaps[mapID]?.get(mapID)?.blueMapMarkerSet
-            ?: BMarkerSet(UUID(0, 0), templateSet).load(markerSetID, map)
+        blueMapSets[mapID] = MarkerManager.blueMapMaps[mapID]?.get(markerSetID)?.blueMapMarkerSet
+            ?: BMarkerSet(UUID(0, 0), templateSet.toMutableMap()).load(markerSetID, map)
     }
 
     fun removeMap(mapID: String, map: BlueMapMap?) {
         map?.markerSets?.remove(markerSetID)
         blueMapSets.remove(mapID)
         maps.remove(mapID)
+        MarkerManager.blueMapMaps[mapID]?.remove(markerSetID)
+        MarkerManager.deleteSetFile(mapID, markerSetID)
         buildSet {
             playerMarkers.forEach { (_, data) ->
                 if (data.placedMaps.remove(mapID) && data.placedMaps.isEmpty()) add(data.id)
@@ -94,8 +96,12 @@ data class TemplateSet(
     fun remove() {
         MarkerManager.templateSets.remove(name)
         maps.forEach { map ->
+            MarkerManager.blueMapAPI?.getMap(map)?.getOrNull()?.markerSets?.remove(markerSetID)
             MarkerManager.blueMapMaps[map]?.remove(markerSetID)
+            MarkerManager.deleteSetFile(map, markerSetID)
         }
+        blueMapSets.clear()
+        MarkerManager.deleteTemplateFile(name)
     }
 }
 

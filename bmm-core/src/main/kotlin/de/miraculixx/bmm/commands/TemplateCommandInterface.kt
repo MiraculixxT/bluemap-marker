@@ -35,6 +35,8 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         val set = TemplateSet(name, needPermission = needsPermission, maps = maps)
         MarkerManager.blueMapAPI?.let { set.load(it) }
         MarkerManager.templateSets[name] = set
+        MarkerManager.saveTemplate(name)
+        maps.forEach { MarkerManager.saveSet(it, set.markerSetID) }
         sendMessage(prefix + locale.msg("command.template.create", listOf(name)))
         return set
     }
@@ -69,7 +71,9 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
             MarkerManager.blueMapMaps[map]?.get(set.markerSetID)?.getEditor()?.apply {
                 setArg(arg, value)
             }?.apply()
+            MarkerManager.saveSet(map, set.markerSetID)
         }
+        MarkerManager.saveTemplate(set.name)
 
         sendMessage(prefix + locale.msg("command.template.setArg", listOf(value.stringify())))
     }
@@ -112,6 +116,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
             }
         }
         set.templateMarker.remove(templateMarkerID) // remove template
+        MarkerManager.saveTemplate(set.name)
         sendMessage(prefix + locale.msg("command.template.removeMarkerTemplate", listOf(templateMarkerID)))
     }
 
@@ -131,6 +136,8 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         }
 
         set.addMap(mapID, map)
+        MarkerManager.saveTemplate(set.name)
+        MarkerManager.saveSet(mapID, set.markerSetID)
         sendMessage(prefix + locale.msg("command.template.addMap", listOf(mapID)))
     }
 
@@ -146,6 +153,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         }
 
         set.removeMap(mapID, map)
+        MarkerManager.saveTemplate(set.name)
         sendMessage(prefix + locale.msg("command.template.removeMap", listOf(mapID)))
     }
 
@@ -172,6 +180,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         entry.placedMaps.addAll(maps)
         set.playerMarkers[entry.id] = entry
         set.placeMarker(entry, templateMarker)
+        MarkerManager.saveTemplate(set.name)
         soundEnable()
         sendMessage(prefix + locale.msg("command.template.place", listOf(entry.templateName)))
     }
@@ -193,6 +202,7 @@ interface TemplateCommandInterface : MarkerBuilderInstance {
         // Clean up
         set.unplaceMarker(entry)
         set.playerMarkers.remove(entry.id)
+        MarkerManager.saveTemplate(set.name)
         soundDisable()
         sendMessage(prefix + locale.msg("command.template.unplace", listOf(entry.templateName)))
     }

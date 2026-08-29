@@ -60,7 +60,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
 
         // Check permissions
         if (pData?.permSetOther != true) {
-            val set = MarkerManager.blueMapMaps[mapID]?.get(setID)
+            val set = MarkerManager.getSet(mapID, setID)
             if (set?.owner != pData?.uuid) {
                 sender.sendMessage(prefix + locale.msg("command.notYourSet"))
                 return
@@ -100,8 +100,8 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
 
         // Check permissions
         if (pData?.permSetOther != true) {
-            val map = MarkerManager.blueMapMaps[mapID]
-            if (map != null && settings.maxUserSets >= 0 && map.count { it.value.owner == pData?.uuid } >= settings.maxUserSets) {
+            val map = MarkerManager.getSets(mapID)
+            if (settings.maxUserSets >= 0 && map.count { it.value.owner == pData?.uuid } >= settings.maxUserSets) {
                 sender.sendMessage(prefix + locale.msg("command.maxSets", listOf(settings.maxUserSets.toString())))
                 return
             }
@@ -131,14 +131,15 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
         }
 
         // Check permissions
-        val set = MarkerManager.blueMapMaps[mapID]?.get(setID)
+        val set = MarkerManager.getSet(mapID, setID)
         if (pData?.permMarkerOther != true && pData?.uuid != set?.owner) {
             sender.sendMessage(prefix + locale.msg("command.notYourMarker"))
             return
         }
 
         // Logic
-        if (MarkerManager.blueMapMaps[mapID]?.get(setID)?.removeMarker(markerID) == true) {
+        if (set?.removeMarker(markerID) == true) {
+            if (mapID != null && setID != null) MarkerManager.saveSet(mapID, setID)
             sender.sendMessage(prefix + locale.msg("command.deleteMarker", listOf(markerID)))
         } else sender.sendMessage(prefix + locale.msg("command.notValidMarker", listOf(markerID)))
     }
@@ -165,13 +166,13 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
         }
 
         // Check permissions
-        if (pData?.permSetOther != true && MarkerManager.blueMapMaps[mapID]?.get(setID)?.owner != pData?.uuid) {
+        if (pData?.permSetOther != true && MarkerManager.getSet(mapID, setID)?.owner != pData?.uuid) {
             sender.sendMessage(prefix + locale.msg("command.notYourSet"))
             return
         }
 
         // Logic
-        if (MarkerManager.removeSet(mapID, setID)) {
+        if (!MarkerManager.isTemplateSet(setID) && MarkerManager.removeSet(mapID, setID)) {
             sender.sendMessage(prefix + locale.msg("command.deleteSet", listOf(setID)))
         } else sender.sendMessage(prefix + cmp("This marker-set does not exist or BlueMap is not loaded!", cError))
     }
@@ -216,6 +217,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
                 sender.sendMessage(cmp("\n") + prefix + locale.msg("command.template.addTemplateMarker", listOf(markerID)))
             }
             builder.remove(id)
+            MarkerManager.saveTemplate(it.name)
             return
         }
 
@@ -230,7 +232,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             sender.sendMessage(prefix + locale.msg("command.mustAlphanumeric"))
             return
         }
-        val set = MarkerManager.blueMapMaps[mapID]?.get(setID)
+        val set = MarkerManager.getSet(mapID, setID)
         if (set == null) {
             sender.sendMessage(prefix + locale.msg("command.setNotFound", listOf("$mapID/$setID", mainCommandPrefix)))
             return
@@ -250,6 +252,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
         // Add/edit marker
         if (!build.isEdit) set.addMarker(uuid ?: UUID(0, 0), build, markerID)
         builder.remove(id)
+        MarkerManager.saveSet(mapID, setID)
         sender.sendMessage(prefix + locale.msg("command.createdMarker"))
     }
 
@@ -285,6 +288,10 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             sender.sendMessage(prefix + locale.msg("command.idAlreadyExist", listOf(setID)))
             return
         }
+        if (build.isEdit && MarkerManager.getSet(mapID, setID) == null) {
+            sender.sendMessage(prefix + locale.msg("command.setNotFound", listOf("$mapID/$setID", mainCommandPrefix)))
+            return
+        }
 
         // Create/edit marker set
         if (build.isEdit) {
@@ -297,6 +304,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
 
         // Send feedback
         builderSet.remove(id)
+        MarkerManager.saveSet(mapID, setID)
         sender.sendMessage(
             prefix + locale.msg("command.createdSet") + cmp("/$mainCommandPrefix create", cMark, underlined = true)
                         .addSuggest("/$mainCommandPrefix create ")
@@ -328,7 +336,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             manageMarkerSelection(sender, worlds ?: emptyList(), "$mainCommandPrefix edit", mapID, setID, pData)
             return
         }
-        val marker = MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.get(markerID)
+        val marker = MarkerManager.getSet(mapID, setID)?.markers?.get(markerID)
         if (marker == null) {
             sender.sendMessage(prefix + locale.msg("command.mustProvideID"))
             return
@@ -364,7 +372,7 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
             sendSetSelection(sender, mapID, "$mainCommandPrefix set-edit $mapID", pData = pData!!)
             return
         }
-        val set = MarkerManager.blueMapMaps[mapID]?.get(setID)
+        val set = MarkerManager.getSet(mapID, setID)
         if (set == null) {
             sender.sendMessage(prefix + locale.msg("command.mustProvideIDSet"))
             return
@@ -474,8 +482,8 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
     }
 
     private fun sendSetSelection(sender: Audience, mapID: String, command: String, suggest: Boolean = false, pData: PlayerData) {
-        val sets = MarkerManager.blueMapMaps[mapID]?.filter { pData.permSetOther || it.value.owner == pData.uuid }
-        if (sets.isNullOrEmpty()) {
+        val sets = MarkerManager.getSets(mapID).filter { pData.permSetOther || it.value.owner == pData.uuid }
+        if (sets.isEmpty()) {
             sender.sendMessage(prefix + locale.msg("command.noSets", listOf(mapID, mainCommandPrefix)))
             return
         }

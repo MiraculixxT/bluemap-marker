@@ -542,7 +542,7 @@ class MarkerCommand : MarkerCommandInstance {
             val allowOthers = info.sender.hasPermission(manageOthersSets)
             set?.forEach { (setID, data) ->
                 if (data.owner != uuid && !allowOthers) return@forEach
-                if (setID.startsWith("template_")) return@forEach // Exclude template sets from indexing
+                if (MarkerManager.isTemplateSet(setID)) return@forEach // Exclude template sets, they are managed by their template
                 val mapName = api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown"
                 builder.suggest(setID, AdventureComponent(cmp("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown"}", cMark)))
             }
@@ -556,7 +556,7 @@ class MarkerCommand : MarkerCommandInstance {
             val setID = info.previousArgs[1].toString()
             val uuid = info.sender.getUUID()
             val allowOthers = info.sender.hasPermission(manageOthersMarkers)
-            MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.forEach { (id, data) ->
+            MarkerManager.getSet(mapID, setID)?.markers?.forEach { (id, data) ->
                 if (data.owner != uuid && !allowOthers) return@forEach
                 builder.suggest(id, AdventureComponent(cmp(data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown", cMark)))
             }

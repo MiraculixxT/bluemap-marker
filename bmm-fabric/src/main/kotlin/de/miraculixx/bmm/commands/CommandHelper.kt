@@ -32,7 +32,7 @@ object CommandHelper {
             val allowOthers = Permissions.require(manageOwnSets, 3).test(info.source)
             set?.mapNotNull { (setID, data) ->
                 if (data.owner != uuid && !allowOthers) return@mapNotNull null
-                if (setID.startsWith("template_")) return@mapNotNull null // Exclude template sets from indexing
+                if (MarkerManager.isTemplateSet(setID)) return@mapNotNull null // Exclude template sets, they are managed by their template
                 val mapName = api?.getMap(mapID)?.getOrNull()?.name ?: "Unknown"
                 setID to literalText("Map: $mapName, Set: ${data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown"}")
             }
@@ -45,7 +45,7 @@ object CommandHelper {
             val setID = info.getArgument(setIDArgument, String::class.java)
             val uuid = info.source.player?.uuid
             val allowOthers = Permissions.require(manageOwnMarkers, 2).test(info.source)
-            MarkerManager.blueMapMaps[mapID]?.get(setID)?.markers?.mapNotNull { (id, data) ->
+            MarkerManager.getSet(mapID, setID)?.markers?.mapNotNull { (id, data) ->
                 if (data.owner != uuid && !allowOthers) return@mapNotNull null
                 id to literalText(data.attributes[MarkerArg.LABEL]?.getString() ?: "Unknown")
             }

@@ -93,8 +93,9 @@ object MarkerManager {
             if (map == null) file.deleteRecursively()
         }
 
-        // Load template sets
-        if (!isFabric) loadTemplates(api)
+        // Load template sets. Fabric already read them at mod init, because its commands have to exist
+        // before the server starts, only their markers still need to be placed onto the maps.
+        if (isFabric) loadTemplateMarkers(api) else loadTemplates(api)
     }
 
     fun loadTemplates(api: BlueMapAPI?) {
@@ -112,10 +113,24 @@ object MarkerManager {
                 if (template != null) warn("Template file '${file.name}' has no name! Skipping it...")
                 return@forEach
             }
+            val known = templateSets[template.name]
+            if (known != null) { // Already loaded (BlueMap reload) - only place it again, never register twice
+                api?.let { known.load(it) }
+                return@forEach
+            }
+            templateSets[template.name] = template
             api?.let { template.load(it) } ?: if (debug) println("[BMM]  - Loading pre api...") else Unit
             templateLoader?.loadTemplate(template)
             if (debug) println("[BMM]  - Loaded template '${template.name}'!")
         }
+    }
+
+    /**
+     * Place all known template sets onto the BlueMap maps.
+     * Used when the templates were already read from disk before the BlueMap API was available.
+     */
+    fun loadTemplateMarkers(api: BlueMapAPI) {
+        templateSets.values.toList().forEach { it.load(api) }
     }
 
     /**

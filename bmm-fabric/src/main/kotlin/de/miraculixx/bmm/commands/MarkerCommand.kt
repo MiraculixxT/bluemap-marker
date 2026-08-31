@@ -10,6 +10,7 @@ import de.miraculixx.bmm.utils.data.*
 import de.miraculixx.bmm.utils.enums.MarkerArg
 import de.miraculixx.mcommons.extensions.round
 import me.lucko.fabric.api.permissions.v0.Permissions
+import net.kyori.adventure.audience.Audience
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.coordinates.Coordinates
@@ -162,6 +163,16 @@ class MarkerCommand : MarkerCommandInstance {
                         editSet(source, source.textName, map(), id(), null, source.getData())
                     }
                 }
+            }
+        }
+
+        // /marker reload
+        literal("reload") {
+            requires {
+                Permissions.require(manageSettings, 3).test(it)
+            }
+            runsAsync {
+                reload(source) { name -> source.server.playerList.getPlayerByName(name) as? Audience }
             }
         }
     }

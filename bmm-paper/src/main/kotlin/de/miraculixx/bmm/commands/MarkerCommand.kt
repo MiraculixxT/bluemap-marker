@@ -21,6 +21,7 @@ import dev.jorel.commandapi.arguments.LocationType
 import dev.jorel.commandapi.kotlindsl.*
 import dev.jorel.commandapi.wrappers.Location2D
 import io.papermc.paper.adventure.AdventureComponent
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -162,6 +163,14 @@ class MarkerCommand : MarkerCommandInstance {
                         editSet(sender, sender.name, args[0].toString(), args[1].toString(), null, sender.getData())
                     }
                 }
+            }
+        }
+
+        // /marker reload
+        literalArgument("reload") {
+            withPermission(manageSettings)
+            anyExecutor { sender, _ ->
+                reload(sender) { name -> Bukkit.getPlayerExact(name) }
             }
         }
     }

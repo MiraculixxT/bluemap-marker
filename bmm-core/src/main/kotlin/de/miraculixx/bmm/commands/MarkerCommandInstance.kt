@@ -395,6 +395,25 @@ interface MarkerCommandInstance: MarkerBuilderInstance {
     }
 
     /**
+     * Reload all markers and marker-sets from disk. Templates are not affected.
+     * All running setups are canceled
+     */
+    fun reload(sender: Audience, resolveAudience: (String) -> Audience?) {
+        if (MarkerManager.blueMapAPI == null) {
+            sender.sendMessage(prefix + cmp("Failed to connect to BlueMap!", cError))
+            return
+        }
+
+        val canceled = builder.keys + builderSet.keys
+        builder.clear()
+        builderSet.clear()
+
+        val amount = MarkerManager.reloadSets() ?: return
+        canceled.forEach { id -> resolveAudience(id)?.sendMessage(prefix + locale.msg("command.reloadCanceledSetup")) }
+        sender.sendMessage(prefix + locale.msg("command.reload", listOf(amount.toString())))
+    }
+
+    /**
      * Toggle the visibility of a player marker
      */
     fun setPlayerVisibility(sender: Audience, targets: List<Pair<UUID, String>>, visible: Boolean) {

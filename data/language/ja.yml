@@ -50,6 +50,8 @@ command:
   canceledSetup: "<grey>現在のマーカー <input-1> の設定をキャンセルしました！" #m #v1
   notValidPlayer: "<red>プレイヤーが見つかりませんでした！" #m
   changedVisibility: "<grey>BlueMapの <color:#6e94ff><input-1></color> を <input-2> に変更しました" #m #v2
+  reload: "<green><input-1> 個のマーカーセットを再読み込みしました！保存されていない変更は失われます" #m #v1
+  reloadCanceledSetup: "<red>再読み込みにより、実行中のマーカー設定がキャンセルされました！" #m
 
 
 #-----------------------------------------#

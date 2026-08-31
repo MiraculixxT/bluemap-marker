@@ -59,6 +59,8 @@ command:
   maxSets: "<red>您在此地图中的集合数量已达上限！(<input-1>)" #m #v1
   notTeleportMarker: "<red>此标记未启用传送功能！" #m
   teleportMarker: "<green>已传送至标记 <u><input-1></u>！" #m #v1
+  reload: "<green>已从磁盘重新加载 <input-1> 个标记集合！所有未保存的更改都已丢失" #m #v1
+  reloadCanceledSetup: "<red>您正在进行的标记设置已被重新加载取消！" #m
   settings:
     current: "<gray>当前值：<color:#6e94ff><input-1></color>" #m #v1
     changed: "<gray>已修改为：<color:#6e94ff><input-1></color>" #m #v1

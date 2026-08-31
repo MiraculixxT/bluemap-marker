@@ -50,6 +50,8 @@ command:
   canceledSetup: "<grey>Aktuelles Marker<input-1> setup abgebrochen!" #m #v1
   notValidPlayer: "<red>Konnte den angegebenen Spieler nicht finden!" #m
   changedVisibility: "<grey><color:#6e94ff><input-1></color> ist jetzt <input-2> auf deiner BlueMap" #m #v2
+  reload: "<green><input-1> Marker-Sets neu geladen! Alle ungespeicherten Änderungen sind verloren" #m #v1
+  reloadCanceledSetup: "<red>Dein laufendes Marker Setup wurde durch einen Reload abgebrochen!" #m
 
 
 

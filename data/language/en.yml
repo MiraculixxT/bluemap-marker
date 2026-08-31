@@ -61,6 +61,8 @@ command:
   maxSets: "<red>You reached your maximum amount of marker-sets in this map! (<input-1>)" #m #v1
   notTeleportMarker: "<red>This marker is not setup to be teleportable!" #m
   teleportMarker: "<green>Teleported to the marker <u><input-1></u>!" #m #v1
+  reload: "<green>Reloaded <input-1> marker-sets from disk! All unsaved changes are gone" #m #v1
+  reloadCanceledSetup: "<red>Your running marker setup was canceled by a reload!" #m
   settings:
     current: "<gray>Current value: <color:#6e94ff><input-1></color>" #m #v1
     changed: "<gray>Changed value to: <color:#6e94ff><input-1></color>" #m #v1

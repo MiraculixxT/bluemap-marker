@@ -66,8 +66,19 @@ object MarkerManager {
         blueMapAPI = api
 
         api.maps.forEach { map -> blueMapMaps[map.id] = mutableMapOf() }
+        loadSets(api, false)
+
+        // Load template sets. Fabric already read them at mod init, because its commands have to exist
+        // before the server starts, only their markers still need to be placed onto the maps.
+        if (isFabric) loadTemplateMarkers(api) else loadTemplates(api)
+    }
+
+    /**
+     * Read all marker sets from disk and place them onto their maps.
+     * @param skipTemplateSets template owned sets are already placed and must not be replaced by their set file
+     */
+    private fun loadSets(api: BlueMapAPI, skipTemplateSets: Boolean) {
         if (debug) consoleAudience.sendMessage(prefix + cmp("Loading marker data for maps ${blueMapMaps.keys}..."))
-        // Load normal sets
         folderSets.listFiles()?.forEach { file -> // List all world folders
             if (!file.isDirectory) return@forEach
             if (debug) consoleAudience.sendMessage(prefix + cmp(" - Load map '${file.name}'..."))
@@ -79,6 +90,7 @@ object MarkerManager {
                 // Load set
                 if (setFile.extension != "json") return@sets
                 val setID = setFile.nameWithoutExtension
+                if (skipTemplateSets && isTemplateSet(setID)) return@sets
                 if (map == null) { // Recover sets that were saved by name instead by ID
                     sendError("   - Cannot find map '$mapID'! Trying to fix '$setID'...")
                     recoverSetByName(mapID, setID, setFile, api)
@@ -92,10 +104,28 @@ object MarkerManager {
             }
             if (map == null) file.deleteRecursively()
         }
+    }
 
-        // Load template sets. Fabric already read them at mod init, because its commands have to exist
-        // before the server starts, only their markers still need to be placed onto the maps.
-        if (isFabric) loadTemplateMarkers(api) else loadTemplates(api)
+    /**
+     * Drop all marker sets from memory and read them again from disk, overriding all unsaved changes.
+     * Template sets and their markers are not touched.
+     * @return amount of loaded sets or null if BlueMap is not connected
+     */
+    fun reloadSets(): Int? {
+        val api = blueMapAPI ?: return null
+
+        // Unload all current sets
+        blueMapMaps.forEach { (mapID, sets) ->
+            val map = api.getMap(mapID).getOrNull()
+            sets.keys.filter { !isTemplateSet(it) }.forEach { setID ->
+                map?.markerSets?.remove(setID)
+                sets.remove(setID)
+            }
+        }
+        api.maps.forEach { map -> blueMapMaps.putIfAbsent(map.id, mutableMapOf()) }
+
+        loadSets(api, true)
+        return blueMapMaps.values.sumOf { sets -> sets.count { !isTemplateSet(it.key) } }
     }
 
     fun loadTemplates(api: BlueMapAPI?) {

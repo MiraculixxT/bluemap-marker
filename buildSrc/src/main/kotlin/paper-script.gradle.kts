@@ -17,8 +17,9 @@ val projectName = properties["projectName"] as String
 repositories {
     mavenCentral()
 //    mavenLocal()
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
 
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
@@ -34,12 +35,12 @@ dependencies {
     // Utility libraries (optional)
     val useBrigadier = properties["useBrigadier"] as String == "true"
     if (useBrigadier) {
-        implementation(library("dev.jorel:commandapi-paper-shade:11.2.0")!!)
-        implementation(library("dev.jorel:commandapi-kotlin-paper:11.2.0")!!)
+        implementation(library("dev.jorel:commandapi-paper-shade:12.0.1-SNAPSHOT")!!)
+        implementation(library("dev.jorel:commandapi-kotlin-paper:12.0.1-SNAPSHOT")!!)
     }
 
     // MC Libraries
-    library("de.miraculixx:kpaper-light:1.2.1")
+    library("de.miraculixx:kpaper-light:1.2.2")
 }
 
 //tasks {

@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation("org.yaml:snakeyaml:2.5")
-    implementation("de.bluecolored:bluemap-api:2.7.6")
+    implementation("de.bluecolored:bluemap-api:2.8.1")
     implementation("de.miraculixx:mc-commons:1.0.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.+")

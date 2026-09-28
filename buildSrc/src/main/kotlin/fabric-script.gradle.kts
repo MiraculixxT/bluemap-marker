@@ -29,8 +29,8 @@ dependencies {
 //    println("FabricLoader: " + outlet.loaderVersion() + " " + outlet.fapiVersion())
 //    modImplementation("net.fabricmc:fabric-loader:${outlet.loaderVersion()}")
 //    modImplementation("net.fabricmc.fabric-api:fabric-api:${outlet.fapiVersion()}")
-    implementation("net.fabricmc:fabric-loader:0.19.3")
-    implementation("net.fabricmc.fabric-api:fabric-api:0.154.2+26.2")
+    implementation("net.fabricmc:fabric-loader:0.19.5")
+    implementation("net.fabricmc.fabric-api:fabric-api:0.161.0+26.3")
 
     //
     // Kotlin libraries
